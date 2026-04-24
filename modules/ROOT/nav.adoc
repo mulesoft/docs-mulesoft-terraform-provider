@@ -1,0 +1,2 @@
+.Anypoint Terraform Provider
+* xref:index.adoc[anypoint-terraform-provider]
