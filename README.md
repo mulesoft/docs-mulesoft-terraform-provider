@@ -1,10 +1,9 @@
-# README
+# Contributions Welcome
 
-A repo containing all the basic file templates for a docs-only project at Salesforce.
+Before creating a pull request review the following:
 
-## Usage
+* [LICENSE.txt](./LICENSE.txt)
+* [SECURITY.adoc](./SECURITY.adoc)
+* [CODE_OF_CONDUCT.adoc](./CODE_OF_CONDUCT.adoc)
 
-It's required that all files must be placed at the top level of your repository.
-
-> **NOTE** Your README should contain detailed, useful information about the project!
-
+When you submit your pull request, you are asked to sign a contributor license agreement (CLA) if we don't have one on file for you.
