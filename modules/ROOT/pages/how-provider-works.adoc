@@ -1,0 +1,73 @@
+= How the Provider Works
+
+The MuleSoft Anypoint Terraform provider manages Anypoint Platform resources using a declarative Infrastructure as Code (IaC) model.
+
+The following concepts explain how the provider provisions and manages resources across Anypoint Platform.
+
+== Declarative Configuration
+
+With Terraform, you define the desired state of your Anypoint Platform resources in Terraform configuration files.
+
+Terraform compares the desired state with the current platform configuration and applies the required changes to reconcile both states.
+
+This approach helps maintain consistency across environments and supports version-controlled infrastructure management.
+
+== Control Plane and Runtime Plane
+
+The provider manages resources across both the control plane and the runtime plane.
+
+The control plane includes resources such as:
+
+* API Manager
+* Access Management
+* Secrets Manager
+* MCP server and AI agent resources
+* Policies and governance configuration
+
+The runtime plane includes deployment and infrastructure resources such as:
+
+* CloudHub 2.0 private spaces
+* Managed Flex Gateway resources
+* Network configuration
+* VPN connections
+* TLS contexts
+
+This separation enables you to manage APIs, gateways, policies, and infrastructure resources independently from application implementations.
+
+== Resource Management
+
+The provider manages resources declaratively through Terraform configuration files.
+
+When you apply a Terraform configuration:
+
+* Resources defined in the configuration are created or updated.
+* Resources removed from the configuration can be removed from the platform during reconciliation.
+* Changes made outside Terraform can be overwritten during future Terraform runs, depending on the resource behavior.
+
+== API, MCP, and AI Agent Resources
+
+The provider supports multiple resource types across Anypoint Platform.
+
+Supported resources include:
+
+* API Manager resources
+* MCP server resources
+* AI agent resources
+* API, MCP, and A2A policies
+* CloudHub 2.0 infrastructure resources
+* Access Management resources
+* Secrets Manager resources
+
+These resources can be managed together as part of a unified Terraform workflow.
+
+== Multi-Environment Configuration
+
+Terraform enables consistent configuration across environments such as development, staging, and production.
+
+You can reuse Terraform configurations across environments while reducing manual configuration drift and maintaining consistent platform configuration.
+
+== See Also
+
+* xref:index.adoc[]
+* xref:install-configure.adoc[]
+* xref:resources.adoc[]

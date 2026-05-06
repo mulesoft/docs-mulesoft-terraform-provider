@@ -1,0 +1,71 @@
+= Resources
+
+The MuleSoft Anypoint Terraform provider includes resources for managing infrastructure, API management, security, governance, and AI-related components across Anypoint Platform.
+
+== CloudHub 2.0 Resources
+
+Use these resources to manage CloudHub 2.0 infrastructure and networking components.
+
+* `anypoint_private_space_config`
+* `anypoint_private_space_association`
+* `anypoint_private_space_connection`
+* `anypoint_private_space_upgrade`
+* `anypoint_privatespace_advanced_config`
+* `anypoint_tls_context`
+* `anypoint_vpn_connection`
+
+== Managed Flex Gateway Resources
+
+Use these resources to manage managed Flex Gateway instances in CloudHub 2.0.
+
+* `anypoint_managed_flexgateway`
+
+== Access Management Resources
+
+Use these resources to manage Access Management configuration.
+
+* `anypoint_connected_app`
+* `anypoint_connected_app_scopes`
+* `anypoint_environment`
+* `anypoint_organization`
+* `anypoint_team`
+
+== Secrets Manager Resources
+
+Use these resources to manage Secrets Manager configuration.
+
+* `anypoint_flex_tls_context`
+* `anypoint_secret_group`
+* `anypoint_secret_group_certificate`
+* `anypoint_secret_group_certificate_pinset`
+* `anypoint_secret_group_keystore`
+* `anypoint_secret_group_shared_secret`
+* `anypoint_secret_group_truststore`
+
+== API Manager Resources
+
+Use these resources to manage APIs and API configuration in API Manager.
+
+* `anypoint_api_instance`
+* `anypoint_api_instance_sla_tier`
+
+== MCP and AI Agent Resources
+
+Use these resources to manage MCP servers and AI agent resources.
+
+* `anypoint_mcp_server`
+* `anypoint_agent_instance`
+
+== API, MCP, and A2A Policy Resources
+
+Use these resources to apply policies declaratively to APIs, MCP servers, and AI agent resources.
+
+The provider supports inbound, outbound, MCP, LLM Gateway, and A2A policy resources.
+
+For the complete list of supported policy resources, see the https://registry.terraform.io/providers/mulesoft-anypoint/anypoint/latest/docs/resources[Terraform Registry resources documentation].
+
+== See Also
+
+* xref:index.adoc[]
+* xref:install-configure.adoc[]
+* xref:how-provider-works.adoc[]

@@ -1,0 +1,5 @@
+name: anypoint-terraform-provider
+title: Anypoint Terraform Provider
+version: 'latest'
+nav:
+- modules/ROOT/nav.adoc

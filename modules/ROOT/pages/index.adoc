@@ -1,0 +1,35 @@
+= MuleSoft Anypoint Terraform Provider
+
+The MuleSoft Anypoint Terraform provider enables you to manage Anypoint Platform resources using Infrastructure as Code (IaC).
+
+Use this provider to provision and manage Anypoint Platform resources declaratively through Terraform configuration files.
+
+The provider supports infrastructure and platform configuration across CloudHub 2.0, API Manager, Access Management, Secrets Manager, MCP servers, and AI agent resources.
+
+== Key Capabilities
+
+* Manage CloudHub 2.0 resources, including private spaces, network configuration, ingress and egress rules, VPN connections, and TLS contexts.
+* Create and manage managed Flex Gateway resources in CloudHub 2.0.
+* Manage Access Management resources, including business groups and teams.
+* Configure Secrets Manager resources, including secret groups, certificates, keystores, truststores, and shared secrets.
+* Create and manage API Manager resources, including API instances and SLA tiers.
+* Apply API, MCP, and A2A policies declaratively.
+* Create and manage MCP server and AI agent resources.
+
+== Terraform Integration with Anypoint Platform
+
+The Anypoint Terraform provider enables a declarative approach to managing platform resources.
+
+Instead of configuring resources through the UI or API calls, you define the desired state in Terraform configuration files. Terraform then provisions and updates resources to match that state.
+
+This approach helps ensure consistency across environments and supports version-controlled configuration management.
+
+The provider supports GitOps-based workflows, so you can manage Anypoint Platform resources alongside your cloud infrastructure resources.
+
+The provider integrates with Terraform workflows and can be used together with cloud providers such as AWS, Azure, and Google Cloud.
+
+== See Also
+
+* xref:install-configure.adoc[]
+* xref:how-provider-works.adoc[]
+* xref:resources.adoc[]
