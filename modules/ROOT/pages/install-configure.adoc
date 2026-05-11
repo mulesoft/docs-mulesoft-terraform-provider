@@ -1,14 +1,14 @@
 = Install and Configure the Terraform Provider
 
-To use the MuleSoft Anypoint Terraform provider, install the provider from the Terraform Registry and configure authentication for your Anypoint Platform organization.
+To use the MuleSoft  Terraform provider, install the provider from the Terraform Registry and configure authentication for your MuleSoft Platform organization.
 
-The provider supports Terraform-based management for Anypoint Platform resources, including CloudHub 2.0, API Manager, Access Management, Secrets Manager, MCP servers, and AI agent resources.
+The provider supports Terraform-based management for MuleSoft Platform resources, including CloudHub 2.0, API Manager, Access Management, Secrets Manager, MCP servers, and AI agent resources.
 
 == Access the Provider in the Terraform Registry
 
-Go to the Terraform Registry and search for the MuleSoft Anypoint Terraform provider.
+Go to the Terraform Registry and search for the MuleSoft Terraform provider.
 
-For provider installation instructions and the complete list of supported resources, see the https://registry.terraform.io/providers/mulesoft-anypoint/anypoint/latest/docs[MuleSoft Anypoint Terraform provider documentation].
+For provider installation instructions and the complete list of supported resources, see the https://registry.terraform.io/providers/mulesoft-anypoint/anypoint/latest/docs[MuleSoft Terraform provider documentation].
 
 == Add the Provider
 
@@ -92,7 +92,7 @@ provider "anypoint" {
 }
 ----
 
-The provider also supports additional authentication methods, including access token authentication and control plane configuration. For the complete provider configuration reference, see the https://registry.terraform.io/providers/mulesoft-anypoint/anypoint/latest/docs[MuleSoft Anypoint Terraform provider documentation].
+The provider also supports additional authentication methods, including access token authentication and control plane configuration. For the complete provider configuration reference, see the https://registry.terraform.io/providers/mulesoft-anypoint/anypoint/latest/docs[MuleSoft Terraform provider documentation].
 
 == See Also
 
