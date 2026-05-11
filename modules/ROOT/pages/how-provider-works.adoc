@@ -27,7 +27,7 @@ The control plane includes resources such as:
 The runtime plane includes deployment and infrastructure resources such as:
 
 * CloudHub 2.0 private spaces
-* Managed Flex Gateway resources
+* Managed Omni Gateway resources
 * Network configuration
 * VPN connections
 * TLS contexts

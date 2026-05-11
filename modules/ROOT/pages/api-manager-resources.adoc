@@ -1,0 +1,189 @@
+= API Manager Resources
+
+Use API Manager resources to manage APIs and API configuration in API Manager.
+
+== `anypoint_api_instance`
+
+Use the `anypoint_api_instance` resource to manage API instances in Anypoint API Manager.
+
+An API instance represents an API specification deployed to an Omni Gateway target with routing rules and upstream backends.
+
+=== Minimal Configuration Example
+
+[source,hcl]
+----
+resource "anypoint_api_instance" "minimal" {
+  environment_id = var.environment_id
+  gateway_id     = var.gateway_id
+  instance_label = "minimal-demo"
+  upstream_uri   = "http://backend.internal:8080"
+
+  spec = {
+    asset_id = "my-api"
+    group_id = var.organization_id
+    version  = "1.0.0"
+  }
+
+  endpoint = {
+    base_path = "minimal"
+  }
+}
+----
+
+=== Weighted Multi-Upstream Routing Example
+
+[source,hcl]
+----
+resource "anypoint_api_instance" "weighted_routing" {
+  environment_id = var.environment_id
+  gateway_id     = var.gateway_id
+  instance_label = "weighted-routing-demo"
+
+  spec = {
+    asset_id = "my-api"
+    group_id = var.organization_id
+    version  = "1.0.0"
+  }
+
+  endpoint = {
+    base_path = "weightedRouting"
+  }
+
+  routing = [
+    {
+      label = "canary"
+
+      upstreams = [
+        {
+          weight = 90
+          uri    = "http://backend-stable.internal:8080"
+          label  = "stable"
+        },
+        {
+          weight = 10
+          uri    = "http://backend-canary.internal:8080"
+          label  = "canary"
+        }
+      ]
+    }
+  ]
+}
+----
+
+=== Key Arguments
+
+* `environment_id` - (Required) Environment ID where the API instance is created.
+* `spec` - (Required) Exchange asset specification associated with the API instance.
+** `asset_id` - The Exchange asset ID.
+** `group_id` - The Exchange group (organization) ID.
+** `version` - The asset version.
+* `organization_id` - Organization ID. If omitted, the provider infers it from the connected app credentials.
+* `technology` - Gateway technology. Supported values are `flexGateway`, `mule4`, and `serviceMesh`. Defaults to `flexGateway`.
+* `provider_id` - Identity provider ID for the API.
+* `instance_label` - Human-readable label for the API instance.
+* `approval_method` - Client approval method. Supported values are `manual` and `automatic`.
+* `consumer_endpoint` - Consumer-facing endpoint URI (the public URL clients use to reach the API).
+* `upstream_uri` - Shorthand for a single-upstream routing configuration. Mutually exclusive with `routing`.
+* `gateway_id` - Omni Gateway UUID. When provided, the deployment block is auto-populated by fetching gateway details (`target_id`, `target_name`, `gateway_version`) from the Gateway Manager. Mutually exclusive with a full `deployment` block.
+* `endpoint` - Endpoint and proxy configuration for the API instance.
+** `deployment_type` - Deployment type. Supported values are `HY` (hybrid), `CH` (CloudHub), `CH2`, and `RF` (Runtime Fabric). Defaults to `HY`.
+** `type` - Endpoint protocol type. Supported values are `http`, `rest`, and `raml`. Defaults to `http`.
+** `base_path` - API base path for OmniGateway (for example, `my-api`). Required when `technology = "omniGateway"`. Mutually exclusive with `uri`.
+** `uri` - Direct implementation URI for Mule4 or other technologies. Required when `technology = "mule4"`. Mutually exclusive with `base_path`.
+** `response_timeout` - Response timeout in milliseconds.
+* `deployment` - Deployment target configuration. Auto-populated when `gateway_id` is set.
+** `environment_id` - Environment ID for deployment.
+** `type` - Deployment type. Supported values: `HY`, `CH`, `RF`. Defaults to `HY`.
+** `expected_status` - Expected deployment status. Supported values: `deployed`, `undeployed`. Defaults to `deployed`.
+** `overwrite` - Whether to overwrite an existing deployment.
+** `target_id` - Target gateway ID to deploy to.
+** `target_name` - Target gateway name.
+** `gateway_version` - Omni Gateway runtime version.
+* `routing` - Routing rules with weighted upstream backends. Mutually exclusive with `upstream_uri`.
+** `label` - Label for this route.
+** `rules` - Match conditions for this route.
+*** `methods` - Pipe-separated HTTP methods (for example, `GET`, `POST|PUT`).
+*** `path` - URL path pattern to match (for example, `/api/*`).
+*** `host` - Host header value to match.
+*** `headers` - Header key-value pairs to match.
+** `upstreams` - (Required) Weighted upstream backends for this route.
+*** `uri` - (Required) Upstream backend URI.
+*** `weight` - Traffic weight percentage (0–100). Defaults to `100`.
+*** `label` - Label for this upstream.
+*** `tls_context_id` - TLS context for upstream connections. Format: `secretGroupId/tlsContextId`.
+
+=== Read-Only Attributes
+
+* `id` - Unique identifier of the API instance.
+* `status` - Current status of the API instance.
+* `asset_id` - Exchange asset ID.
+* `asset_version` - Exchange asset version.
+* `product_version` - Product version.
+
+=== Import
+
+[source,shell]
+----
+terraform import anypoint_api_instance.example <organization_id>/<environment_id>/<api_instance_id>
+----
+
+== `anypoint_api_instance_sla_tier`
+
+Use the `anypoint_api_instance_sla_tier` resource to manage SLA tiers for API instances in API Manager.
+
+=== Example
+
+[source,hcl]
+----
+resource "anypoint_api_instance_sla_tier" "gold" {
+  organization_id = var.organization_id
+  environment_id  = var.environment_id
+  api_instance_id = var.api_instance_id
+
+  name         = "Gold"
+  description  = "Gold tier with high volume limits for premium customers"
+  auto_approve = true
+  status       = "ACTIVE"
+
+  limits = [
+    {
+      time_period_in_milliseconds = 60000
+      maximum_requests            = 1000
+      visible                     = true
+    },
+    {
+      time_period_in_milliseconds = 3600000
+      maximum_requests            = 50000
+      visible                     = true
+    }
+  ]
+}
+----
+
+=== Key Arguments
+
+* `environment_id` - Environment ID where the API instance exists.
+* `api_instance_id` - Numeric ID of the API instance.
+* `name` - Name of the SLA tier.
+* `limits` - Rate limit configuration for the SLA tier.
+* `organization_id` - Organization ID. If omitted, the provider infers it from the connected app credentials.
+* `description` - Description of the SLA tier.
+* `auto_approve` - Indicates whether requests for the SLA tier are automatically approved.
+* `status` - Status of the SLA tier. Supported values are `ACTIVE` and `INACTIVE`.
+
+=== Limit Arguments
+
+* `time_period_in_milliseconds` - Time period for the rate limit.
+* `maximum_requests` - Maximum number of requests allowed during the time period.
+* `visible` - Indicates whether the limit is visible to API consumers.
+
+=== Read-Only Attributes
+
+* `id` - Unique identifier of the SLA tier.
+
+=== Import
+
+[source,shell]
+----
+terraform import anypoint_api_instance_sla_tier.example organization_id/environment_id/api_instance_id/tier_id
+----

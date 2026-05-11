@@ -6,61 +6,127 @@ The MuleSoft Anypoint Terraform provider includes resources for managing infrast
 
 Use these resources to manage CloudHub 2.0 infrastructure and networking components.
 
-* `anypoint_private_space_config`
-* `anypoint_private_space_association`
-* `anypoint_private_space_connection`
-* `anypoint_private_space_upgrade`
-* `anypoint_privatespace_advanced_config`
-* `anypoint_tls_context`
-* `anypoint_vpn_connection`
+* xref:cloudhub2-resources.adoc#anypoint_private_space_config[`anypoint_private_space_config`]
+* xref:cloudhub2-resources.adoc#anypoint_private_space_association[`anypoint_private_space_association`]
+* xref:cloudhub2-resources.adoc#anypoint_private_space_upgrade[`anypoint_private_space_upgrade`]
+* xref:cloudhub2-resources.adoc#anypoint_privatespace_advanced_config[`anypoint_privatespace_advanced_config`]
+* xref:cloudhub2-resources.adoc#anypoint_tls_context[`anypoint_tls_context`]
+* xref:cloudhub2-resources.adoc#anypoint_vpn_connection[`anypoint_vpn_connection`]
 
-== Managed Flex Gateway Resources
+== Managed Omni Gateway Resources
 
-Use these resources to manage managed Flex Gateway instances in CloudHub 2.0.
+Use these resources to manage managed Omni Gateway instances in CloudHub 2.0.
 
-* `anypoint_managed_flexgateway`
+* xref:managed-gateway-resources.adoc#anypoint_managed_omni_gateway[`anypoint_managed_omni_gateway`]
 
 == Access Management Resources
 
 Use these resources to manage Access Management configuration.
 
-* `anypoint_connected_app`
-* `anypoint_connected_app_scopes`
-* `anypoint_environment`
-* `anypoint_organization`
-* `anypoint_team`
+* xref:access-management-resources.adoc#anypoint_connected_app_scopes[`anypoint_connected_app_scopes`]
+* xref:access-management-resources.adoc#anypoint_environment[`anypoint_environment`]
+* xref:access-management-resources.adoc#anypoint_organization[`anypoint_organization`]
+* xref:access-management-resources.adoc#anypoint_team[`anypoint_team`]
+
 
 == Secrets Manager Resources
 
 Use these resources to manage Secrets Manager configuration.
 
-* `anypoint_flex_tls_context`
-* `anypoint_secret_group`
-* `anypoint_secret_group_certificate`
-* `anypoint_secret_group_certificate_pinset`
-* `anypoint_secret_group_keystore`
-* `anypoint_secret_group_shared_secret`
-* `anypoint_secret_group_truststore`
+* xref:secret-manager-resources.adoc#anypoint_secret_group[`anypoint_secret_group`]
+* xref:secret-manager-resources.adoc#anypoint_secret_group_certificate[`anypoint_secret_group_certificate`]
+* xref:secret-manager-resources.adoc#anypoint_secret_group_certificate_pinset[`anypoint_secret_group_certificate_pinset`]
+* xref:secret-manager-resources.adoc#anypoint_secret_group_keystore[`anypoint_secret_group_keystore`]
+* xref:secret-manager-resources.adoc#anypoint_secret_group_shared_secret[`anypoint_secret_group_shared_secret`]
+* xref:secret-manager-resources.adoc#anypoint_secret_group_tls_context[`anypoint_secret_group_tls_context`]
+* xref:secret-manager-resources.adoc#anypoint_secret_group_truststore[`anypoint_secret_group_truststore`]
 
 == API Manager Resources
 
 Use these resources to manage APIs and API configuration in API Manager.
 
-* `anypoint_api_instance`
-* `anypoint_api_instance_sla_tier`
+* xref:api-manager-resources.adoc#anypoint_api_instance[`anypoint_api_instance`]
+* xref:api-manager-resources.adoc#anypoint_api_instance_sla_tier[`anypoint_api_instance_sla_tier`]
 
 == MCP and AI Agent Resources
 
 Use these resources to manage MCP servers and AI agent resources.
 
-* `anypoint_mcp_server`
-* `anypoint_agent_instance`
+* xref:mcp-resources.adoc#anypoint_mcp_server[`anypoint_mcp_server`]
+* xref:mcp-resources.adoc#anypoint_agent_instance[`anypoint_agent_instance`]
 
 == API, MCP, and A2A Policy Resources
 
-Use these resources to apply policies declaratively to APIs, MCP servers, and AI agent resources.
+Use these resources to apply policies declaratively to APIs, MCP servers, gateways, and AI agent resources.
 
-The provider supports inbound, outbound, MCP, LLM Gateway, and A2A policy resources.
+* xref:a2a-resources.adoc#anypoint_api_policy[`anypoint_api_policy`]
+* xref:a2a-resources.adoc#anypoint_api_policy_a2a_agent_card[`anypoint_api_policy_a2a_agent_card`]
+* xref:a2a-resources.adoc#anypoint_api_policy_a2a_pii_detector[`anypoint_api_policy_a2a_pii_detector`]
+* xref:a2a-resources.adoc#anypoint_api_policy_a2a_prompt_decorator[`anypoint_api_policy_a2a_prompt_decorator`]
+* xref:a2a-resources.adoc#anypoint_api_policy_a2a_schema_validation[`anypoint_api_policy_a2a_schema_validation`]
+* xref:a2a-resources.adoc#anypoint_api_policy_a2a_token_rate_limit[`anypoint_api_policy_a2a_token_rate_limit`]
+* xref:a2a-resources.adoc#anypoint_api_policy_body_transformation[`anypoint_api_policy_body_transformation`]
+* xref:a2a-resources.adoc#anypoint_api_policy_circuit_breaker[`anypoint_api_policy_circuit_breaker`]
+* xref:a2a-resources.adoc#anypoint_api_policy_access_block[`anypoint_api_policy_access_block`]
+* xref:a2a-resources.adoc#anypoint_api_policy_client_id_enforcement[`anypoint_api_policy_client_id_enforcement`]
+* xref:a2a-resources.adoc#anypoint_api_policy_cors[`anypoint_api_policy_cors`]
+* xref:a2a-resources.adoc#anypoint_api_policy_credential_injection_basic_auth[`anypoint_api_policy_credential_injection_basic_auth`]
+* xref:a2a-resources.adoc#anypoint_api_policy_credential_injection_oauth2[`anypoint_api_policy_credential_injection_oauth2`]
+* xref:a2a-resources.adoc#anypoint_api_policy_credential_injection_oauth2_obo[`anypoint_api_policy_credential_injection_oauth2_obo`]
+* xref:a2a-resources.adoc#anypoint_api_policy_dataweave_request_filter[`anypoint_api_policy_dataweave_request_filter`]
+* xref:a2a-resources.adoc#anypoint_api_policy_dataweave_body_transformation[`anypoint_api_policy_dataweave_body_transformation`]
+* xref:a2a-resources.adoc#anypoint_api_policy_dataweave_headers_transformation[`anypoint_api_policy_dataweave_headers_transformation`]
+* xref:a2a-resources.adoc#anypoint_api_policy_external_oauth2_access_token_enforcement[`anypoint_api_policy_external_oauth2_access_token_enforcement`]
+* xref:a2a-resources.adoc#anypoint_api_policy_header_injection[`anypoint_api_policy_header_injection`]
+* xref:a2a-resources.adoc#anypoint_api_policy_header_removal[`anypoint_api_policy_header_removal`]
+* xref:a2a-resources.adoc#anypoint_api_policy_header_transformation[`anypoint_api_policy_header_transformation`]
+* xref:a2a-resources.adoc#anypoint_api_policy_health_check[`anypoint_api_policy_health_check`]
+* xref:a2a-resources.adoc#anypoint_api_policy_http_basic_authentication[`anypoint_api_policy_http_basic_authentication`]
+* xref:a2a-resources.adoc#anypoint_api_policy_http_caching[`anypoint_api_policy_http_caching`]
+* xref:a2a-resources.adoc#anypoint_api_policy_idle_timeout[`anypoint_api_policy_idle_timeout`]
+* xref:a2a-resources.adoc#anypoint_api_policy_intask_authentication_policy[`anypoint_api_policy_intask_authentication_policy`]
+* xref:a2a-resources.adoc#anypoint_api_policy_intask_authorization_code_policy[`anypoint_api_policy_intask_authorization_code_policy`]
+* xref:a2a-resources.adoc#anypoint_api_policy_ip_allowlist[`anypoint_api_policy_ip_allowlist`]
+* xref:a2a-resources.adoc#anypoint_api_policy_ip_blocklist[`anypoint_api_policy_ip_blocklist`]
+* xref:a2a-resources.adoc#anypoint_api_policy_injection_protection[`anypoint_api_policy_injection_protection`]
+* xref:a2a-resources.adoc#anypoint_api_policy_json_threat_protection[`anypoint_api_policy_json_threat_protection`]
+* xref:a2a-resources.adoc#anypoint_api_policy_jwt_validation[`anypoint_api_policy_jwt_validation`]
+* xref:a2a-resources.adoc#anypoint_api_policy_ldap_authentication[`anypoint_api_policy_ldap_authentication`]
+* xref:a2a-resources.adoc#anypoint_api_policy_bedrock_llm_provider_policy[`anypoint_api_policy_bedrock_llm_provider_policy`]
+* xref:a2a-resources.adoc#anypoint_api_policy_gemini_llm_provider_policy[`anypoint_api_policy_gemini_llm_provider_policy`]
+* xref:a2a-resources.adoc#anypoint_api_policy_gemini_transcoding_policy[`anypoint_api_policy_gemini_transcoding_policy`]
+* xref:a2a-resources.adoc#anypoint_api_policy_llm_gw_core_policy[`anypoint_api_policy_llm_gw_core_policy`]
+* xref:a2a-resources.adoc#anypoint_api_policy_llm_proxy_core[`anypoint_api_policy_llm_proxy_core`]
+* xref:a2a-resources.adoc#anypoint_api_policy_llm_proxy_core_policy[`anypoint_api_policy_llm_proxy_core_policy`]
+* xref:a2a-resources.adoc#anypoint_api_policy_mcp_access_control[`anypoint_api_policy_mcp_access_control`]
+* xref:a2a-resources.adoc#anypoint_api_policy_mcp_global_access_policy[`anypoint_api_policy_mcp_global_access_policy`]
+* xref:a2a-resources.adoc#anypoint_api_policy_mcp_pii_detector[`anypoint_api_policy_mcp_pii_detector`]
+* xref:a2a-resources.adoc#anypoint_api_policy_mcp_schema_validation[`anypoint_api_policy_mcp_schema_validation`]
+* xref:a2a-resources.adoc#anypoint_api_policy_mcp_support[`anypoint_api_policy_mcp_support`]
+* xref:a2a-resources.adoc#anypoint_api_policy_mcp_tool_mapping[`anypoint_api_policy_mcp_tool_mapping`]
+* xref:a2a-resources.adoc#anypoint_api_policy_mcp_transcoding_router[`anypoint_api_policy_mcp_transcoding_router`]
+* xref:a2a-resources.adoc#anypoint_api_policy_message_logging[`anypoint_api_policy_message_logging`]
+* xref:a2a-resources.adoc#anypoint_api_policy_message_logging_outbound[`anypoint_api_policy_message_logging_outbound`]
+* xref:a2a-resources.adoc#anypoint_api_policy_model_based_routing[`anypoint_api_policy_model_based_routing`]
+* xref:a2a-resources.adoc#anypoint_api_policy_agent_connection_telemetry[`anypoint_api_policy_agent_connection_telemetry`]
+* xref:a2a-resources.adoc#anypoint_api_policy_native_aws_lambda[`anypoint_api_policy_native_aws_lambda`]
+* xref:a2a-resources.adoc#anypoint_api_policy_native_ext_authz[`anypoint_api_policy_native_ext_authz`]
+* xref:a2a-resources.adoc#anypoint_api_policy_native_ext_proc[`anypoint_api_policy_native_ext_proc`]
+* xref:a2a-resources.adoc#anypoint_api_policy_oauth2_token_introspection[`anypoint_api_policy_oauth2_token_introspection`]
+* xref:a2a-resources.adoc#anypoint_api_policy_openai_transcoding_policy[`anypoint_api_policy_openai_transcoding_policy`]
+* xref:a2a-resources.adoc#anypoint_api_policy_semantic_prompt_guard_policy_openai[`anypoint_api_policy_semantic_prompt_guard_policy_openai`]
+* xref:a2a-resources.adoc#anypoint_api_policy_semantic_routing_policy_huggingface[`anypoint_api_policy_semantic_routing_policy_huggingface`]
+* xref:a2a-resources.adoc#anypoint_api_policy_rate_limiting[`anypoint_api_policy_rate_limiting`]
+* xref:a2a-resources.adoc#anypoint_api_policy_rate_limiting_sla_based[`anypoint_api_policy_rate_limiting_sla_based`]
+* xref:a2a-resources.adoc#anypoint_api_policy_response_timeout[`anypoint_api_policy_response_timeout`]
+* xref:a2a-resources.adoc#anypoint_api_policy_script_evaluation_transformation[`anypoint_api_policy_script_evaluation_transformation`]
+* xref:a2a-resources.adoc#anypoint_api_policy_sse_logging[`anypoint_api_policy_sse_logging`]
+* xref:a2a-resources.adoc#anypoint_api_policy_spec_validation[`anypoint_api_policy_spec_validation`]
+* xref:a2a-resources.adoc#anypoint_api_policy_spike_control[`anypoint_api_policy_spike_control`]
+* xref:a2a-resources.adoc#anypoint_api_policy_stream_idle_timeout[`anypoint_api_policy_stream_idle_timeout`]
+* xref:a2a-resources.adoc#anypoint_api_policy_tracing[`anypoint_api_policy_tracing`]
+* xref:a2a-resources.adoc#anypoint_api_policy_xml_threat_protection[`anypoint_api_policy_xml_threat_protection`]
+
 
 For the complete list of supported policy resources, see the https://registry.terraform.io/providers/mulesoft-anypoint/anypoint/latest/docs/resources[Terraform Registry resources documentation].
 

@@ -1,0 +1,264 @@
+= MCP and AI Agent Resources
+
+Use these resources to manage MCP servers and AI agent resources.
+
+== `anypoint_mcp_server`
+
+Use the `anypoint_mcp_server` resource to manage MCP servers in Anypoint API Manager.
+
+An MCP server represents an MCP server specification deployed to an Omni Gateway target with routing rules and upstream backends.
+
+NOTE: After a successful `terraform apply`, the `status` field is populated from a GET request made immediately after the POST. The platform typically returns `status = "active"` right away.
+
+NOTE: `upstream_uri` and `routing` are mutually exclusive. Use `upstream_uri` for a single upstream. Only one upstream per route is supported for MCP servers — multi-upstream weighted routing is not available.
+
+NOTE: The computed `upstream_id` attribute is the server-assigned ID for the first upstream. Reference it in outbound policy `upstream_ids` to bind policies to this MCP server's upstream.
+
+=== Basic Example
+
+[source,hcl]
+----
+resource "anypoint_mcp_server" "example" {
+  organization_id = var.organization_id
+  environment_id  = var.environment_id
+  technology      = "flexGateway"
+  instance_label  = "atlassian-mcp-server"
+
+  spec = {
+    asset_id = "my-mcp-spec"
+    group_id = var.organization_id
+    version  = "1.0.0"
+  }
+
+  endpoint = {
+    deployment_type = "HY"
+    base_path       = "mcp1"
+  }
+
+  gateway_id   = var.gateway_id
+  upstream_uri = "http://example.com"
+}
+----
+
+=== Explicit Routing Example
+
+[source,hcl]
+----
+resource "anypoint_mcp_server" "advanced" {
+  organization_id = var.organization_id
+  environment_id  = var.environment_id
+  technology      = "flexGateway"
+  instance_label  = "enterprise-tools-mcp"
+
+  spec = {
+    asset_id = "postman-mcp-server"
+    group_id = var.organization_id
+    version  = "1.0.0"
+  }
+
+  endpoint = {
+    deployment_type = "HY"
+    base_path       = "mcp-tools"
+  }
+
+  gateway_id = var.gateway_id
+
+  routing = [
+    {
+      upstreams = [
+        {
+          weight = 100
+          uri    = "http://mcp-tools.internal:8080"
+        }
+      ]
+    }
+  ]
+}
+----
+
+=== Key Arguments
+
+* `environment_id` - (Required) Environment ID where the MCP server is created.
+* `spec` - (Required) Exchange asset specification associated with the MCP server.
+** `asset_id` - The Exchange asset ID.
+** `group_id` - The Exchange group (organization) ID.
+** `version` - The asset version.
+* `organization_id` - Organization ID. If omitted, the provider infers it from the connected app credentials.
+* `technology` - Gateway technology. Supported values are `flexGateway`, `mule4`, and `serviceMesh`. Defaults to `flexGateway`.
+* `provider_id` - Identity provider ID for the MCP server.
+* `instance_label` - Human-readable label for the MCP server.
+* `approval_method` - Client approval method. Supported values are `manual` and `automatic`.
+* `endpoint` - Endpoint and proxy configuration for the MCP server.
+** `deployment_type` - Deployment type. Supported values: `HY` (hybrid), `CH` (CloudHub), `RF` (Runtime Fabric). Defaults to `HY`.
+** `type` - Endpoint protocol type. For MCP servers, this is `mcp`. Defaults to `mcp`.
+** `base_path` - MCP server base path for OmniGateway (for example, `my-mcp-server`). The provider constructs the full proxy URI as `http://0.0.0.0:8081/<base_path>`. Required when `technology = "flexGateway"`. Mutually exclusive with `uri`.
+** `uri` - Direct implementation URI for Mule4 or other technologies. Required when `technology = "mule4"`. Mutually exclusive with `base_path`.
+** `response_timeout` - Response timeout in milliseconds.
+* `consumer_endpoint` - Consumer-facing endpoint URI (the public URL clients use to reach the MCP server). For MCP, this is the proxy URI that clients connect to.
+* `upstream_uri` - Shorthand for a single-upstream routing configuration. When set, the provider constructs routing as `[{upstreams: [{weight: 100, uri: <value>}]}]`. This is typically the upstream MCP server URI that the proxy forwards to. Mutually exclusive with `routing`.
+* `gateway_id` - Omni Gateway UUID. When provided, the deployment block is auto-populated by fetching gateway details (`target_id`, `target_name`, `gateway_version`) from the Gateway Manager. Mutually exclusive with a full `deployment` block.
+* `deployment` - Deployment target configuration. Auto-populated when `gateway_id` is set.
+** `environment_id` - Environment ID for deployment.
+** `type` - Deployment type. Supported values: `HY`, `CH`, `RF`. Defaults to `HY`.
+** `expected_status` - Expected deployment status. Supported values: `deployed`, `undeployed`. Defaults to `deployed`.
+** `overwrite` - Whether to overwrite an existing deployment.
+** `target_id` - Target gateway ID to deploy to.
+** `target_name` - Target gateway name.
+** `gateway_version` - Omni Gateway runtime version.
+* `routing` - Routing rules with upstream backends. Upstreams point to the actual MCP server implementation URIs. Mutually exclusive with `upstream_uri`.
+** `label` - Label for this route.
+** `rules` - Match conditions for this route.
+*** `methods` - Pipe-separated HTTP methods (for example, `GET`, `POST|PUT`).
+*** `path` - URL path pattern to match (for example, `/api/*`).
+*** `host` - Host header value to match.
+*** `headers` - Header key-value pairs to match.
+** `upstreams` - (Required) Upstream backends for this route.
+*** `uri` - (Required) Upstream backend URI. For MCP servers, this is the actual MCP server implementation URI that requests are forwarded to.
+*** `weight` - Traffic weight percentage (0–100). Defaults to `100`.
+*** `label` - Label for this upstream.
+*** `tls_context_id` - TLS context for upstream connections. Format: `secretGroupId/tlsContextId`.
+
+=== Read-Only Attributes
+
+* `id` - Unique identifier of the MCP server.
+* `status` - Current status of the MCP server.
+* `asset_id` - Exchange asset ID.
+* `asset_version` - Exchange asset version.
+* `product_version` - Product version.
+* `upstream_id` - Server-assigned upstream ID for the first upstream. Use this to reference the upstream in outbound policy `upstream_ids`.
+
+=== Import
+
+[source,shell]
+----
+terraform import anypoint_mcp_server.example <organization_id>/<environment_id>/<instance_id>
+----
+
+== `anypoint_agent_instance`
+
+Use the `anypoint_agent_instance` resource to manage agent instances in Anypoint API Manager.
+
+An agent instance represents an agent specification deployed to an Omni Gateway target with routing rules and upstream backends.
+
+NOTE: After a successful `terraform apply`, the `status` field is populated from a GET request made immediately after the POST. The platform typically returns `status = "active"` right away. If your Gateway is not yet ready, the provider retries the POST up to 5 times with a 20-second backoff before failing.
+
+NOTE: `upstream_uri` and `routing` are mutually exclusive. Use `upstream_uri` for a single upstream — the provider expands it to `[{upstreams: [{weight: 100, uri: <value>}]}]` automatically. Only one upstream per route is supported; multi-upstream weighted routing is not available for agent instances.
+
+=== Basic Example
+
+[source,hcl]
+----
+resource "anypoint_agent_instance" "example" {
+  organization_id = var.organization_id
+  environment_id  = var.environment_id
+  technology      = "flexGateway"
+  instance_label  = "customer-support-agent"
+
+  spec = {
+    asset_id = "my-agent-spec"
+    group_id = var.organization_id
+    version  = "1.0.0"
+  }
+
+  endpoint = {
+    deployment_type = "HY"
+    base_path       = "agent/support"
+  }
+
+  gateway_id   = var.gateway_id
+  upstream_uri = "http://agent-service.internal:8080"
+}
+----
+
+=== Explicit Routing Example
+
+[source,hcl]
+----
+resource "anypoint_agent_instance" "advanced" {
+  organization_id = var.organization_id
+  environment_id  = var.environment_id
+  technology      = "flexGateway"
+  instance_label  = "sales-agent"
+
+  spec = {
+    asset_id = "my-agent-spec"
+    group_id = var.organization_id
+    version  = "1.0.0"
+  }
+
+  endpoint = {
+    deployment_type = "HY"
+    base_path       = "agent/sales"
+  }
+
+  gateway_id = var.gateway_id
+
+  routing = [
+    {
+      upstreams = [
+        {
+          weight = 100
+          uri    = "http://sales-agent.internal:8080"
+        }
+      ]
+    }
+  ]
+}
+----
+
+=== Key Arguments
+
+* `environment_id` - (Required) Environment ID where the agent instance is created.
+* `spec` - (Required) Exchange asset specification associated with the agent instance.
+** `asset_id` - The Exchange asset ID.
+** `group_id` - The Exchange group (organization) ID.
+** `version` - The asset version.
+* `organization_id` - Organization ID. If omitted, the provider infers it from the connected app credentials.
+* `technology` - Gateway technology. Supported values are `flexGateway`, `mule4`, and `serviceMesh`. Defaults to `flexGateway`.
+* `provider_id` - Identity provider ID for the agent.
+* `instance_label` - Human-readable label for the agent instance.
+* `approval_method` - Client approval method. Supported values are `manual` and `automatic`.
+* `endpoint` - Endpoint and proxy configuration for the agent instance.
+** `deployment_type` - Deployment type. Supported values: `HY` (hybrid), `CH` (CloudHub), `RF` (Runtime Fabric). Defaults to `HY`.
+** `type` - Endpoint protocol type. For agent instances, this is `a2a` (Agent-to-Agent). Defaults to `a2a`.
+** `base_path` - Agent base path for OmniGateway (for example, `my-agent`). Required when `technology = "flexGateway"`. Mutually exclusive with `uri`.
+** `uri` - Direct implementation URI for Mule4 or other technologies. Required when `technology = "mule4"`. Mutually exclusive with `base_path`.
+** `response_timeout` - Response timeout in milliseconds.
+* `consumer_endpoint` - Consumer-facing endpoint URI (the public URL clients use to reach the agent).
+* `upstream_uri` - Shorthand for a single-upstream routing configuration. Mutually exclusive with `routing`.
+* `gateway_id` - Omni Gateway UUID. When provided, the deployment block is auto-populated from the Gateway Manager. Mutually exclusive with a full `deployment` block.
+* `deployment` - Deployment target configuration.
+** `environment_id` - Environment ID for deployment.
+** `type` - Deployment type. Supported values: `HY`, `CH`, `RF`. Defaults to `HY`.
+** `expected_status` - Expected deployment status. Supported values: `deployed`, `undeployed`. Defaults to `deployed`.
+** `overwrite` - Whether to overwrite an existing deployment.
+** `target_id` - Target gateway ID to deploy to.
+** `target_name` - Target gateway name.
+** `gateway_version` - Omni Gateway runtime version.
+* `routing` - Routing rules with weighted upstream backends. Mutually exclusive with `upstream_uri`.
+** `label` - Label for this route.
+** `rules` - Match conditions for this route.
+*** `methods` - Pipe-separated HTTP methods (for example, `GET`, `POST|PUT`).
+*** `path` - URL path pattern to match (for example, `/api/*`).
+*** `host` - Host header value to match.
+*** `headers` - Header key-value pairs to match.
+** `upstreams` - (Required) Weighted upstream backends for this route.
+*** `uri` - (Required) Upstream backend URI.
+*** `weight` - Traffic weight percentage (0–100). Defaults to `100`.
+*** `label` - Label for this upstream.
+*** `tls_context_id` - TLS context for upstream connections. Format: `secretGroupId/tlsContextId`.
+
+=== Read-Only Attributes
+
+* `id` - Unique identifier of the agent instance.
+* `status` - Current status of the agent instance.
+* `asset_id` - Exchange asset ID.
+* `asset_version` - Exchange asset version.
+* `product_version` - Product version.
+
+=== Import
+
+[source,shell]
+----
+terraform import anypoint_agent_instance.example <organization_id>/<environment_id>/<instance_id>
+----
