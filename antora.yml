@@ -1,5 +1,5 @@
 name: mulesoft-terraform-provider
 title: MuleSoft Terraform Provider
-version: 'latest'
+version: ~
 nav:
 - modules/ROOT/nav.adoc
