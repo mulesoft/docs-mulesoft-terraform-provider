@@ -3,7 +3,6 @@
 Before creating a pull request review the following:
 
 * [LICENSE.txt](./LICENSE.txt)
-* [SECURITY.adoc](./SECURITY.adoc)
-* [CODE_OF_CONDUCT.adoc](./CODE_OF_CONDUCT.adoc)
+* [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
 
 When you submit your pull request, you are asked to sign a contributor license agreement (CLA) if we don't have one on file for you.
