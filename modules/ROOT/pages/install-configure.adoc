@@ -1,0 +1,101 @@
+= Install and Configure the Terraform Provider
+
+To use the MuleSoft  Terraform provider, install the provider from the Terraform Registry and configure authentication for your MuleSoft Platform organization.
+
+The provider supports Terraform-based management for MuleSoft Platform resources, including CloudHub 2.0, API Manager, Access Management, Secrets Manager, MCP servers, and AI agent resources.
+
+== Access the Provider in the Terraform Registry
+
+Go to the Terraform Registry and search for the MuleSoft Terraform provider.
+
+For provider installation instructions and the complete list of supported resources, see the https://registry.terraform.io/providers/mulesoft-anypoint/anypoint/latest/docs[MuleSoft Terraform provider documentation].
+
+== Add the Provider
+
+Add the provider to your Terraform configuration file:
+
+[source,hcl]
+----
+terraform {
+  required_providers {
+    anypoint = {
+      source  = "mulesoft-anypoint/anypoint"
+      version = "~> 1.0"
+    }
+  }
+}
+----
+
+== Initialize Terraform
+
+Run the following command to download and install the provider:
+
+[source,bash]
+----
+terraform init
+----
+
+== Configure Credentials
+
+The provider supports multiple authentication methods depending on the resources you manage.
+
+=== Connected App Credentials
+
+Use connected app credentials when resources support client credentials authentication:
+
+[source,bash]
+----
+export TF_VAR_anypoint_client_id="<client-id>"
+export TF_VAR_anypoint_client_secret="<client-secret>"
+export TF_VAR_anypoint_base_url="https://anypoint.mulesoft.com"
+----
+
+=== Connected App Authentication for Access Management Resources
+
+Some Access Management resources require authentication on behalf of a user:
+
+[source,bash]
+----
+export TF_VAR_anypoint_admin_client_id="<admin-connected-app-client-id>"
+export TF_VAR_anypoint_admin_client_secret="<admin-connected-app-client-secret>"
+export TF_VAR_anypoint_admin_username="<admin-username>"
+export TF_VAR_anypoint_admin_password="<admin-password>"
+export TF_VAR_anypoint_base_url="https://anypoint.mulesoft.com"
+----
+
+== Configure the Provider
+
+Configure the provider using the authentication method required for your resources.
+
+=== Connected App Credentials
+
+[source,hcl]
+----
+provider "anypoint" {
+  client_id     = var.anypoint_client_id
+  client_secret = var.anypoint_client_secret
+  cplane        = var.anypoint_cplane
+}
+----
+
+=== Connected App Authentication for Access Management Resources
+
+[source,hcl]
+----
+provider "anypoint" {
+  alias         = "admin"
+  username      = var.anypoint_admin_username
+  password      = var.anypoint_admin_password
+  client_id     = var.anypoint_admin_client_id
+  client_secret = var.anypoint_admin_client_secret
+  cplane        = var.anypoint_cplane
+}
+----
+
+The provider also supports additional authentication methods, including access token authentication and control plane configuration. For the complete provider configuration reference, see the https://registry.terraform.io/providers/mulesoft-anypoint/anypoint/latest/docs[MuleSoft Terraform provider documentation].
+
+== See Also
+
+* xref:index.adoc[]
+* xref:how-provider-works.adoc[]
+* xref:resources.adoc[]

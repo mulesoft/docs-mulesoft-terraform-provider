@@ -1,5 +1,5 @@
-name: anypoint-terraform-provider
-title: Anypoint Terraform Provider
-version: ~
+name: mulesoft-terraform-provider
+title: MuleSoft Terraform Provider
+version: 'latest'
 nav:
 - modules/ROOT/nav.adoc

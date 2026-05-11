@@ -1,0 +1,245 @@
+= CloudHub 2.0 Resources
+
+Use CloudHub 2.0 resources to manage private spaces, network configuration, TLS contexts, VPN connections, and related infrastructure components.
+
+These resources help you provision and manage CloudHub 2.0 infrastructure declaratively with Terraform.
+
+== `anypoint_private_space_config`
+
+Use the `anypoint_private_space_config` resource to manage a CloudHub 2.0 private space, including its network configuration and firewall rules.
+
+This resource supports private space creation, network provisioning, egress configuration, IAM role configuration, and firewall rule management.
+
+=== Example
+
+[source,hcl]
+----
+resource "anypoint_private_space_config" "example" {
+  name            = "my-private-space"
+  organization_id = var.organization_id
+  enable_egress   = true
+
+  network {
+    region     = "us-east-1"
+    cidr_block = "10.0.0.0/22"
+  }
+}
+----
+
+=== Key Arguments
+
+* `name` - Name of the private space.
+* `organization_id` - Organization ID where the private space is created. If omitted, the provider organization is used.
+* `enable_egress` - Enables egress for the private space.
+* `enable_iam_role` - Enables IAM role configuration for the private space.
+* `network` - Network configuration for the private space, including region and CIDR block.
+* `firewall_rules` - Firewall rules for the private space.
+
+=== Import
+
+[source,shell]
+----
+terraform import anypoint_private_space_config.example <private_space_id>
+----
+
+== `anypoint_private_space_association`
+
+Use the `anypoint_private_space_association` resource to associate a CloudHub 2.0 private space with environments.
+
+=== Example
+
+[source,hcl]
+----
+resource "anypoint_private_space_association" "example" {
+  private_space_id = var.private_space_id
+
+  associations = [
+    {
+      organization_id = "080f1918-0096-4cac-85b5-b1cd9cdf9260"
+      environment     = "all"
+    }
+  ]
+}
+----
+
+=== Key Arguments
+
+* `private_space_id` - ID of the private space.
+* `organization_id` - Organization ID. If omitted, the provider infers it from the connected app credentials.
+* `associations` - List of associations between the private space and environments.
+
+=== Import
+
+[source,shell]
+----
+terraform import anypoint_private_space_association.example <private_space_id>
+----
+
+== `anypoint_private_space_upgrade`
+
+Use the `anypoint_private_space_upgrade` resource to schedule an upgrade for a CloudHub 2.0 private space.
+
+Deleting this resource cancels the scheduled upgrade.
+
+=== Example
+
+[source,hcl]
+----
+resource "anypoint_private_space_upgrade" "example" {
+  private_space_id = var.private_space_id
+  organization_id  = var.organization_id
+  date             = "2025-09-12"
+  opt_in           = true
+}
+----
+
+=== Key Arguments
+
+* `private_space_id` - ID of the private space to upgrade.
+* `organization_id` - Organization ID where the private space is located. If omitted, the provider infers it from the connected app credentials.
+* `date` - Date when the upgrade is scheduled, in `YYYY-MM-DD` format.
+* `opt_in` - Whether to opt in to the upgrade.
+
+=== Import
+
+[source,shell]
+----
+terraform import anypoint_private_space_upgrade.example <private_space_id>:<date>:<opt_in>
+----
+
+== `anypoint_privatespace_advanced_config`
+
+Use the `anypoint_privatespace_advanced_config` resource to manage advanced configuration for a CloudHub 2.0 private space.
+
+This resource supports ingress configuration and IAM role configuration.
+
+=== Example
+
+[source,hcl]
+----
+resource "anypoint_privatespace_advanced_config" "example" {
+  private_space_id = var.private_space_id
+
+  ingress_configuration = {
+    read_response_timeout = "600"
+    protocol              = "https-redirect"
+  }
+
+  enable_iam_role = true
+}
+----
+
+=== Key Arguments
+
+* `private_space_id` - ID of the private space to configure.
+* `organization_id` - Organization ID where the private space is located. If omitted, the provider infers it from the connected app credentials.
+* `ingress_configuration` - Ingress configuration for the private space.
+* `enable_iam_role` - Enables IAM role configuration for the private space.
+
+=== Import
+
+[source,shell]
+----
+terraform import anypoint_privatespace_advanced_config.example <private_space_id>
+----
+
+== `anypoint_tls_context`
+
+Use the `anypoint_tls_context` resource to manage a CloudHub 2.0 TLS context.
+
+This resource supports both PEM and JKS keystores.
+
+=== Example
+
+[source,hcl]
+----
+resource "anypoint_tls_context" "pem_example" {
+  private_space_id     = "your-private-space-id"
+  name                 = "example-pem-tls-context"
+  keystore_type        = "PEM"
+
+  certificate          = file("cert.pem")
+  key                  = file("key.pem")
+  key_filename         = "key.pem"
+  certificate_filename = "cert.pem"
+
+  ciphers = {
+    aes128_gcm_sha256             = true
+    ecdhe_ecdsa_aes128_gcm_sha256 = true
+    ecdhe_rsa_aes128_gcm_sha256   = true
+    tls_aes128_gcm_sha256         = true
+  }
+}
+----
+
+=== Key Arguments
+
+* `private_space_id` - ID of the private space that contains the TLS context.
+* `name` - Name of the TLS context.
+* `keystore_type` - Type of keystore. Supported values are `PEM` and `JKS`.
+* `certificate` - PEM certificate content. Required for PEM keystores.
+* `key` - PEM private key content. Required for PEM keystores.
+* `keystore_base64` - Base64-encoded JKS keystore content. Required for JKS keystores.
+* `store_passphrase` - Store passphrase for the JKS keystore.
+* `alias` - Alias for the JKS keystore.
+* `ciphers` - Cipher configuration for the TLS context.
+
+=== Import
+
+[source,shell]
+----
+terraform import anypoint_tls_context.example <private_space_id>:<tls_context_id>
+----
+
+== `anypoint_vpn_connection`
+
+Use the `anypoint_vpn_connection` resource to create a VPN connection in a CloudHub 2.0 private space.
+
+=== Example
+
+[source,hcl]
+----
+resource "anypoint_vpn_connection" "example" {
+  private_space_id = anypoint_private_space.example.id
+  name             = "my-vpn-connection"
+
+  vpns = [
+    {
+      local_asn         = "64512"
+      remote_asn        = "65534"
+      remote_ip_address = "203.0.113.1"
+      static_routes     = []
+
+      vpn_tunnels = [
+        {
+          psk            = "my-pre-shared-key-1"
+          ptp_cidr       = "169.254.10.0/30"
+          startup_action = "start"
+        }
+      ]
+    }
+  ]
+}
+----
+
+=== Key Arguments
+
+* `private_space_id` - ID of the private space.
+* `name` - Name of the VPN connection.
+* `organization_id` - Organization ID where the private space is located. If omitted, the provider infers it from the connected app credentials.
+* `vpns` - List of VPN configurations.
+* `local_asn` - Local ASN for the VPN.
+* `remote_asn` - Remote ASN for the VPN.
+* `remote_ip_address` - Remote IP address for the VPN.
+* `static_routes` - Static routes for the VPN.
+* `vpn_tunnels` - VPN tunnel configuration.
+* `psk` - Pre-shared key for the VPN tunnel.
+* `ptp_cidr` - Point-to-point CIDR for the VPN tunnel.
+* `startup_action` - Startup action for the VPN tunnel.
+
+=== Import
+
+[source,shell]
+----
+terraform import anypoint_vpn_connection.example <private_space_id>/<connection_id>
+----
