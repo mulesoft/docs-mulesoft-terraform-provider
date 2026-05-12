@@ -1,6 +1,6 @@
 = Install and Configure the Terraform Provider
 
-To use the MuleSoft  Terraform provider, install the provider from the Terraform Registry and configure authentication for your MuleSoft Platform organization.
+To use the MuleSoft Terraform provider, install the provider from the Terraform Registry and configure authentication for your MuleSoft Platform organization.
 
 The provider supports Terraform-based management for MuleSoft Platform resources, including CloudHub 2.0, API Manager, Access Management, Secrets Manager, MCP servers, and AI agent resources.
 
