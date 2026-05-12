@@ -1,6 +1,6 @@
 = Resources
 
-The MuleSoft Anypoint Terraform provider includes resources for managing infrastructure, API management, security, governance, and AI-related components across Anypoint Platform.
+The MuleSoft Terraform provider includes resources for managing infrastructure, API management, security, governance, and AI-related components across the MuleSoft Platform.
 
 == CloudHub 2.0 Resources
 

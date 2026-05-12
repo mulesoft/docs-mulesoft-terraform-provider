@@ -5,7 +5,7 @@
 * xref:how-provider-works.adoc[How the Provider Works]
 * xref:resources.adoc[Resources]
 ** xref:cloudhub2-resources.adoc[CloudHub 2.0 Resources]
-** xref:managed-gateway.adoc[Managed Omni Gateway Resources]
+** xref:managed-gateway-resources.adoc[Managed Omni Gateway Resources]
 ** xref:access-management-resources.adoc[Access Management Resources]
 ** xref:secret-manager-resources.adoc[Secrets Manager Resources]
 ** xref:api-manager-resources.adoc[API Manager Resources]
