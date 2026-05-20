@@ -8,7 +8,7 @@ The provider supports Terraform-based management for MuleSoft Platform resources
 
 Go to the Terraform Registry and search for the MuleSoft Terraform provider.
 
-For provider installation instructions and the complete list of supported resources, see the https://registry.terraform.io/providers/mulesoft-anypoint/anypoint/latest/docs[MuleSoft Terraform provider documentation].
+For provider installation instructions and the complete list of supported resources, see the https://registry.terraform.io/providers/mulesoft/anypoint/latest/docs[MuleSoft Terraform provider documentation].
 
 == Add the Provider
 
@@ -19,8 +19,8 @@ Add the provider to your Terraform configuration file:
 terraform {
   required_providers {
     anypoint = {
-      source  = "mulesoft-anypoint/anypoint"
-      version = "~> 1.0"
+      source  = "mulesoft/anypoint"
+      version = "~> 0.0.8"
     }
   }
 }
@@ -92,7 +92,7 @@ provider "anypoint" {
 }
 ----
 
-The provider also supports additional authentication methods, including access token authentication and control plane configuration. For the complete provider configuration reference, see the https://registry.terraform.io/providers/mulesoft-anypoint/anypoint/latest/docs[MuleSoft Terraform provider documentation].
+The provider also supports additional authentication methods, including access token authentication and control plane configuration. For the complete provider configuration reference, see the https://registry.terraform.io/providers/mulesoft/anypoint/latest/docs[MuleSoft Terraform provider documentation].
 
 == See Also
 
