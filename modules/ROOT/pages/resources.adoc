@@ -128,7 +128,7 @@ Use these resources to apply policies declaratively to APIs, MCP servers, gatewa
 * xref:a2a-resources.adoc#anypoint_api_policy_xml_threat_protection[`anypoint_api_policy_xml_threat_protection`]
 
 
-For the complete list of supported policy resources, see the https://registry.terraform.io/providers/mulesoft-anypoint/anypoint/latest/docs/resources[Terraform Registry resources documentation].
+For the complete list of supported policy resources, see the https://registry.terraform.io/providers/mulesoft/anypoint/latest/docs/resources[Terraform Registry resources documentation].
 
 == See Also
 
