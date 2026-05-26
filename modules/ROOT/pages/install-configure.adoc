@@ -26,6 +26,8 @@ terraform {
 }
 ----
 
+NOTE: Replace `0.0.8` with the latest version. See the https://registry.terraform.io/providers/mulesoft/anypoint/latest[MuleSoft Anypoint provider on the Terraform Registry] for the current release.
+
 == Initialize Terraform
 
 Run the following command to download and install the provider:
@@ -74,7 +76,7 @@ Configure the provider using the authentication method required for your resourc
 provider "anypoint" {
   client_id     = var.anypoint_client_id
   client_secret = var.anypoint_client_secret
-  cplane        = var.anypoint_cplane
+  base_url      = var.anypoint_base_url
 }
 ----
 
@@ -88,7 +90,7 @@ provider "anypoint" {
   password      = var.anypoint_admin_password
   client_id     = var.anypoint_admin_client_id
   client_secret = var.anypoint_admin_client_secret
-  cplane        = var.anypoint_cplane
+  base_url      = var.anypoint_base_url
 }
 ----
 
