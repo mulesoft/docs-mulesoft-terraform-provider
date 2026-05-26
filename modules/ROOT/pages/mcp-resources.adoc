@@ -21,7 +21,7 @@ NOTE: The computed `upstream_id` attribute is the server-assigned ID for the fir
 resource "anypoint_mcp_server" "example" {
   organization_id = var.organization_id
   environment_id  = var.environment_id
-  technology      = "flexGateway"
+  technology      = "omniGateway"
   instance_label  = "atlassian-mcp-server"
 
   spec = {
@@ -47,7 +47,7 @@ resource "anypoint_mcp_server" "example" {
 resource "anypoint_mcp_server" "advanced" {
   organization_id = var.organization_id
   environment_id  = var.environment_id
-  technology      = "flexGateway"
+  technology      = "omniGateway"
   instance_label  = "enterprise-tools-mcp"
 
   spec = {
@@ -84,14 +84,14 @@ resource "anypoint_mcp_server" "advanced" {
 ** `group_id` - The Exchange group (organization) ID.
 ** `version` - The asset version.
 * `organization_id` - Organization ID. If omitted, the provider infers it from the connected app credentials.
-* `technology` - Gateway technology. Supported values are `flexGateway`, `mule4`, and `serviceMesh`. Defaults to `flexGateway`.
+* `technology` - Gateway technology. Supported values are `omniGateway`, `mule4`, and `serviceMesh`. Defaults to `omniGateway`.
 * `provider_id` - Identity provider ID for the MCP server.
 * `instance_label` - Human-readable label for the MCP server.
 * `approval_method` - Client approval method. Supported values are `manual` and `automatic`.
 * `endpoint` - Endpoint and proxy configuration for the MCP server.
 ** `deployment_type` - Deployment type. Supported values: `HY` (hybrid), `CH` (CloudHub), `RF` (Runtime Fabric). Defaults to `HY`.
 ** `type` - Endpoint protocol type. For MCP servers, this is `mcp`. Defaults to `mcp`.
-** `base_path` - MCP server base path for OmniGateway (for example, `my-mcp-server`). The provider constructs the full proxy URI as `http://0.0.0.0:8081/<base_path>`. Required when `technology = "flexGateway"`. Mutually exclusive with `uri`.
+** `base_path` - MCP server base path for OmniGateway (for example, `my-mcp-server`). The provider constructs the full proxy URI as `http://0.0.0.0:8081/<base_path>`. Required when `technology = "omniGateway"`. Mutually exclusive with `uri`.
 ** `uri` - Direct implementation URI for Mule4 or other technologies. Required when `technology = "mule4"`. Mutually exclusive with `base_path`.
 ** `response_timeout` - Response timeout in milliseconds.
 * `consumer_endpoint` - Consumer-facing endpoint URI (the public URL clients use to reach the MCP server). For MCP, this is the proxy URI that clients connect to.
@@ -151,7 +151,7 @@ NOTE: `upstream_uri` and `routing` are mutually exclusive. Use `upstream_uri` fo
 resource "anypoint_agent_instance" "example" {
   organization_id = var.organization_id
   environment_id  = var.environment_id
-  technology      = "flexGateway"
+  technology      = "omniGateway"
   instance_label  = "customer-support-agent"
 
   spec = {
@@ -177,7 +177,7 @@ resource "anypoint_agent_instance" "example" {
 resource "anypoint_agent_instance" "advanced" {
   organization_id = var.organization_id
   environment_id  = var.environment_id
-  technology      = "flexGateway"
+  technology      = "omniGateway"
   instance_label  = "sales-agent"
 
   spec = {
@@ -214,14 +214,14 @@ resource "anypoint_agent_instance" "advanced" {
 ** `group_id` - The Exchange group (organization) ID.
 ** `version` - The asset version.
 * `organization_id` - Organization ID. If omitted, the provider infers it from the connected app credentials.
-* `technology` - Gateway technology. Supported values are `flexGateway`, `mule4`, and `serviceMesh`. Defaults to `flexGateway`.
+* `technology` - Gateway technology. Supported values are `omniGateway`, `mule4`, and `serviceMesh`. Defaults to `omniGateway`.
 * `provider_id` - Identity provider ID for the agent.
 * `instance_label` - Human-readable label for the agent instance.
 * `approval_method` - Client approval method. Supported values are `manual` and `automatic`.
 * `endpoint` - Endpoint and proxy configuration for the agent instance.
 ** `deployment_type` - Deployment type. Supported values: `HY` (hybrid), `CH` (CloudHub), `RF` (Runtime Fabric). Defaults to `HY`.
 ** `type` - Endpoint protocol type. For agent instances, this is `a2a` (Agent-to-Agent). Defaults to `a2a`.
-** `base_path` - Agent base path for OmniGateway (for example, `my-agent`). Required when `technology = "flexGateway"`. Mutually exclusive with `uri`.
+** `base_path` - Agent base path for OmniGateway (for example, `my-agent`). Required when `technology = "omniGateway"`. Mutually exclusive with `uri`.
 ** `uri` - Direct implementation URI for Mule4 or other technologies. Required when `technology = "mule4"`. Mutually exclusive with `base_path`.
 ** `response_timeout` - Response timeout in milliseconds.
 * `consumer_endpoint` - Consumer-facing endpoint URI (the public URL clients use to reach the agent).

@@ -78,10 +78,10 @@ resource "anypoint_api_instance" "weighted_routing" {
 ** `group_id` - The Exchange group (organization) ID.
 ** `version` - The asset version.
 * `organization_id` - Organization ID. If omitted, the provider infers it from the connected app credentials.
-* `technology` - Gateway technology. Supported values are `flexGateway`, `mule4`, and `serviceMesh`. Defaults to `flexGateway`.
+* `technology` - Gateway technology. Supported values are `omniGateway`, `mule4`, and `serviceMesh`. Defaults to `omniGateway`.
 * `provider_id` - Identity provider ID for the API.
 * `instance_label` - Human-readable label for the API instance.
-* `approval_method` - Client approval method. Supported values are `manual` and `automatic`.
+* `approval_method` - Client approval method. Supported values are `manual` and `null`. Use `manual` to require manual client approval. If omitted or set to `null`, client approval is automatic.
 * `consumer_endpoint` - Consumer-facing endpoint URI (the public URL clients use to reach the API).
 * `upstream_uri` - Shorthand for a single-upstream routing configuration. Mutually exclusive with `routing`.
 * `gateway_id` - Omni Gateway UUID. When provided, the deployment block is auto-populated by fetching gateway details (`target_id`, `target_name`, `gateway_version`) from the Gateway Manager. Mutually exclusive with a full `deployment` block.
@@ -90,7 +90,7 @@ resource "anypoint_api_instance" "weighted_routing" {
 ** `type` - Endpoint protocol type. Supported values are `http`, `rest`, and `raml`. Defaults to `http`.
 ** `base_path` - API base path for OmniGateway (for example, `my-api`). Required when `technology = "omniGateway"`. Mutually exclusive with `uri`.
 ** `uri` - Direct implementation URI for Mule4 or other technologies. Required when `technology = "mule4"`. Mutually exclusive with `base_path`.
-** `response_timeout` - Response timeout in milliseconds.
+** `response_timeout` - Response timeout in milliseconds. Not supported when `technology = "omniGateway"`; must be omitted or set to `null`.
 * `deployment` - Deployment target configuration. Auto-populated when `gateway_id` is set.
 ** `environment_id` - Environment ID for deployment.
 ** `type` - Deployment type. Supported values: `HY`, `CH`, `RF`. Defaults to `HY`.
