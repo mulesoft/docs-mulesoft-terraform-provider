@@ -64,15 +64,72 @@ resource "anypoint_private_space_association" "example" {
 
 === Key Arguments
 
-* `private_space_id` - ID of the private space.
+* `private_space_id` - (Required) ID of the private space.
 * `organization_id` - Organization ID. If omitted, the provider infers it from the connected app credentials.
-* `associations` - List of associations between the private space and environments.
+* `associations` - List of associations to create between the private space and environments.
+** `organization_id` - (Required) Organization ID for the association.
+** `environment` - (Required) Environment for the association. Accepted values: an environment UUID, `all`, `production`, or `sandbox`.
+
+=== Read-Only Attributes
+
+* `id` - Unique identifier for the Private Space Association resource.
+* `created_associations` - List of associations read from the Anypoint Platform API after apply or import.
+** `id` - ID of the created association.
+** `organization_id` - Organization ID of the association.
+** `environment` - Environment of the association.
 
 === Import
 
+Use an import block (Terraform ≥ 1.5, recommended) or the Terraform CLI.
+
+*Root organization — simple ID:*
+
+[source,hcl]
+----
+import {
+  to = anypoint_private_space_association.imported
+  id = "<private_space_id>"
+}
+
+resource "anypoint_private_space_association" "imported" {
+  private_space_id = "<private_space_id>"
+  organization_id  = "<organization_id>"
+  associations     = []
+}
+----
+
+*Business Group (sub-org) — composite ID:*
+
+[source,hcl]
+----
+import {
+  to = anypoint_private_space_association.imported
+  id = "<org_id>/<private_space_id>"
+}
+
+resource "anypoint_private_space_association" "imported" {
+  private_space_id = "<private_space_id>"
+  organization_id  = "<org_id>"
+  associations     = []
+}
+----
+
+To auto-generate the resource configuration instead of writing it manually, run:
+
 [source,shell]
 ----
+terraform plan -generate-config-out=generated.tf
+----
+
+For Terraform < 1.5, use the CLI:
+
+[source,shell]
+----
+# Root organization:
 terraform import anypoint_private_space_association.example <private_space_id>
+
+# Business Group (sub-org):
+terraform import anypoint_private_space_association.example <org_id>/<private_space_id>
 ----
 
 == `anypoint_private_space_upgrade`
@@ -104,7 +161,7 @@ resource "anypoint_private_space_upgrade" "example" {
 
 [source,shell]
 ----
-terraform import anypoint_private_space_upgrade.example <private_space_id>:<date>:<opt_in>
+terraform import anypoint_private_space_upgrade.example <org_id>:<space_id>:<date>:<opt_in>
 ----
 
 == `anypoint_privatespace_advanced_config`
@@ -188,7 +245,7 @@ resource "anypoint_tls_context" "pem_example" {
 
 [source,shell]
 ----
-terraform import anypoint_tls_context.example <private_space_id>:<tls_context_id>
+terraform import anypoint_tls_context.example <org_id>:<space_id>:<tls_id>
 ----
 
 == `anypoint_vpn_connection`
@@ -241,5 +298,5 @@ resource "anypoint_vpn_connection" "example" {
 
 [source,shell]
 ----
-terraform import anypoint_vpn_connection.example <private_space_id>/<connection_id>
+terraform import anypoint_vpn_connection.example <org_id>/<space_id>/<connection_id>
 ----

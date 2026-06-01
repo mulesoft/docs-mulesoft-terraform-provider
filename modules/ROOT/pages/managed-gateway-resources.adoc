@@ -77,3 +77,10 @@ resource "anypoint_managed_omni_gateway" "example" {
 ----
 terraform import anypoint_managed_omni_gateway.example <organization_id>/<environment_id>/<gateway_id>
 ----
+
+For root-level organizations, you can omit the organization ID:
+
+[source,shell]
+----
+terraform import anypoint_managed_omni_gateway.example <env_id>/<gateway_id>
+----
