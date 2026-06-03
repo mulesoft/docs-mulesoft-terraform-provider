@@ -66,7 +66,7 @@ resource "anypoint_private_space_association" "example" {
 
 * `private_space_id` - (Required) ID of the private space.
 * `organization_id` - Organization ID. If omitted, the provider infers it from the connected app credentials.
-* `associations` - List of associations to create between the private space and environments.
+* `associations` - (Optional) List of associations to create between the private space and environments. When omitted, the provider reads the existing associations from the API and populates this field automatically.
 ** `organization_id` - (Required) Organization ID for the association.
 ** `environment` - (Required) Environment for the association. Accepted values: an environment UUID, `all`, `production`, or `sandbox`.
 
@@ -94,7 +94,6 @@ import {
 resource "anypoint_private_space_association" "imported" {
   private_space_id = "<private_space_id>"
   organization_id  = "<organization_id>"
-  associations     = []
 }
 ----
 
@@ -110,7 +109,6 @@ import {
 resource "anypoint_private_space_association" "imported" {
   private_space_id = "<private_space_id>"
   organization_id  = "<org_id>"
-  associations     = []
 }
 ----
 
