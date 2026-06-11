@@ -127,6 +127,13 @@ resource "anypoint_api_instance" "weighted_routing" {
 terraform import anypoint_api_instance.example <organization_id>/<environment_id>/<api_instance_id>
 ----
 
+For root-level organizations, you can omit the organization ID:
+
+[source,shell]
+----
+terraform import anypoint_api_instance.example <env_id>/<instance_id>
+----
+
 == `anypoint_api_instance_sla_tier`
 
 Use the `anypoint_api_instance_sla_tier` resource to manage SLA tiers for API instances in API Manager.

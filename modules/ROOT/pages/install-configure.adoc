@@ -20,13 +20,13 @@ terraform {
   required_providers {
     anypoint = {
       source  = "mulesoft/anypoint"
-      version = "~> 0.0.8"
+      version = "~> 1.0.0"
     }
   }
 }
 ----
 
-NOTE: Replace `0.0.8` with the latest version. See the https://registry.terraform.io/providers/mulesoft/anypoint/latest[MuleSoft Anypoint provider on the Terraform Registry] for the current release.
+NOTE: Replace `1.0.0` with the latest version. See the https://registry.terraform.io/providers/mulesoft/anypoint/latest[MuleSoft Anypoint provider on the Terraform Registry] for the current release.
 
 == Initialize Terraform
 
