@@ -4,17 +4,33 @@ Use these resources to manage MCP servers and AI agent resources.
 
 == `anypoint_mcp_server`
 
-Use the `anypoint_mcp_server` resource to manage MCP servers in Anypoint API Manager.
+Use the `anypoint_mcp_server` resource to create and manage MCP servers in Anypoint API Manager.
 
 An MCP server represents an MCP server specification deployed to an Omni Gateway target with routing rules and upstream backends.
 
-NOTE: After a successful `terraform apply`, the `status` field is populated from a GET request made immediately after the POST. The platform typically returns `status = "active"` right away.
+[NOTE]
+====
+*Connected App:* This resource requires a *standard connected app* (client credentials). An admin connected app isn't needed. The connected app must have relevant scopes.
+====
 
-NOTE: `upstream_uri` and `routing` are mutually exclusive. Use `upstream_uri` for a single upstream. Only one upstream per route is supported for MCP servers — multi-upstream weighted routing is not available.
+[NOTE]
+====
+*Status after create:* After a successful `terraform apply` the `status` field is populated from a GET request made immediately after the POST. The platform typically returns `status = "active"` right away.
+====
 
-NOTE: The computed `upstream_id` attribute is the server-assigned ID for the first upstream. Reference it in outbound policy `upstream_ids` to bind policies to this MCP server's upstream.
+[NOTE]
+====
+*`upstream_uri` vs `routing`:* `upstream_uri` and `routing` are mutually exclusive. Use `upstream_uri` for a single upstream. Only one upstream per route is supported for MCP servers — multi-upstream weighted routing isn't available.
+====
 
-=== Basic Example
+[NOTE]
+====
+*`upstream_id`:* The computed `upstream_id` attribute is the server-assigned ID for the first upstream. Reference it in outbound policy `upstream_ids` to bind policies to this MCP server's upstream.
+====
+
+=== Example Usage
+
+==== Basic MCP server with `upstream_uri`
 
 [source,hcl]
 ----
@@ -40,7 +56,7 @@ resource "anypoint_mcp_server" "example" {
 }
 ----
 
-=== Explicit Routing Example
+==== MCP server with explicit routing
 
 [source,hcl]
 ----
@@ -76,75 +92,146 @@ resource "anypoint_mcp_server" "advanced" {
 }
 ----
 
-=== Key Arguments
+=== Required Arguments
 
-* `environment_id` - (Required) Environment ID where the MCP server is created.
-* `spec` - (Required) Exchange asset specification associated with the MCP server.
-** `asset_id` - The Exchange asset ID.
-** `group_id` - The Exchange group (organization) ID.
-** `version` - The asset version.
-* `organization_id` - Organization ID. If omitted, the provider infers it from the connected app credentials.
-* `technology` - Gateway technology. Supported values are `omniGateway`, `mule4`, and `serviceMesh`. Defaults to `omniGateway`.
-* `provider_id` - Identity provider ID for the MCP server.
-* `instance_label` - Human-readable label for the MCP server.
-* `approval_method` - Client approval method. Supported values are `manual` and `automatic`.
-* `endpoint` - Endpoint and proxy configuration for the MCP server.
-** `deployment_type` - Deployment type. Supported values: `HY` (hybrid), `CH` (CloudHub), `RF` (Runtime Fabric). Defaults to `HY`.
-** `type` - Endpoint protocol type. For MCP servers, this is `mcp`. Defaults to `mcp`.
-** `base_path` - MCP server base path for OmniGateway (for example, `my-mcp-server`). The provider constructs the full proxy URI as `http://0.0.0.0:8081/<base_path>`. Required when `technology = "omniGateway"`. Mutually exclusive with `uri`.
-** `uri` - Direct implementation URI for Mule4 or other technologies. Required when `technology = "mule4"`. Mutually exclusive with `base_path`.
-** `response_timeout` - Response timeout in milliseconds.
+* `environment_id` - The environment ID where the MCP server will be created.
+* `spec` - (Block) The Exchange asset specification backing this MCP server. See <<Nested Schema for spec>>.
+
+=== Optional Arguments
+
+* `organization_id` - Organization ID. If not provided, the organization ID is inferred from the connected app credentials.
+* `technology` - The gateway technology. Only `omniGateway` is currently supported. Defaults to `omniGateway`.
+* `provider_id` - The identity provider ID for the MCP server.
+* `instance_label` - A human-readable label for this MCP server.
+* `approval_method` - Client approval method. Valid values: `manual`, `automatic`. Defaults to `null` (no approval required).
 * `consumer_endpoint` - Consumer-facing endpoint URI (the public URL clients use to reach the MCP server). For MCP, this is the proxy URI that clients connect to.
-* `upstream_uri` - Shorthand for a single-upstream routing configuration. When set, the provider constructs routing as `[{upstreams: [{weight: 100, uri: <value>}]}]`. This is typically the upstream MCP server URI that the proxy forwards to. Mutually exclusive with `routing`.
-* `gateway_id` - Omni Gateway UUID. When provided, the deployment block is auto-populated by fetching gateway details (`target_id`, `target_name`, `gateway_version`) from the Gateway Manager. Mutually exclusive with a full `deployment` block.
-* `deployment` - Deployment target configuration. Auto-populated when `gateway_id` is set.
-** `environment_id` - Environment ID for deployment.
-** `type` - Deployment type. Supported values: `HY`, `CH`, `RF`. Defaults to `HY`.
-** `expected_status` - Expected deployment status. Supported values: `deployed`, `undeployed`. Defaults to `deployed`.
-** `overwrite` - Whether to overwrite an existing deployment.
-** `target_id` - Target gateway ID to deploy to.
-** `target_name` - Target gateway name.
-** `gateway_version` - Omni Gateway runtime version.
-* `routing` - Routing rules with upstream backends. Upstreams point to the actual MCP server implementation URIs. Mutually exclusive with `upstream_uri`.
-** `label` - Label for this route.
-** `rules` - Match conditions for this route.
-*** `methods` - Pipe-separated HTTP methods (for example, `GET`, `POST|PUT`).
-*** `path` - URL path pattern to match (for example, `/api/*`).
-*** `host` - Host header value to match.
-*** `headers` - Header key-value pairs to match.
-** `upstreams` - (Required) Upstream backends for this route.
-*** `uri` - (Required) Upstream backend URI. For MCP servers, this is the actual MCP server implementation URI that requests are forwarded to.
-*** `weight` - Traffic weight percentage (0–100). Defaults to `100`.
-*** `label` - Label for this upstream.
-*** `tls_context_id` - TLS context for upstream connections. Format: `secretGroupId/tlsContextId`.
+* `upstream_uri` - Shorthand for a single-upstream routing configuration. Mutually exclusive with `routing`.
+* `gateway_id` - The Omni Gateway UUID. When provided, the deployment block is auto-populated from the Gateway Manager. Mutually exclusive with a full `deployment` block.
+* `endpoint` - (Block) Endpoint and proxy configuration. See <<Nested Schema for endpoint>>.
+* `deployment` - (Block) Deployment target configuration. Auto-populated when `gateway_id` is set. See <<Nested Schema for deployment>>.
+* `routing` - (Block List) Routing rules with upstream backends. Mutually exclusive with `upstream_uri`. See <<Nested Schema for routing>>.
 
 === Read-Only Attributes
 
-* `id` - Unique identifier of the MCP server.
-* `status` - Current status of the MCP server.
-* `asset_id` - Exchange asset ID.
-* `asset_version` - Exchange asset version.
-* `product_version` - Product version.
-* `upstream_id` - Server-assigned upstream ID for the first upstream. Use this to reference the upstream in outbound policy `upstream_ids`.
+* `id` - The numeric identifier of the MCP server (stored as string for Terraform compatibility).
+* `status` - The current status of the MCP server.
+* `asset_id` - The Exchange asset ID (computed from MCP server response).
+* `asset_version` - The Exchange asset version (computed from MCP server response).
+* `product_version` - The product version (computed from MCP server response).
+* `upstream_id` - The server-assigned upstream ID for the first upstream. Use this to reference the upstream in outbound policy `upstream_ids`.
+
+=== Nested Schema for `spec`
+
+* `asset_id` - (Required) The Exchange asset ID.
+* `group_id` - (Required) The Exchange group (organization) ID.
+* `version` - (Required) The asset version.
+
+=== Nested Schema for `endpoint`
+
+* `deployment_type` - Deployment type. Valid values: `HY` (hybrid), `CH` (CloudHub), `RF` (Runtime Fabric). Defaults to `HY`.
+* `type` - Endpoint protocol type. For MCP servers, this is `mcp`. Defaults to `mcp`.
+* `base_path` - MCP server base path for Omni Gateway (for example, `my-mcp-server`). The provider constructs the proxy URI as `\http://0.0.0.0:8081/<base_path>`.
+* `uri` - Direct implementation URI. Mutually exclusive with `base_path`.
+* `response_timeout` - Response timeout in milliseconds.
+
+=== Nested Schema for `deployment`
+
+* `environment_id` - The environment ID for deployment (usually matches the top-level `environment_id`).
+* `type` - Deployment type. Valid values: `HY`, `CH`, `RF`. Defaults to `HY`.
+* `expected_status` - Expected deployment status. Valid values: `deployed`, `undeployed`. Defaults to `deployed`.
+* `overwrite` - Whether to overwrite an existing deployment.
+* `target_id` - The target gateway ID to deploy to.
+* `target_name` - The target gateway name.
+* `gateway_version` - The Omni Gateway runtime version.
+
+=== Nested Schema for `routing`
+
+* `upstreams` - (Required, Block List) Upstream backends for this route. For MCP servers, these are the actual MCP server implementation endpoints. See <<Nested Schema for routing.upstreams>>.
+* `label` - A label for this route.
+* `rules` - (Block) Match conditions for this route. See <<Nested Schema for routing.rules>>.
+
+=== Nested Schema for `routing.rules`
+
+* `methods` - Pipe-separated HTTP methods (for example, `GET`, `POST|PUT`).
+* `path` - URL path pattern to match (for example, `/api/*`).
+* `host` - Host header value to match.
+* `headers` - (Map) Header key-value pairs to match.
+
+=== Nested Schema for `routing.upstreams`
+
+* `uri` - (Required) The upstream backend URI. For MCP servers, this is the actual MCP server implementation URI that requests are forwarded to.
+* `weight` - Traffic weight percentage (0–100). Defaults to `100`.
+* `label` - A label for this upstream.
+* `tls_context_id` - TLS context for upstream connections. Format: `secretGroupId/tlsContextId`.
 
 === Import
 
+An existing MCP server can be imported using its composite ID: `organization_id/environment_id/mcp_server_id`.
+
+The `mcp_server_id` is the numeric ID visible in the Anypoint API Manager URL.
+
+==== Using an import block (Terraform ≥ 1.5 — recommended)
+
+[source,hcl]
+----
+import {
+  to = anypoint_mcp_server.imported
+  id = "<organization_id>/<environment_id>/<mcp_server_id>"
+}
+
+resource "anypoint_mcp_server" "imported" {
+  organization_id = "<organization_id>"
+  environment_id  = "<environment_id>"
+  spec = {
+    asset_id = "<mcp_server_asset_id>"
+    group_id = "<organization_id>"
+    version  = "1.0.0"
+  }
+}
+----
+
+After adding the import block, run:
+
 [source,shell]
 ----
-terraform import anypoint_mcp_server.example <organization_id>/<environment_id>/<instance_id>
+# Let Terraform generate the full resource configuration automatically:
+terraform plan -generate-config-out=generated.tf
+
+# Or apply the import directly if you have an existing resource block:
+terraform apply
+----
+
+==== Using the CLI (deprecated, Terraform < 1.5)
+
+[source,shell]
+----
+terraform import anypoint_mcp_server.imported <organization_id>/<environment_id>/<mcp_server_id>
 ----
 
 == `anypoint_agent_instance`
 
-Use the `anypoint_agent_instance` resource to manage agent instances in Anypoint API Manager.
+Use the `anypoint_agent_instance` resource to create and manage Agent instances in Anypoint API Manager.
 
-An agent instance represents an agent specification deployed to an Omni Gateway target with routing rules and upstream backends.
+An Agent instance represents an Agent specification deployed to an Omni Gateway target with routing rules and upstream backends.
 
-NOTE: After a successful `terraform apply`, the `status` field is populated from a GET request made immediately after the POST. The platform typically returns `status = "active"` right away. If your Gateway is not yet ready, the provider retries the POST up to 5 times with a 20-second backoff before failing.
+[NOTE]
+====
+*Connected App:* This resource requires a *standard connected app* (client credentials). An admin connected app isn't needed. The connected app must have relevant scopes.
+====
 
-NOTE: `upstream_uri` and `routing` are mutually exclusive. Use `upstream_uri` for a single upstream — the provider expands it to `[{upstreams: [{weight: 100, uri: <value>}]}]` automatically. Only one upstream per route is supported; multi-upstream weighted routing is not available for agent instances.
+[NOTE]
+====
+*Status after create:* After a successful `terraform apply` the `status` field is populated from a GET request made immediately after the POST. The platform typically returns `status = "active"` right away. If your Gateway isn't yet ready, the provider retries the POST up to 5 times with a 20-second backoff before failing.
+====
 
-=== Basic Example
+[NOTE]
+====
+*`upstream_uri` vs `routing`:* `upstream_uri` and `routing` are mutually exclusive. Use `upstream_uri` for a single upstream — the provider expands it to `[{upstreams: [{weight: 100, uri: <value>}]}]` automatically. Only one upstream per route is supported; multi-upstream weighted routing isn't available for Agent instances.
+====
+
+=== Example Usage
+
+==== Basic Agent instance with `upstream_uri`
 
 [source,hcl]
 ----
@@ -170,7 +257,7 @@ resource "anypoint_agent_instance" "example" {
 }
 ----
 
-=== Explicit Routing Example
+==== Agent instance with explicit routing
 
 [source,hcl]
 ----
@@ -206,59 +293,117 @@ resource "anypoint_agent_instance" "advanced" {
 }
 ----
 
-=== Key Arguments
+=== Required Arguments
 
-* `environment_id` - (Required) Environment ID where the agent instance is created.
-* `spec` - (Required) Exchange asset specification associated with the agent instance.
-** `asset_id` - The Exchange asset ID.
-** `group_id` - The Exchange group (organization) ID.
-** `version` - The asset version.
-* `organization_id` - Organization ID. If omitted, the provider infers it from the connected app credentials.
-* `technology` - Gateway technology. Supported values are `omniGateway`, `mule4`, and `serviceMesh`. Defaults to `omniGateway`.
-* `provider_id` - Identity provider ID for the agent.
-* `instance_label` - Human-readable label for the agent instance.
-* `approval_method` - Client approval method. Supported values are `manual` and `automatic`.
-* `endpoint` - Endpoint and proxy configuration for the agent instance.
-** `deployment_type` - Deployment type. Supported values: `HY` (hybrid), `CH` (CloudHub), `RF` (Runtime Fabric). Defaults to `HY`.
-** `type` - Endpoint protocol type. For agent instances, this is `a2a` (Agent-to-Agent). Defaults to `a2a`.
-** `base_path` - Agent base path for OmniGateway (for example, `my-agent`). Required when `technology = "omniGateway"`. Mutually exclusive with `uri`.
-** `uri` - Direct implementation URI for Mule4 or other technologies. Required when `technology = "mule4"`. Mutually exclusive with `base_path`.
-** `response_timeout` - Response timeout in milliseconds.
-* `consumer_endpoint` - Consumer-facing endpoint URI (the public URL clients use to reach the agent).
+* `environment_id` - The environment ID where the Agent instance will be created.
+* `spec` - (Block) The Exchange asset specification backing this Agent instance. See <<Nested Schema for spec>>.
+
+=== Optional Arguments
+
+* `organization_id` - Organization ID. If not provided, the organization ID is inferred from the connected app credentials.
+* `technology` - The gateway technology. Only `omniGateway` is currently supported. Defaults to `omniGateway`.
+* `provider_id` - The identity provider ID for the Agent.
+* `instance_label` - A human-readable label for this Agent instance.
+* `approval_method` - Client approval method. Valid values: `manual`, `automatic`. Defaults to `null` (no approval required).
+* `consumer_endpoint` - Consumer-facing endpoint URI (the public URL clients use to reach the Agent).
 * `upstream_uri` - Shorthand for a single-upstream routing configuration. Mutually exclusive with `routing`.
-* `gateway_id` - Omni Gateway UUID. When provided, the deployment block is auto-populated from the Gateway Manager. Mutually exclusive with a full `deployment` block.
-* `deployment` - Deployment target configuration.
-** `environment_id` - Environment ID for deployment.
-** `type` - Deployment type. Supported values: `HY`, `CH`, `RF`. Defaults to `HY`.
-** `expected_status` - Expected deployment status. Supported values: `deployed`, `undeployed`. Defaults to `deployed`.
-** `overwrite` - Whether to overwrite an existing deployment.
-** `target_id` - Target gateway ID to deploy to.
-** `target_name` - Target gateway name.
-** `gateway_version` - Omni Gateway runtime version.
-* `routing` - Routing rules with weighted upstream backends. Mutually exclusive with `upstream_uri`.
-** `label` - Label for this route.
-** `rules` - Match conditions for this route.
-*** `methods` - Pipe-separated HTTP methods (for example, `GET`, `POST|PUT`).
-*** `path` - URL path pattern to match (for example, `/api/*`).
-*** `host` - Host header value to match.
-*** `headers` - Header key-value pairs to match.
-** `upstreams` - (Required) Weighted upstream backends for this route.
-*** `uri` - (Required) Upstream backend URI.
-*** `weight` - Traffic weight percentage (0–100). Defaults to `100`.
-*** `label` - Label for this upstream.
-*** `tls_context_id` - TLS context for upstream connections. Format: `secretGroupId/tlsContextId`.
+* `gateway_id` - The Omni Gateway UUID. When provided, the deployment block is auto-populated from the Gateway Manager. Mutually exclusive with a full `deployment` block.
+* `endpoint` - (Block) Endpoint and proxy configuration. See <<Nested Schema for endpoint>>.
+* `deployment` - (Block) Deployment target configuration. Auto-populated when `gateway_id` is set. See <<Nested Schema for deployment>>.
+* `routing` - (Block List) Routing rules with weighted upstream backends. Mutually exclusive with `upstream_uri`. See <<Nested Schema for routing>>.
 
 === Read-Only Attributes
 
-* `id` - Unique identifier of the agent instance.
-* `status` - Current status of the agent instance.
-* `asset_id` - Exchange asset ID.
-* `asset_version` - Exchange asset version.
-* `product_version` - Product version.
+* `id` - The numeric identifier of the Agent instance (stored as string for Terraform compatibility).
+* `status` - The current status of the Agent instance.
+* `asset_id` - The Exchange asset ID (computed from Agent response).
+* `asset_version` - The Exchange asset version (computed from Agent response).
+* `product_version` - The product version (computed from Agent response).
+
+=== Nested Schema for `spec`
+
+* `asset_id` - (Required) The Exchange asset ID.
+* `group_id` - (Required) The Exchange group (organization) ID.
+* `version` - (Required) The asset version.
+
+=== Nested Schema for `endpoint`
+
+* `deployment_type` - Deployment type. Valid values: `HY` (hybrid), `CH` (CloudHub), `RF` (Runtime Fabric). Defaults to `HY`.
+* `type` - Endpoint protocol type. For Agent instances, this is `a2a` (Agent-to-Agent). Defaults to `a2a`.
+* `base_path` - Agent base path for Omni Gateway (for example, `my-agent`). The provider constructs the proxy URI as `\http://0.0.0.0:8081/<base_path>`.
+* `uri` - Direct implementation URI. Mutually exclusive with `base_path`.
+* `response_timeout` - Response timeout in milliseconds.
+
+=== Nested Schema for `deployment`
+
+* `environment_id` - The environment ID for deployment (usually matches the top-level `environment_id`).
+* `type` - Deployment type. Valid values: `HY`, `CH`, `RF`. Defaults to `HY`.
+* `expected_status` - Expected deployment status. Valid values: `deployed`, `undeployed`. Defaults to `deployed`.
+* `overwrite` - Whether to overwrite an existing deployment.
+* `target_id` - The target gateway ID to deploy to.
+* `target_name` - The target gateway name.
+* `gateway_version` - The Omni Gateway runtime version.
+
+=== Nested Schema for `routing`
+
+* `upstreams` - (Required, Block List) Weighted upstream backends for this route. See <<Nested Schema for routing.upstreams>>.
+* `label` - A label for this route.
+* `rules` - (Block) Match conditions for this route. See <<Nested Schema for routing.rules>>.
+
+=== Nested Schema for `routing.rules`
+
+* `methods` - Pipe-separated HTTP methods (for example, `GET`, `POST|PUT`).
+* `path` - URL path pattern to match (for example, `/api/*`).
+* `host` - Host header value to match.
+* `headers` - (Map) Header key-value pairs to match.
+
+=== Nested Schema for `routing.upstreams`
+
+* `uri` - (Required) The upstream backend URI.
+* `weight` - Traffic weight percentage (0–100). Defaults to `100`.
+* `label` - A label for this upstream.
+* `tls_context_id` - TLS context for upstream connections. Format: `secretGroupId/tlsContextId`.
 
 === Import
 
+An existing Agent instance can be imported using its composite ID: `organization_id/environment_id/agent_instance_id`.
+
+The `agent_instance_id` is the numeric ID visible in the Anypoint API Manager URL.
+
+==== Using an import block (Terraform ≥ 1.5 — recommended)
+
+[source,hcl]
+----
+import {
+  to = anypoint_agent_instance.imported
+  id = "<organization_id>/<environment_id>/<agent_instance_id>"
+}
+
+resource "anypoint_agent_instance" "imported" {
+  organization_id = "<organization_id>"
+  environment_id  = "<environment_id>"
+  spec = {
+    asset_id = "<agent_asset_id>"
+    group_id = "<organization_id>"
+    version  = "1.0.0"
+  }
+}
+----
+
+After adding the import block, run:
+
 [source,shell]
 ----
-terraform import anypoint_agent_instance.example <organization_id>/<environment_id>/<instance_id>
+# Let Terraform generate the full resource configuration automatically:
+terraform plan -generate-config-out=generated.tf
+
+# Or apply the import directly if you have an existing resource block:
+terraform apply
+----
+
+==== Using the CLI (deprecated, Terraform < 1.5)
+
+[source,shell]
+----
+terraform import anypoint_agent_instance.imported <organization_id>/<environment_id>/<agent_instance_id>
 ----

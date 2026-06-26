@@ -6,11 +6,25 @@ These resources help you provision and manage CloudHub 2.0 infrastructure declar
 
 == `anypoint_private_space_config`
 
-Use the `anypoint_private_space_config` resource to manage a CloudHub 2.0 private space, including its network configuration and firewall rules.
+Use the `anypoint_private_space_config` resource to manage a CloudHub 2.0 private space together with its network configuration and firewall rules as a single composite resource.
 
-This resource supports private space creation, network provisioning, egress configuration, IAM role configuration, and firewall rule management.
+[NOTE]
+====
+*Connected App:* This resource requires a *standard connected app* (client credentials). An admin connected app isn't needed. The connected app must have relevant scopes.
+====
 
-=== Example
+=== Example Usage
+
+==== Minimal (space only, no network)
+
+[source,hcl]
+----
+resource "anypoint_private_space_config" "example" {
+  name = "my-private-space"
+}
+----
+
+==== Basic (space + network)
 
 [source,hcl]
 ----
@@ -26,27 +40,160 @@ resource "anypoint_private_space_config" "example" {
 }
 ----
 
-=== Key Arguments
+==== Full (space + network + firewall rules)
 
-* `name` - Name of the private space.
-* `organization_id` - Organization ID where the private space is created. If omitted, the provider organization is used.
-* `enable_egress` - Enables egress for the private space.
-* `enable_iam_role` - Enables IAM role configuration for the private space.
-* `network` - Network configuration for the private space, including region and CIDR block.
-* `firewall_rules` - Firewall rules for the private space.
+[source,hcl]
+----
+resource "anypoint_private_space_config" "example" {
+  name            = "my-private-space"
+  organization_id = var.organization_id
+  enable_egress   = true
+  enable_iam_role = false
+
+  network {
+    region         = "us-east-1"
+    cidr_block     = "10.0.0.0/22"
+    reserved_cidrs = ["10.0.3.0/24"]
+  }
+
+  firewall_rules = [
+    {
+      cidr_block = "0.0.0.0/0"
+      protocol   = "tcp"
+      from_port  = 30500
+      to_port    = 32500
+      type       = "inbound"
+    },
+    {
+      cidr_block = "0.0.0.0/0"
+      protocol   = "tcp"
+      from_port  = 0
+      to_port    = 65535
+      type       = "outbound"
+    },
+  ]
+}
+
+output "private_space_id" {
+  value = anypoint_private_space_config.example.id
+}
+
+output "network_dns_target" {
+  value = anypoint_private_space_config.example.network.dns_target
+}
+
+output "inbound_static_ips" {
+  value = anypoint_private_space_config.example.network.inbound_static_ips
+}
+----
+
+=== Required Arguments
+
+* `name` - The name of the private space.
+
+=== Optional Arguments
+
+* `organization_id` - Organization ID where the private space will be created. Defaults to the provider organization.
+* `enable_egress` - Whether to enable egress for the private space. Defaults to `false`.
+* `enable_iam_role` - Whether to enable IAM role for the private space. Defaults to `false`.
+* `firewall_rules` - (List of Object) Firewall rules for the private space. Omit to use platform-managed default rules.
+** `cidr_block` - (Required) The CIDR block for the firewall rule.
+** `protocol` - (Required) The protocol (`tcp`, `udp`, `icmp`).
+** `from_port` - (Required) The starting port.
+** `to_port` - (Required) The ending port.
+** `type` - (Required) The rule direction (`inbound` or `outbound`).
+* `network` - (Block) Network configuration for the private space. Omit to create the space without a network.
+** `region` - The AWS region for the private network. Forces replacement if changed.
+** `cidr_block` - The CIDR block for the private network. Forces replacement if changed.
+** `reserved_cidrs` - (List of String) Reserved CIDR blocks for the private network.
+
+=== Read-Only Attributes
+
+* `id` - The unique identifier for the private space.
+* `status` - The current status of the private space (for example, `Running`, `Provisioning`).
+* `root_organization_id` - The root organization ID of the private space.
+* `mule_app_deployment_count` - The number of Mule apps currently deployed in the private space.
+* `days_left_for_relaxed_quota` - The number of days left for the relaxed deployment quota.
+* `vpc_migration_in_progress` - Whether a VPC migration is currently in progress.
+* `managed_firewall_rules` - (List of String) Platform-managed firewall rule identifiers.
+* `global_space_status` - (Map of String) Per-region global space status details.
+
+Within the `network` block:
+
+* `inbound_static_ips` - (List of String) Inbound static IPs assigned to the private network.
+* `inbound_internal_static_ips` - (List of String) Inbound internal static IPs assigned to the private network.
+* `outbound_static_ips` - (List of String) Outbound static IPs assigned to the private network.
+* `dns_target` - The DNS target hostname for the private network.
 
 === Import
 
+An existing private space configuration can be imported using its private space ID (UUID). Use the simple ID for root-org private spaces, or `<org_id>/<private_space_id>` for Business Groups.
+
+After import, run `terraform plan` to verify the state matches the actual configuration. The imported state captures all network and firewall settings from the platform.
+
+==== Using an import block (Terraform ≥ 1.5 — recommended)
+
+Root org:
+
+[source,hcl]
+----
+import {
+  to = anypoint_private_space_config.imported
+  id = "<private_space_id>"
+}
+
+resource "anypoint_private_space_config" "imported" {
+  name = "<private_space_name>"
+}
+----
+
+Sub-org (Business Group):
+
+[source,hcl]
+----
+import {
+  to = anypoint_private_space_config.imported
+  id = "<org_id>/<private_space_id>"
+}
+
+resource "anypoint_private_space_config" "imported" {
+  name            = "<private_space_name>"
+  organization_id = "<org_id>"
+}
+----
+
+After adding the import block, run:
+
 [source,shell]
 ----
-terraform import anypoint_private_space_config.example <private_space_id>
+# Let Terraform generate the full resource configuration automatically:
+terraform plan -generate-config-out=generated.tf
+
+# Or apply the import directly if you have an existing resource block:
+terraform apply
+----
+
+==== Using the CLI (deprecated, Terraform < 1.5)
+
+[source,shell]
+----
+# Root org:
+terraform import anypoint_private_space_config.imported <private_space_id>
+
+# Sub-org:
+terraform import anypoint_private_space_config.imported <org_id>/<private_space_id>
 ----
 
 == `anypoint_private_space_association`
 
-Use the `anypoint_private_space_association` resource to associate a CloudHub 2.0 private space with environments.
+Use the `anypoint_private_space_association` resource to create and manage associations between a CloudHub 2.0 private space and environments.
 
-=== Example
+[NOTE]
+====
+*Connected App:* This resource requires a *standard connected app* (client credentials). An admin connected app isn't needed. The connected app must have relevant scopes.
+====
+
+=== Example Usage
 
 [source,hcl]
 ----
@@ -62,27 +209,38 @@ resource "anypoint_private_space_association" "example" {
 }
 ----
 
-=== Key Arguments
+=== Required Arguments
 
-* `private_space_id` - (Required) ID of the private space.
-* `organization_id` - Organization ID. If omitted, the provider infers it from the connected app credentials.
-* `associations` - (Optional) List of associations to create between the private space and environments. When omitted, the provider reads the existing associations from the API and populates this field automatically.
-** `organization_id` - (Required) Organization ID for the association.
-** `environment` - (Required) Environment for the association. Accepted values: an environment UUID, `all`, `production`, or `sandbox`.
+* `private_space_id` - The ID of the private space.
+
+=== Optional Arguments
+
+* `organization_id` - Organization ID. If not provided, the organization ID is inferred from the connected app credentials.
+* `associations` - (Block List) List of associations to create between the private space and environments. When omitted, the provider reads the existing associations from the API and populates this field automatically. See <<Nested Schema for associations>>.
 
 === Read-Only Attributes
 
-* `id` - Unique identifier for the Private Space Association resource.
-* `created_associations` - List of associations read from the Anypoint Platform API after apply or import.
-** `id` - ID of the created association.
-** `organization_id` - Organization ID of the association.
-** `environment` - Environment of the association.
+* `id` - The unique identifier for the Private Space Association resource.
+* `created_associations` - (Block List) List of associations read from the Anypoint Platform API after apply or import. See <<Nested Schema for created_associations>>.
+
+=== Nested Schema for `associations`
+
+* `organization_id` - (Required) The organization ID for the association.
+* `environment` - (Required) The environment for the association. Valid values: an environment UUID, `all`, `production`, or `sandbox`.
+
+=== Nested Schema for `created_associations`
+
+* `id` - The ID of the created association.
+* `organization_id` - The organization ID of the association.
+* `environment` - The environment of the association.
 
 === Import
 
-Use an import block (Terraform ≥ 1.5, recommended) or the Terraform CLI.
+An existing private space association can be imported using the private space ID, or a composite `<org_id>/<private_space_id>` when the private space belongs to a Business Group (sub-org).
 
-*Root organization — simple ID:*
+==== Using an import block (Terraform ≥ 1.5 — recommended)
+
+Root org (simple ID):
 
 [source,hcl]
 ----
@@ -97,7 +255,7 @@ resource "anypoint_private_space_association" "imported" {
 }
 ----
 
-*Business Group (sub-org) — composite ID:*
+Sub-org (composite ID):
 
 [source,hcl]
 ----
@@ -112,31 +270,38 @@ resource "anypoint_private_space_association" "imported" {
 }
 ----
 
-To auto-generate the resource configuration instead of writing it manually, run:
+After adding the import block, run:
 
 [source,shell]
 ----
+# Let Terraform generate the full resource configuration automatically:
 terraform plan -generate-config-out=generated.tf
+
+# Or apply the import directly if you have an existing resource block:
+terraform apply
 ----
 
-For Terraform < 1.5, use the CLI:
+==== Using the CLI (deprecated, Terraform < 1.5)
 
 [source,shell]
 ----
-# Root organization:
-terraform import anypoint_private_space_association.example <private_space_id>
+# Root org:
+terraform import anypoint_private_space_association.imported <private_space_id>
 
-# Business Group (sub-org):
-terraform import anypoint_private_space_association.example <org_id>/<private_space_id>
+# Sub-org:
+terraform import anypoint_private_space_association.imported <org_id>/<private_space_id>
 ----
 
 == `anypoint_private_space_upgrade`
 
-Use the `anypoint_private_space_upgrade` resource to schedule an upgrade for a CloudHub 2.0 private space.
+Use the `anypoint_private_space_upgrade` resource to schedule an upgrade for a CloudHub 2.0 private space. Deleting this resource cancels the scheduled upgrade.
 
-Deleting this resource cancels the scheduled upgrade.
+[NOTE]
+====
+*Connected App:* This resource requires a *standard connected app* (client credentials). An admin connected app isn't needed. The connected app must have relevant scopes.
+====
 
-=== Example
+=== Example Usage
 
 [source,hcl]
 ----
@@ -148,27 +313,93 @@ resource "anypoint_private_space_upgrade" "example" {
 }
 ----
 
-=== Key Arguments
+=== Required Arguments
 
-* `private_space_id` - ID of the private space to upgrade.
-* `organization_id` - Organization ID where the private space is located. If omitted, the provider infers it from the connected app credentials.
-* `date` - Date when the upgrade is scheduled, in `YYYY-MM-DD` format.
+* `private_space_id` - The ID of the private space to upgrade.
+* `date` - The date when the upgrade should be scheduled (format: `YYYY-MM-DD`).
 * `opt_in` - Whether to opt in to the upgrade.
+
+=== Optional Arguments
+
+* `organization_id` - Organization ID where the private space is located. If not provided, the organization ID is inferred from the connected app credentials.
+
+=== Read-Only Attributes
+
+* `id` - The unique identifier for the upgrade operation.
+* `scheduled_update_time` - The scheduled update time returned by the API.
+* `status` - The status of the upgrade operation.
 
 === Import
 
+An existing scheduled upgrade can be imported using a composite ID. Use the 3-part form for root-org private spaces and the 4-part form when the private space belongs to a Business Group (sub-org).
+
+==== Using an import block (Terraform ≥ 1.5 — recommended)
+
+Root org (3-part ID):
+
+[source,hcl]
+----
+import {
+  to = anypoint_private_space_upgrade.imported
+  id = "<private_space_id>:<date>:<opt_in>"
+}
+
+resource "anypoint_private_space_upgrade" "imported" {
+  private_space_id = "<private_space_id>"
+  date             = "<date>"
+  opt_in           = true
+}
+----
+
+Sub-org (4-part ID):
+
+[source,hcl]
+----
+import {
+  to = anypoint_private_space_upgrade.imported
+  id = "<org_id>:<private_space_id>:<date>:<opt_in>"
+}
+
+resource "anypoint_private_space_upgrade" "imported" {
+  private_space_id = "<private_space_id>"
+  organization_id  = "<org_id>"
+  date             = "<date>"
+  opt_in           = true
+}
+----
+
+After adding the import block, run:
+
 [source,shell]
 ----
-terraform import anypoint_private_space_upgrade.example <org_id>:<space_id>:<date>:<opt_in>
+# Let Terraform generate the full resource configuration automatically:
+terraform plan -generate-config-out=generated.tf
+
+# Or apply the import directly if you have an existing resource block:
+terraform apply
+----
+
+==== Using the CLI (deprecated, Terraform < 1.5)
+
+[source,shell]
+----
+# Root org:
+terraform import anypoint_private_space_upgrade.imported <private_space_id>:<date>:<opt_in>
+
+# Sub-org:
+terraform import anypoint_private_space_upgrade.imported <org_id>:<private_space_id>:<date>:<opt_in>
 ----
 
 == `anypoint_privatespace_advanced_config`
 
-Use the `anypoint_privatespace_advanced_config` resource to manage advanced configuration for a CloudHub 2.0 private space.
+Use the `anypoint_privatespace_advanced_config` resource to manage advanced configuration for an Anypoint Private Space, including ingress settings and IAM role configuration.
 
-This resource supports ingress configuration and IAM role configuration.
+[NOTE]
+====
+*Connected App:* This resource requires a *standard connected app* (client credentials). An admin connected app isn't needed. The connected app must have relevant scopes.
+====
 
-=== Example
+=== Example Usage
 
 [source,hcl]
 ----
@@ -178,33 +409,124 @@ resource "anypoint_privatespace_advanced_config" "example" {
   ingress_configuration = {
     read_response_timeout = "600"
     protocol              = "https-redirect"
+
+    logs = {
+      port_log_level = "INFO"
+      filters        = []
+    }
+
+    deployment = {
+      status              = "APPLIED"
+      last_seen_timestamp = 1753719215000
+    }
   }
 
   enable_iam_role = true
 }
 ----
 
-=== Key Arguments
+=== Required Arguments
 
-* `private_space_id` - ID of the private space to configure.
-* `organization_id` - Organization ID where the private space is located. If omitted, the provider infers it from the connected app credentials.
-* `ingress_configuration` - Ingress configuration for the private space.
-* `enable_iam_role` - Enables IAM role configuration for the private space.
+* `private_space_id` - The ID of the private space to configure.
+
+=== Optional Arguments
+
+* `organization_id` - Organization ID where the private space is located. If not provided, the organization ID is inferred from the connected app credentials.
+* `ingress_configuration` - (Block) Ingress configuration for the private space. See <<Nested Schema for ingress_configuration>>.
+* `enable_iam_role` - Whether to enable IAM role for the private space. Defaults to `false`.
+
+=== Read-Only Attributes
+
+* `id` - The unique identifier of the advanced configuration.
+
+=== Nested Schema for `ingress_configuration`
+
+* `read_response_timeout` - Read response timeout in seconds. Defaults to `"300"`.
+* `protocol` - Protocol for ingress configuration. Defaults to `"https-redirect"`.
+* `logs` - (Block) Logs configuration for ingress. See <<Nested Schema for ingress_configuration.logs>>.
+* `deployment` - (Block) Deployment configuration for ingress. See <<Nested Schema for ingress_configuration.deployment>>.
+
+=== Nested Schema for `ingress_configuration.logs`
+
+* `port_log_level` - Port log level. Defaults to `"ERROR"`.
+* `filters` - (Block List) List of log filters. Defaults to `[]`.
+** `ip` - (Required) IP address for the filter.
+** `level` - (Required) Log level for the filter.
+
+=== Nested Schema for `ingress_configuration.deployment`
+
+* `status` - Deployment status. Defaults to `"APPLIED"`.
+* `last_seen_timestamp` - Last seen timestamp.
 
 === Import
 
+An existing private space advanced configuration can be imported using its private space ID (UUID). Use the simple ID for root-org private spaces, or `<org_id>/<private_space_id>` for Business Groups.
+
+==== Using an import block (Terraform ≥ 1.5 — recommended)
+
+Root org:
+
+[source,hcl]
+----
+import {
+  to = anypoint_privatespace_advanced_config.imported
+  id = "<private_space_id>"
+}
+
+resource "anypoint_privatespace_advanced_config" "imported" {
+  private_space_id = "<private_space_id>"
+}
+----
+
+Sub-org (Business Group):
+
+[source,hcl]
+----
+import {
+  to = anypoint_privatespace_advanced_config.imported
+  id = "<org_id>/<private_space_id>"
+}
+
+resource "anypoint_privatespace_advanced_config" "imported" {
+  private_space_id = "<private_space_id>"
+  organization_id  = "<org_id>"
+}
+----
+
+After adding the import block, run:
+
 [source,shell]
 ----
-terraform import anypoint_privatespace_advanced_config.example <private_space_id>
+# Let Terraform generate the full resource configuration automatically:
+terraform plan -generate-config-out=generated.tf
+
+# Or apply the import directly if you have an existing resource block:
+terraform apply
+----
+
+==== Using the CLI (deprecated, Terraform < 1.5)
+
+[source,shell]
+----
+# Root org:
+terraform import anypoint_privatespace_advanced_config.imported <private_space_id>
+
+# Sub-org:
+terraform import anypoint_privatespace_advanced_config.imported <org_id>/<private_space_id>
 ----
 
 == `anypoint_tls_context`
 
-Use the `anypoint_tls_context` resource to manage a CloudHub 2.0 TLS context.
+Use the `anypoint_tls_context` resource to manage a CloudHub 2.0 TLS context with support for both PEM and JKS keystores.
 
-This resource supports both PEM and JKS keystores.
+[NOTE]
+====
+*Connected App:* This resource requires a *standard connected app* (client credentials). An admin connected app isn't needed. The connected app must have relevant scopes.
+====
 
-=== Example
+=== Example Usage
+
+==== PEM keystore
 
 [source,hcl]
 ----
@@ -220,37 +542,196 @@ resource "anypoint_tls_context" "pem_example" {
 
   ciphers = {
     aes128_gcm_sha256             = true
+    aes128_sha256                 = false
+    aes256_gcm_sha384             = false
+    aes256_sha256                 = false
+    dhe_rsa_aes128_sha256         = false
+    dhe_rsa_aes256_gcm_sha384     = false
+    dhe_rsa_aes256_sha256         = false
     ecdhe_ecdsa_aes128_gcm_sha256 = true
+    ecdhe_ecdsa_aes256_gcm_sha384 = true
     ecdhe_rsa_aes128_gcm_sha256   = true
+    ecdhe_rsa_aes256_gcm_sha384   = true
+    ecdhe_ecdsa_chacha20_poly1305 = false
+    ecdhe_rsa_chacha20_poly1305   = false
+    dhe_rsa_chacha20_poly1305     = false
+    tls_aes256_gcm_sha384         = true
+    tls_chacha20_poly1305_sha256  = true
     tls_aes128_gcm_sha256         = true
   }
 }
 ----
 
-=== Key Arguments
+==== JKS keystore
 
-* `private_space_id` - ID of the private space that contains the TLS context.
-* `name` - Name of the TLS context.
-* `keystore_type` - Type of keystore. Supported values are `PEM` and `JKS`.
-* `certificate` - PEM certificate content. Required for PEM keystores.
-* `key` - PEM private key content. Required for PEM keystores.
-* `keystore_base64` - Base64-encoded JKS keystore content. Required for JKS keystores.
-* `store_passphrase` - Store passphrase for the JKS keystore.
-* `alias` - Alias for the JKS keystore.
-* `ciphers` - Cipher configuration for the TLS context.
+[source,hcl]
+----
+resource "anypoint_tls_context" "jks_example" {
+  private_space_id  = "your-private-space-id"
+  name              = "example-jks-tls-context"
+  keystore_type     = "JKS"
+
+  keystore_base64   = var.jks_keystore_base64
+  store_passphrase  = var.jks_store_passphrase
+  key_passphrase    = var.jks_key_passphrase
+  alias             = "my-alias"
+  keystore_filename = "keystore.jks"
+
+  ciphers = {
+    aes128_gcm_sha256             = false
+    aes128_sha256                 = false
+    aes256_gcm_sha384             = true
+    aes256_sha256                 = false
+    dhe_rsa_aes128_sha256         = false
+    dhe_rsa_aes256_gcm_sha384     = false
+    dhe_rsa_aes256_sha256         = false
+    ecdhe_ecdsa_aes128_gcm_sha256 = false
+    ecdhe_ecdsa_aes256_gcm_sha384 = true
+    ecdhe_rsa_aes128_gcm_sha256   = false
+    ecdhe_rsa_aes256_gcm_sha384   = true
+    ecdhe_ecdsa_chacha20_poly1305 = false
+    ecdhe_rsa_chacha20_poly1305   = false
+    dhe_rsa_chacha20_poly1305     = false
+    tls_aes256_gcm_sha384         = true
+    tls_chacha20_poly1305_sha256  = false
+    tls_aes128_gcm_sha256         = false
+  }
+}
+----
+
+=== Required Arguments
+
+* `private_space_id` - The ID of the private space this TLS context belongs to.
+* `name` - The name of the TLS context.
+* `ciphers` - (Block) Cipher configuration for the TLS context. See <<Nested Schema for ciphers>>.
+
+=== Optional Arguments
+
+* `organization_id` - Organization ID where the private space is located. If not provided, the organization ID is inferred from the connected app credentials.
+* `keystore_type` - The type of keystore: `PEM` or `JKS`. Required when creating a new TLS context. Populated automatically on import from the API response.
+* `certificate` - _(Sensitive)_ PEM certificate content. Required for PEM keystore.
+* `key` - _(Sensitive)_ PEM private key content. Required for PEM keystore.
+* `key_filename` - Filename for the private key (PEM keystore).
+* `certificate_filename` - Filename for the certificate (PEM keystore).
+* `keystore_base64` - _(Sensitive)_ Base64-encoded JKS keystore content. Required for JKS keystore.
+* `store_passphrase` - _(Sensitive)_ Store passphrase for the JKS keystore. Required for JKS keystore.
+* `alias` - Alias for the JKS keystore. Required for JKS keystore.
+* `keystore_filename` - Filename for the JKS keystore. Required for JKS keystore.
+* `key_passphrase` - _(Sensitive)_ Passphrase for the private key.
+
+=== Read-Only Attributes
+
+* `id` - The unique identifier for the TLS context.
+* `type` - The type of TLS context.
+* `trust_store` - (Block) Trust store information. See <<Nested Schema for trust_store>>.
+* `key_store` - (Block) Key store information. See <<Nested Schema for key_store>>.
+
+=== Nested Schema for `ciphers`
+
+* `aes128_gcm_sha256` - Enable AES128-GCM-SHA256. Defaults to `false`.
+* `aes128_sha256` - Enable AES128-SHA256. Defaults to `false`.
+* `aes256_gcm_sha384` - Enable AES256-GCM-SHA384. Defaults to `false`.
+* `aes256_sha256` - Enable AES256-SHA256. Defaults to `false`.
+* `dhe_rsa_aes128_sha256` - Enable DHE-RSA-AES128-SHA256. Defaults to `false`.
+* `dhe_rsa_aes256_gcm_sha384` - Enable DHE-RSA-AES256-GCM-SHA384. Defaults to `false`.
+* `dhe_rsa_aes256_sha256` - Enable DHE-RSA-AES256-SHA256. Defaults to `false`.
+* `ecdhe_ecdsa_aes128_gcm_sha256` - Enable ECDHE-ECDSA-AES128-GCM-SHA256. Defaults to `false`.
+* `ecdhe_ecdsa_aes256_gcm_sha384` - Enable ECDHE-ECDSA-AES256-GCM-SHA384. Defaults to `false`.
+* `ecdhe_rsa_aes128_gcm_sha256` - Enable ECDHE-RSA-AES128-GCM-SHA256. Defaults to `false`.
+* `ecdhe_rsa_aes256_gcm_sha384` - Enable ECDHE-RSA-AES256-GCM-SHA384. Defaults to `false`.
+* `ecdhe_ecdsa_chacha20_poly1305` - Enable ECDHE-ECDSA-CHACHA20-POLY1305. Defaults to `false`.
+* `ecdhe_rsa_chacha20_poly1305` - Enable ECDHE-RSA-CHACHA20-POLY1305. Defaults to `false`.
+* `dhe_rsa_chacha20_poly1305` - Enable DHE-RSA-CHACHA20-POLY1305. Defaults to `false`.
+* `tls_aes256_gcm_sha384` - Enable TLS-AES256-GCM-SHA384. Defaults to `false`.
+* `tls_chacha20_poly1305_sha256` - Enable TLS-CHACHA20-POLY1305-SHA256. Defaults to `false`.
+* `tls_aes128_gcm_sha256` - Enable TLS-AES128-GCM-SHA256. Defaults to `false`.
+
+=== Nested Schema for `trust_store`
+
+* `filename` - Trust store filename.
+* `expiration_date` - Trust store expiration date.
+* `type` - Trust store type.
+
+=== Nested Schema for `key_store`
+
+* `filename` - Key store filename.
+* `type` - Key store type.
+* `cn` - Common name from the certificate.
+* `san` - (List of String) Subject alternative names.
+* `expiration_date` - Key store expiration date.
 
 === Import
 
+An existing TLS context can be imported using a composite ID. Use the 2-part form for root-org private spaces and the 3-part form for Business Groups.
+
+==== Using an import block (Terraform ≥ 1.5 — recommended)
+
+Root org (2-part ID):
+
+[source,hcl]
+----
+import {
+  to = anypoint_tls_context.imported
+  id = "<private_space_id>:<tls_context_id>"
+}
+
+resource "anypoint_tls_context" "imported" {
+  private_space_id = "<private_space_id>"
+  organization_id  = "<organization_id>"
+  name             = "<tls_context_name>"
+  # keystore_type is populated automatically from the API response on import
+}
+----
+
+Sub-org (3-part ID):
+
+[source,hcl]
+----
+import {
+  to = anypoint_tls_context.imported
+  id = "<org_id>:<private_space_id>:<tls_context_id>"
+}
+
+resource "anypoint_tls_context" "imported" {
+  private_space_id = "<private_space_id>"
+  organization_id  = "<org_id>"
+  name             = "<tls_context_name>"
+  keystore_type    = "PEM"
+}
+----
+
+After adding the import block, run:
+
 [source,shell]
 ----
-terraform import anypoint_tls_context.example <org_id>:<space_id>:<tls_id>
+# Let Terraform generate the full resource configuration automatically:
+terraform plan -generate-config-out=generated.tf
+
+# Or apply the import directly if you have an existing resource block:
+terraform apply
+----
+
+==== Using the CLI (deprecated, Terraform < 1.5)
+
+[source,shell]
+----
+# Root org:
+terraform import anypoint_tls_context.imported <private_space_id>:<tls_context_id>
+
+# Sub-org:
+terraform import anypoint_tls_context.imported <org_id>:<private_space_id>:<tls_context_id>
 ----
 
 == `anypoint_vpn_connection`
 
 Use the `anypoint_vpn_connection` resource to create a VPN connection in a CloudHub 2.0 private space.
 
-=== Example
+[NOTE]
+====
+*Connected App:* This resource requires a *standard connected app* (client credentials). An admin connected app isn't needed. The connected app must have relevant scopes.
+====
+
+=== Example Usage
 
 [source,hcl]
 ----
@@ -277,24 +758,98 @@ resource "anypoint_vpn_connection" "example" {
 }
 ----
 
-=== Key Arguments
+=== Required Arguments
 
-* `private_space_id` - ID of the private space.
-* `name` - Name of the VPN connection.
-* `organization_id` - Organization ID where the private space is located. If omitted, the provider infers it from the connected app credentials.
-* `vpns` - List of VPN configurations.
-* `local_asn` - Local ASN for the VPN.
-* `remote_asn` - Remote ASN for the VPN.
-* `remote_ip_address` - Remote IP address for the VPN.
-* `static_routes` - Static routes for the VPN.
-* `vpn_tunnels` - VPN tunnel configuration.
-* `psk` - Pre-shared key for the VPN tunnel.
+* `private_space_id` - The ID of the private space.
+* `name` - The name of the VPN connection.
+* `vpns` - (Block List) List of VPN configurations. See <<Nested Schema for vpns>>.
+
+=== Optional Arguments
+
+* `organization_id` - Organization ID where the private space is located. If not provided, the organization ID is inferred from the connected app credentials.
+
+=== Read-Only Attributes
+
+* `id` - The unique identifier for the VPN connection.
+
+=== Nested Schema for `vpns`
+
+* `local_asn` - (Required) Local ASN for the VPN.
+* `remote_asn` - (Required) Remote ASN for the VPN.
+* `remote_ip_address` - (Required) Remote IP address for the VPN.
+* `vpn_tunnels` - (Required, Block List) List of VPN tunnel configurations. See <<Nested Schema for vpns.vpn_tunnels>>.
+* `name` - The name of the VPN.
+* `static_routes` - (List of String) List of static routes.
+* `connection_name` - The connection name of the VPN. _(Read-Only)_
+* `vpn_connection_status` - The status of the VPN connection. _(Read-Only)_
+* `vpn_id` - The ID of the VPN. _(Read-Only)_
+* `connection_id` - The connection ID of the VPN. _(Read-Only)_
+
+=== Nested Schema for `vpns.vpn_tunnels`
+
+* `psk` - (Required) Pre-shared key for the VPN tunnel.
+* `startup_action` - (Required) Startup action for the VPN tunnel.
 * `ptp_cidr` - Point-to-point CIDR for the VPN tunnel.
-* `startup_action` - Startup action for the VPN tunnel.
+* `is_logs_enabled` - Whether logs are enabled for the VPN tunnel. _(Read-Only)_
 
 === Import
 
+An existing VPN connection can be imported using a composite ID. Use the 2-part form for root-org private spaces and the 3-part form for Business Groups.
+
+==== Using an import block (Terraform ≥ 1.5 — recommended)
+
+Root org (2-part ID):
+
+[source,hcl]
+----
+import {
+  to = anypoint_vpn_connection.imported
+  id = "<private_space_id>/<connection_id>"
+}
+
+resource "anypoint_vpn_connection" "imported" {
+  private_space_id = "<private_space_id>"
+  organization_id  = "<organization_id>"
+  name             = "<connection_name>"
+  vpns             = []
+}
+----
+
+Sub-org (3-part ID):
+
+[source,hcl]
+----
+import {
+  to = anypoint_vpn_connection.imported
+  id = "<org_id>/<private_space_id>/<connection_id>"
+}
+
+resource "anypoint_vpn_connection" "imported" {
+  private_space_id = "<private_space_id>"
+  organization_id  = "<org_id>"
+  name             = "<connection_name>"
+  vpns             = []
+}
+----
+
+After adding the import block, run:
+
 [source,shell]
 ----
-terraform import anypoint_vpn_connection.example <org_id>/<space_id>/<connection_id>
+# Let Terraform generate the full resource configuration automatically:
+terraform plan -generate-config-out=generated.tf
+
+# Or apply the import directly if you have an existing resource block:
+terraform apply
+----
+
+==== Using the CLI (deprecated, Terraform < 1.5)
+
+[source,shell]
+----
+# Root org:
+terraform import anypoint_vpn_connection.imported <private_space_id>/<connection_id>
+
+# Sub-org:
+terraform import anypoint_vpn_connection.imported <org_id>/<private_space_id>/<connection_id>
 ----
