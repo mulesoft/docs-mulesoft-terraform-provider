@@ -4,11 +4,28 @@ Use API Manager resources to manage APIs and API configuration in API Manager.
 
 == `anypoint_api_instance`
 
-Use the `anypoint_api_instance` resource to manage API instances in Anypoint API Manager.
+Use the `anypoint_api_instance` resource to create and manage API instances in Anypoint API Manager.
 
-An API instance represents an API specification deployed to an Omni Gateway target with routing rules and upstream backends.
+An API instance binds an Exchange asset specification to an Omni Gateway target, defining how traffic is routed to upstream backends.
 
-=== Minimal Configuration Example
+[NOTE]
+====
+*Supported gateway type:* This provider currently supports *MuleSoft Managed Omni Gateway* (CloudHub 2.0) only. Self-managed Omni Gateway will be supported in a future release.
+====
+
+[NOTE]
+====
+*Connected App:* This resource requires a *standard connected app* (client credentials). An admin connected app isn't needed. The connected app must have relevant scopes.
+====
+
+=== Example Usage
+
+[WARNING]
+====
+The top-level `upstream_uri` field is deprecated and will be removed in the next major version. New configurations should use the `routing` block, which supports TLS, labels, multiple upstreams, and weighted routing. See xref:_migrating_from_upstream_uri[Migrating from upstream_uri] below.
+====
+
+==== Minimal configuration
 
 [source,hcl]
 ----
@@ -16,7 +33,6 @@ resource "anypoint_api_instance" "minimal" {
   environment_id = var.environment_id
   gateway_id     = var.gateway_id
   instance_label = "minimal-demo"
-  upstream_uri   = "http://backend.internal:8080"
 
   spec = {
     asset_id = "my-api"
@@ -27,10 +43,18 @@ resource "anypoint_api_instance" "minimal" {
   endpoint = {
     base_path = "minimal"
   }
+
+  routing = [
+    {
+      upstreams = [
+        { uri = "http://backend.internal:8080" }
+      ]
+    }
+  ]
 }
 ----
 
-=== Weighted Multi-Upstream Routing Example
+==== Weighted multi-upstream routing (canary / blue-green)
 
 [source,hcl]
 ----
@@ -70,75 +94,194 @@ resource "anypoint_api_instance" "weighted_routing" {
 }
 ----
 
-=== Key Arguments
+=== Migrating from `upstream_uri`
 
-* `environment_id` - (Required) Environment ID where the API instance is created.
-* `spec` - (Required) Exchange asset specification associated with the API instance.
-** `asset_id` - The Exchange asset ID.
-** `group_id` - The Exchange group (organization) ID.
-** `version` - The asset version.
-* `organization_id` - Organization ID. If omitted, the provider infers it from the connected app credentials.
-* `technology` - Gateway technology. Supported values are `omniGateway`, `mule4`, and `serviceMesh`. Defaults to `omniGateway`.
-* `provider_id` - Identity provider ID for the API.
-* `instance_label` - Human-readable label for the API instance.
-* `approval_method` - Client approval method. Supported values are `manual` and `null`. Use `manual` to require manual client approval. If omitted or set to `null`, client approval is automatic.
+If you are using the deprecated `upstream_uri` field, replace it with an equivalent single-upstream `routing` block:
+
+[source,hcl]
+----
+# Before (deprecated)
+resource "anypoint_api_instance" "example" {
+  # ...
+  upstream_uri = "http://backend.internal:8080"
+}
+
+# After
+resource "anypoint_api_instance" "example" {
+  # ...
+  routing = [
+    {
+      upstreams = [
+        { uri = "http://backend.internal:8080" }
+      ]
+    }
+  ]
+}
+----
+
+The two forms are semantically identical — `upstream_uri` was always shorthand for `routing = [{ upstreams = [{ weight = 100, uri = <value> }] }]`.
+
+=== Routing and Upstream Behavior
+
+Always set `label` on every upstream. Labels are stable across URI changes and reordering — without a label, changing a URI is treated as "delete + add" instead of "edit," which can disrupt stateful backends (sticky sessions, cookies).
+
+When adding a route with a brand-new upstream, the provider runs two PATCHes: one to pre-register the upstream and get its ID, then the main PATCH with the updated routing. All other changes (weights, rules, reordering, removing routes) are a single PATCH.
+
+[NOTE]
+====
+Removing a route doesn't remove its upstreams from the backend catalog — they remain inert. Cleanup requires a manual API call. If two routes reference the same backend (same `label` or `uri`), write the upstream in both — the provider deduplicates them automatically.
+====
+
+=== Required Arguments
+
+* `environment_id` - (Required) The environment ID where the API instance is created.
+* `spec` - (Required) The Exchange asset specification backing this API instance. See <<Nested Schema for spec>>.
+
+=== Optional Arguments
+
+* `organization_id` - Organization ID. If not provided, the organization ID is inferred from the connected app credentials.
+* `technology` - Gateway technology. Only `omniGateway` is currently supported. Defaults to `omniGateway`.
+* `provider_id` - The identity provider ID for the API.
+* `instance_label` - A human-readable label for this API instance.
+* `approval_method` - Client approval method. Valid values: `manual`. Defaults to `null` (no approval required). Note: `automatic` approval is no longer supported.
 * `consumer_endpoint` - Consumer-facing endpoint URI (the public URL clients use to reach the API).
-* `upstream_uri` - Shorthand for a single-upstream routing configuration. Mutually exclusive with `routing`.
-* `gateway_id` - Omni Gateway UUID. When provided, the deployment block is auto-populated by fetching gateway details (`target_id`, `target_name`, `gateway_version`) from the Gateway Manager. Mutually exclusive with a full `deployment` block.
-* `endpoint` - Endpoint and proxy configuration for the API instance.
-** `deployment_type` - Deployment type. Supported values are `HY` (hybrid), `CH` (CloudHub), `CH2`, and `RF` (Runtime Fabric). Defaults to `HY`.
-** `type` - Endpoint protocol type. Supported values are `http`, `rest`, and `raml`. Defaults to `http`.
-** `base_path` - API base path for OmniGateway (for example, `my-api`). Required when `technology = "omniGateway"`. Mutually exclusive with `uri`.
-** `uri` - Direct implementation URI for Mule4 or other technologies. Required when `technology = "mule4"`. Mutually exclusive with `base_path`.
-** `response_timeout` - Response timeout in milliseconds. Not supported when `technology = "omniGateway"`; must be omitted or set to `null`.
-* `deployment` - Deployment target configuration. Auto-populated when `gateway_id` is set.
-** `environment_id` - Environment ID for deployment.
-** `type` - Deployment type. Supported values: `HY`, `CH`, `RF`. Defaults to `HY`.
-** `expected_status` - Expected deployment status. Supported values: `deployed`, `undeployed`. Defaults to `deployed`.
-** `overwrite` - Whether to overwrite an existing deployment.
-** `target_id` - Target gateway ID to deploy to.
-** `target_name` - Target gateway name.
-** `gateway_version` - Omni Gateway runtime version.
-* `routing` - Routing rules with weighted upstream backends. Mutually exclusive with `upstream_uri`.
-** `label` - Label for this route.
-** `rules` - Match conditions for this route.
-*** `methods` - Pipe-separated HTTP methods (for example, `GET`, `POST|PUT`).
-*** `path` - URL path pattern to match (for example, `/api/*`).
-*** `host` - Host header value to match.
-*** `headers` - Header key-value pairs to match.
-** `upstreams` - (Required) Weighted upstream backends for this route.
-*** `uri` - (Required) Upstream backend URI.
-*** `weight` - Traffic weight percentage (0–100). Defaults to `100`.
-*** `label` - Label for this upstream.
-*** `tls_context_id` - TLS context for upstream connections. Format: `secretGroupId/tlsContextId`.
+* `upstream_uri` - *(Deprecated)* Shorthand for a single-upstream routing configuration. Will be removed in the next major version. Use `routing` instead.
+* `gateway_id` - The Omni Gateway UUID. When provided, the deployment block is auto-populated by fetching gateway details (`target_id`, `target_name`, `gateway_version`) from the Gateway Manager API. Mutually exclusive with a full `deployment` block.
+* `endpoint` - Endpoint and proxy configuration for the API instance. See <<Nested Schema for endpoint>>.
+* `deployment` - Deployment target configuration. Auto-populated when `gateway_id` is set. See <<Nested Schema for deployment>>.
+* `routing` - (Block List) Routing rules with weighted upstream backends. Mutually exclusive with `upstream_uri`. See <<Nested Schema for routing>>.
+
+=== Nested Schema for `spec`
+
+* `asset_id` - (Required) The Exchange asset ID.
+* `group_id` - (Required) The Exchange group (organization) ID.
+* `version` - (Required) The asset version.
+
+=== Nested Schema for `endpoint`
+
+* `deployment_type` - Deployment type. Valid values: `HY` (hybrid), `CH` (CloudHub), `CH2`, `RF` (Runtime Fabric). Defaults to `HY`.
+* `type` - Endpoint protocol type. Valid values: `http`, `rest`, `raml`. Defaults to `http`.
+* `base_path` - API base path for the Omni Gateway proxy listener (for example, `my-api`). The provider constructs the proxy URI as `\http://0.0.0.0:8081/<base_path>`.
+* `response_timeout` - Response timeout in milliseconds.
+
+=== Nested Schema for `deployment`
+
+* `environment_id` - The environment ID for deployment (usually matches the top-level `environment_id`).
+* `type` - Deployment type. Valid values: `HY`, `CH`, `RF`. Defaults to `HY`.
+* `expected_status` - Expected deployment status. Valid values: `deployed`, `undeployed`. Defaults to `deployed`.
+* `overwrite` - Whether to overwrite an existing deployment.
+* `target_id` - The target gateway ID to deploy to.
+* `target_name` - The target gateway name.
+* `gateway_version` - The Omni Gateway runtime version.
+
+=== Nested Schema for `routing`
+
+* `upstreams` - (Required, Block List) Weighted upstream backends for this route. See <<Nested Schema for routing.upstreams>>.
+* `label` - A label for this route.
+* `rules` - (Block) Match conditions for this route. See <<Nested Schema for routing.rules>>.
+
+=== Nested Schema for `routing.rules`
+
+* `methods` - Pipe-separated HTTP methods (for example, `GET`, `POST|PUT`).
+* `path` - URL path pattern to match (for example, `/api/*`).
+* `host` - Host header value to match.
+* `headers` - (Map) Header key-value pairs to match.
+
+=== Nested Schema for `routing.upstreams`
+
+* `uri` - (Required) The upstream backend URI.
+* `weight` - Traffic weight percentage (0–100). Weights across upstreams should sum to 100. Defaults to `100`.
+* `label` - A label for this upstream.
+* `tls_context_id` - TLS context for upstream connections. Format: `secretGroupId/tlsContextId`.
 
 === Read-Only Attributes
 
-* `id` - Unique identifier of the API instance.
-* `status` - Current status of the API instance.
-* `asset_id` - Exchange asset ID.
-* `asset_version` - Exchange asset version.
-* `product_version` - Product version.
+* `id` - The numeric identifier of the API instance (stored as string for Terraform compatibility).
+* `status` - The current status of the API instance.
+* `asset_id` - The Exchange asset ID (computed from API response).
+* `asset_version` - The Exchange asset version (computed from API response).
+* `product_version` - The product version (computed from API response).
 
 === Import
 
-[source,shell]
+An existing API instance can be imported using a composite ID. Use the 2-part form for root-org instances and the 3-part form when the instance belongs to a Business Group (sub-org).
+
+The `api_instance_id` is the numeric ID visible in the Anypoint API Manager URL.
+
+==== Using an import block (Terraform ≥ 1.5 — recommended)
+
+Root org (2-part ID):
+
+[source,hcl]
 ----
-terraform import anypoint_api_instance.example <organization_id>/<environment_id>/<api_instance_id>
+import {
+  to = anypoint_api_instance.imported
+  id = "<environment_id>/<api_instance_id>"
+}
+
+resource "anypoint_api_instance" "imported" {
+  environment_id = "<environment_id>"
+  spec = {
+    asset_id = "<api_asset_id>"
+    group_id = "<organization_id>"
+    version  = "1.0.0"
+  }
+}
 ----
 
-For root-level organizations, you can omit the organization ID:
+Sub-org (3-part ID):
+
+[source,hcl]
+----
+import {
+  to = anypoint_api_instance.imported
+  id = "<organization_id>/<environment_id>/<api_instance_id>"
+}
+
+resource "anypoint_api_instance" "imported" {
+  organization_id = "<organization_id>"
+  environment_id  = "<environment_id>"
+  spec = {
+    asset_id = "<api_asset_id>"
+    group_id = "<organization_id>"
+    version  = "1.0.0"
+  }
+}
+----
+
+After adding the import block, run:
 
 [source,shell]
 ----
-terraform import anypoint_api_instance.example <env_id>/<instance_id>
+# Let Terraform generate the full resource configuration automatically:
+terraform plan -generate-config-out=generated.tf
+
+# Or apply the import directly if you have an existing resource block:
+terraform apply
 ----
+
+==== Using the CLI (deprecated, Terraform < 1.5)
+
+[source,shell]
+----
+# Root org:
+terraform import anypoint_api_instance.imported <environment_id>/<api_instance_id>
+
+# Sub-org:
+terraform import anypoint_api_instance.imported <organization_id>/<environment_id>/<api_instance_id>
+----
+
 
 == `anypoint_api_instance_sla_tier`
 
-Use the `anypoint_api_instance_sla_tier` resource to manage SLA tiers for API instances in API Manager.
+Use the `anypoint_api_instance_sla_tier` resource to define rate-limited access tiers for an API instance in Anypoint API Manager.
 
-=== Example
+[NOTE]
+====
+*Connected App:* This resource requires a *standard connected app* (client credentials). An admin connected app isn't needed. The connected app must have relevant scopes.
+====
+
+=== Example Usage
 
 [source,hcl]
 ----
@@ -167,22 +310,25 @@ resource "anypoint_api_instance_sla_tier" "gold" {
 }
 ----
 
-=== Key Arguments
+=== Required Arguments
 
-* `environment_id` - Environment ID where the API instance exists.
+* `environment_id` - Environment ID where the API instance lives.
 * `api_instance_id` - Numeric ID of the API instance.
 * `name` - Name of the SLA tier.
-* `limits` - Rate limit configuration for the SLA tier.
-* `organization_id` - Organization ID. If omitted, the provider infers it from the connected app credentials.
+* `limits` - (Block List) Rate limits for this SLA tier. See <<Nested Schema for limits>>.
+
+=== Optional Arguments
+
+* `organization_id` - Organization ID. If not provided, the organization ID is inferred from the connected app credentials.
 * `description` - Description of the SLA tier.
-* `auto_approve` - Indicates whether requests for the SLA tier are automatically approved.
-* `status` - Status of the SLA tier. Supported values are `ACTIVE` and `INACTIVE`.
+* `auto_approve` - Whether requests for this SLA tier are auto-approved. Defaults to `false`.
+* `status` - Status of the SLA tier. Valid values: `ACTIVE`, `INACTIVE`.
 
-=== Limit Arguments
+=== Nested Schema for `limits`
 
-* `time_period_in_milliseconds` - Time period for the rate limit.
-* `maximum_requests` - Maximum number of requests allowed during the time period.
-* `visible` - Indicates whether the limit is visible to API consumers.
+* `time_period_in_milliseconds` - (Required) Time period for the rate limit in milliseconds.
+* `maximum_requests` - (Required) Maximum number of requests allowed in the time period.
+* `visible` - Whether this limit is visible to API consumers. Defaults to `true`.
 
 === Read-Only Attributes
 
@@ -190,7 +336,207 @@ resource "anypoint_api_instance_sla_tier" "gold" {
 
 === Import
 
+An existing SLA tier can be imported using its composite ID: `organization_id/environment_id/api_instance_id/tier_name_or_tier_id`.
+
+The last segment accepts either the tier name (as shown in the Anypoint UI, for example `Gold`) or the numeric tier ID. Using the name is recommended — it is visible without API calls.
+
+==== Using an import block (Terraform ≥ 1.5 — recommended)
+
+[source,hcl]
+----
+import {
+  to = anypoint_api_instance_sla_tier.imported
+  id = "<organization_id>/<environment_id>/<api_instance_id>/<tier_name>"
+}
+
+resource "anypoint_api_instance_sla_tier" "imported" {
+  organization_id = "<organization_id>"
+  environment_id  = "<environment_id>"
+  api_instance_id = "<api_instance_id>"
+  name            = "<tier_name>"
+  limits = [
+    {
+      time_period_in_milliseconds = 60000
+      maximum_requests            = 100
+    }
+  ]
+}
+----
+
+After adding the import block, run:
+
 [source,shell]
 ----
-terraform import anypoint_api_instance_sla_tier.example organization_id/environment_id/api_instance_id/tier_id
+# Let Terraform generate the full resource configuration automatically:
+terraform plan -generate-config-out=generated.tf
+
+# Or apply the import directly if you have an existing resource block:
+terraform apply
+----
+
+==== Using the CLI (deprecated, Terraform < 1.5)
+
+[source,shell]
+----
+terraform import anypoint_api_instance_sla_tier.imported <organization_id>/<environment_id>/<api_instance_id>/<tier_name>
+----
+
+== `anypoint_api_policy`
+
+Use the `anypoint_api_policy` resource to apply a policy to an API instance in Anypoint API Manager.
+
+Set `policy_type` for known policies — the provider auto-resolves `group_id`, `asset_id`, and the default version. For custom policies not in the built-in registry, omit `policy_type` and provide `group_id`, `asset_id`, and `asset_version` directly.
+
+[NOTE]
+====
+*Connected App:* This resource requires a *standard connected app* (client credentials). An admin connected app isn't needed. The connected app must have relevant scopes.
+====
+
+=== Example Usage
+
+==== Using `policy_type` for a known policy
+
+[source,hcl]
+----
+resource "anypoint_api_policy" "rate_limit" {
+  organization_id = var.organization_id
+  environment_id  = var.environment_id
+  api_instance_id = var.api_instance_id
+
+  policy_type = "rate-limiting"
+  label       = "rate-limit-100rpm"
+  order       = 1
+
+  configuration_data = jsonencode({
+    key_selector = "#[attributes.queryParams['identifier']]"
+    rate_limits = [
+      {
+        maximum_requests            = 100
+        time_period_in_milliseconds = 60000
+      }
+    ]
+    expose_headers = true
+    clusterizable  = true
+  })
+}
+----
+
+==== Using explicit `group_id`, `asset_id`, `asset_version` for a custom policy
+
+[source,hcl]
+----
+resource "anypoint_api_policy" "custom" {
+  organization_id = var.organization_id
+  environment_id  = var.environment_id
+  api_instance_id = var.api_instance_id
+
+  group_id      = "my-org-id"
+  asset_id      = "my-custom-policy"
+  asset_version = "1.0.0"
+  label         = "custom-policy"
+  order         = 2
+
+  configuration_data = jsonencode({
+    custom_field = "value"
+  })
+}
+----
+
+=== Required Arguments
+
+* `environment_id` - Environment ID where the API instance lives.
+* `api_instance_id` - Numeric ID of the API instance this policy is applied to.
+* `configuration_data` - Policy configuration as a JSON string. Use `jsonencode()` to set this. Fields vary by policy type; the provider validates known policies at plan time.
+
+=== Optional Arguments
+
+* `organization_id` - Organization ID. If not provided, the organization ID is inferred from the connected app credentials.
+* `policy_type` - Known policy type name (for example, `rate-limiting`, `cors`, `jwt-validation`). When set, `group_id`, `asset_id`, and `asset_version` are auto-resolved from the built-in registry. You can still override `asset_version` to pin a specific version.
+* `group_id` - Exchange group ID for the policy asset. Auto-resolved when `policy_type` is set.
+* `asset_id` - Exchange asset ID that identifies the policy type. Auto-resolved when `policy_type` is set.
+* `asset_version` - Version of the policy asset from Exchange. Auto-resolved to default when `policy_type` is set, but can be overridden.
+* `label` - A human-readable label for this policy instance.
+* `order` - Execution order of the policy. Lower numbers execute first.
+* `disabled` - Whether the policy is disabled. Defaults to `false`.
+* `pointcut_data` - Pointcut definition as a JSON string. Restricts the policy to specific resources (methods and/or URIs). When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+
+=== Read-Only Attributes
+
+* `id` - Unique identifier of the applied policy.
+* `policy_template_id` - Policy template ID assigned by the server.
+
+=== Pointcut Data
+
+The optional `pointcut_data` attribute restricts the policy to specific HTTP methods and/or URI patterns, matching what is configured under "Apply configurations to specific methods & resources" in the Anypoint Platform UI.
+
+Each element in the array maps to one condition row in the UI:
+
+* `methodRegex` — pipe-separated HTTP methods (for example, `GET`, `GET|POST`). Omit or set to `.*` to match all methods.
+* `uriTemplateRegex` — regex for the URI path (for example, `/api/v1/.*`). Omit or set to `.*` to match all paths.
+
+Multiple conditions act as a logical OR — the policy applies if any condition matches.
+
+[source,hcl]
+----
+# Apply policy to GET and POST requests on /api/v1/* only
+pointcut_data = jsonencode([
+  {
+    methodRegex      = "GET|POST"
+    uriTemplateRegex = "/api/v1/.*"
+  }
+])
+
+# Multiple conditions
+pointcut_data = jsonencode([
+  {
+    methodRegex      = "GET"
+    uriTemplateRegex = "/api/v1/read/.*"
+  },
+  {
+    methodRegex      = "POST|PUT"
+    uriTemplateRegex = "/api/v1/write/.*"
+  }
+])
+----
+
+=== Import
+
+An existing API policy can be imported using its composite ID: `organization_id/environment_id/api_instance_id/policy_id`.
+
+The `policy_id` is the numeric ID of the policy, visible in the Anypoint API Manager URL or from the API response.
+
+==== Using an import block (Terraform ≥ 1.5 — recommended)
+
+[source,hcl]
+----
+import {
+  to = anypoint_api_policy.imported
+  id = "<organization_id>/<environment_id>/<api_instance_id>/<policy_id>"
+}
+
+resource "anypoint_api_policy" "imported" {
+  organization_id    = "<organization_id>"
+  environment_id     = "<environment_id>"
+  api_instance_id    = "<api_instance_id>"
+  policy_type        = "<policy_type>"
+  configuration_data = jsonencode({})
+}
+----
+
+After adding the import block, run:
+
+[source,shell]
+----
+# Let Terraform generate the full resource configuration automatically:
+terraform plan -generate-config-out=generated.tf
+
+# Or apply the import directly if you have an existing resource block:
+terraform apply
+----
+
+==== Using the CLI (deprecated, Terraform < 1.5)
+
+[source,shell]
+----
+terraform import anypoint_api_policy.imported <organization_id>/<environment_id>/<api_instance_id>/<policy_id>
 ----

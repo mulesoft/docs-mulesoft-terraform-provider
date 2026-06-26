@@ -59,7 +59,7 @@ Use these resources to manage MCP servers and AI agent resources.
 
 Use these resources to apply policies declaratively to APIs, MCP servers, gateways, and AI agent resources.
 
-* xref:a2a-resources.adoc#anypoint_api_policy[`anypoint_api_policy`]
+* xref:api-manager-resources.adoc#anypoint_api_policy[`anypoint_api_policy`]
 * xref:a2a-resources.adoc#anypoint_api_policy_a2a_agent_card[`anypoint_api_policy_a2a_agent_card`]
 * xref:a2a-resources.adoc#anypoint_api_policy_a2a_pii_detector[`anypoint_api_policy_a2a_pii_detector`]
 * xref:a2a-resources.adoc#anypoint_api_policy_a2a_prompt_decorator[`anypoint_api_policy_a2a_prompt_decorator`]
