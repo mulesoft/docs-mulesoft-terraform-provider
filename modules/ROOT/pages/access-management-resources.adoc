@@ -53,7 +53,7 @@ resource "anypoint_connected_app_scopes" "example" {
 === Required Arguments
 
 * `connected_app_id` - The ID of the connected application to manage scopes for.
-* `scopes` - (Block Set) The set of scopes to assign to the connected application. See <<Nested Schema for scopes>>.
+* `scopes` - (Block Set) The set of scopes to assign to the connected application. See xref:nested-schema-for-scopes[Nested Schema for `scopes`].
 
 === Read-Only Attributes
 
@@ -257,7 +257,7 @@ resource "anypoint_organization" "example" {
 
 === Optional Arguments
 
-* `entitlements` - (Block) Entitlements for the organization. Only declared fields are managed by Terraform. See <<Nested Schema for entitlements>>.
+* `entitlements` - (Block) Entitlements for the organization. Only declared fields are managed by Terraform. See xref:nested-schema-for-entitlements[Nested Schema for `entitlements`].
 
 === Read-Only Attributes
 
@@ -266,7 +266,7 @@ resource "anypoint_organization" "example" {
 * `created_at` - The creation timestamp of the organization.
 * `deleted_at` - The deletion timestamp of the organization.
 * `domain` - The domain of the organization.
-* `environments` - (Block List) The environments within the organization. See <<Nested Schema for environments>>.
+* `environments` - (Block List) The environments within the organization..
 * `gdot_id` - The GDOT ID of the organization.
 * `idprovider_id` - The ID provider ID for the organization.
 * `is_automatic_admin_promotion_exempt` - Whether the organization is exempt from automatic admin promotion.
@@ -278,7 +278,7 @@ resource "anypoint_organization" "example" {
 * `parent_organization_ids` - List of parent organization IDs (ancestor chain).
 * `session_timeout` - The session timeout for the organization.
 * `sub_organization_ids` - List of sub-organization IDs.
-* `subscription` - (Block) The subscription details for the organization. See <<Nested Schema for subscription>>.
+* `subscription` - (Block) The subscription details for the organization..
 * `tenant_organization_ids` - List of tenant organization IDs.
 * `updated_at` - The last update timestamp of the organization.
 

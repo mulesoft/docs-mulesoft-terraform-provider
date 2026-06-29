@@ -135,7 +135,7 @@ Removing a route doesn't remove its upstreams from the backend catalog — they 
 === Required Arguments
 
 * `environment_id` - (Required) The environment ID where the API instance is created.
-* `spec` - (Required) The Exchange asset specification backing this API instance. See <<Nested Schema for spec>>.
+* `spec` - (Required) The Exchange asset specification backing this API instance. See xref:nested-schema-for-spec[Nested Schema for `spec`].
 
 === Optional Arguments
 
@@ -147,16 +147,18 @@ Removing a route doesn't remove its upstreams from the backend catalog — they 
 * `consumer_endpoint` - Consumer-facing endpoint URI (the public URL clients use to reach the API).
 * `upstream_uri` - *(Deprecated)* Shorthand for a single-upstream routing configuration. Will be removed in the next major version. Use `routing` instead.
 * `gateway_id` - The Omni Gateway UUID. When provided, the deployment block is auto-populated by fetching gateway details (`target_id`, `target_name`, `gateway_version`) from the Gateway Manager API. Mutually exclusive with a full `deployment` block.
-* `endpoint` - Endpoint and proxy configuration for the API instance. See <<Nested Schema for endpoint>>.
-* `deployment` - Deployment target configuration. Auto-populated when `gateway_id` is set. See <<Nested Schema for deployment>>.
-* `routing` - (Block List) Routing rules with weighted upstream backends. Mutually exclusive with `upstream_uri`. See <<Nested Schema for routing>>.
+* `endpoint` - Endpoint and proxy configuration for the API instance. See xref:nested-schema-for-endpoint[Nested Schema for `endpoint`].
+* `deployment` - Deployment target configuration. Auto-populated when `gateway_id` is set. See xref:nested-schema-for-deployment[Nested Schema for `deployment`].
+* `routing` - (Block List) Routing rules with weighted upstream backends. Mutually exclusive with `upstream_uri`. See xref:nested-schema-for-routing[Nested Schema for `routing`].
 
+[[nested-schema-for-spec]]
 === Nested Schema for `spec`
 
 * `asset_id` - (Required) The Exchange asset ID.
 * `group_id` - (Required) The Exchange group (organization) ID.
 * `version` - (Required) The asset version.
 
+[[nested-schema-for-endpoint]]
 === Nested Schema for `endpoint`
 
 * `deployment_type` - Deployment type. Valid values: `HY` (hybrid), `CH` (CloudHub), `CH2`, `RF` (Runtime Fabric). Defaults to `HY`.
@@ -164,6 +166,7 @@ Removing a route doesn't remove its upstreams from the backend catalog — they 
 * `base_path` - API base path for the Omni Gateway proxy listener (for example, `my-api`). The provider constructs the proxy URI as `\http://0.0.0.0:8081/<base_path>`.
 * `response_timeout` - Response timeout in milliseconds.
 
+[[nested-schema-for-deployment]]
 === Nested Schema for `deployment`
 
 * `environment_id` - The environment ID for deployment (usually matches the top-level `environment_id`).
@@ -174,12 +177,14 @@ Removing a route doesn't remove its upstreams from the backend catalog — they 
 * `target_name` - The target gateway name.
 * `gateway_version` - The Omni Gateway runtime version.
 
+[[nested-schema-for-routing]]
 === Nested Schema for `routing`
 
-* `upstreams` - (Required, Block List) Weighted upstream backends for this route. See <<Nested Schema for routing.upstreams>>.
+* `upstreams` - (Required, Block List) Weighted upstream backends for this route. See xref:nested-schema-for-routing-upstreams[Nested Schema for `routing.upstreams`].
 * `label` - A label for this route.
-* `rules` - (Block) Match conditions for this route. See <<Nested Schema for routing.rules>>.
+* `rules` - (Block) Match conditions for this route. See xref:nested-schema-for-routing-rules[Nested Schema for `routing.rules`].
 
+[[nested-schema-for-routing-rules]]
 === Nested Schema for `routing.rules`
 
 * `methods` - Pipe-separated HTTP methods (for example, `GET`, `POST|PUT`).
@@ -187,6 +192,7 @@ Removing a route doesn't remove its upstreams from the backend catalog — they 
 * `host` - Host header value to match.
 * `headers` - (Map) Header key-value pairs to match.
 
+[[nested-schema-for-routing-upstreams]]
 === Nested Schema for `routing.upstreams`
 
 * `uri` - (Required) The upstream backend URI.
@@ -315,7 +321,7 @@ resource "anypoint_api_instance_sla_tier" "gold" {
 * `environment_id` - Environment ID where the API instance lives.
 * `api_instance_id` - Numeric ID of the API instance.
 * `name` - Name of the SLA tier.
-* `limits` - (Block List) Rate limits for this SLA tier. See <<Nested Schema for limits>>.
+* `limits` - (Block List) Rate limits for this SLA tier. See xref:nested-schema-for-limits[Nested Schema for `limits`].
 
 === Optional Arguments
 
@@ -324,6 +330,7 @@ resource "anypoint_api_instance_sla_tier" "gold" {
 * `auto_approve` - Whether requests for this SLA tier are auto-approved. Defaults to `false`.
 * `status` - Status of the SLA tier. Valid values: `ACTIVE`, `INACTIVE`.
 
+[[nested-schema-for-limits]]
 === Nested Schema for `limits`
 
 * `time_period_in_milliseconds` - (Required) Time period for the rate limit in milliseconds.
@@ -458,13 +465,14 @@ resource "anypoint_api_policy" "custom" {
 * `label` - A human-readable label for this policy instance.
 * `order` - Execution order of the policy. Lower numbers execute first.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
-* `pointcut_data` - Pointcut definition as a JSON string. Restricts the policy to specific resources (methods and/or URIs). When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Pointcut definition as a JSON string. Restricts the policy to specific resources (methods and/or URIs). When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See xref:pointcut-data[Pointcut Data].
 
 === Read-Only Attributes
 
 * `id` - Unique identifier of the applied policy.
 * `policy_template_id` - Policy template ID assigned by the server.
 
+[[pointcut-data]]
 === Pointcut Data
 
 The optional `pointcut_data` attribute restricts the policy to specific HTTP methods and/or URI patterns, matching what is configured under "Apply configurations to specific methods & resources" in the Anypoint Platform UI.

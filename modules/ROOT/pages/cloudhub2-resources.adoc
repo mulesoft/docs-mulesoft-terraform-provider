@@ -216,12 +216,12 @@ resource "anypoint_private_space_association" "example" {
 === Optional Arguments
 
 * `organization_id` - Organization ID. If not provided, the organization ID is inferred from the connected app credentials.
-* `associations` - (Block List) List of associations to create between the private space and environments. When omitted, the provider reads the existing associations from the API and populates this field automatically. See <<Nested Schema for associations>>.
+* `associations` - (Block List) List of associations to create between the private space and environments. When omitted, the provider reads the existing associations from the API and populates this field automatically..
 
 === Read-Only Attributes
 
 * `id` - The unique identifier for the Private Space Association resource.
-* `created_associations` - (Block List) List of associations read from the Anypoint Platform API after apply or import. See <<Nested Schema for created_associations>>.
+* `created_associations` - (Block List) List of associations read from the Anypoint Platform API after apply or import..
 
 === Nested Schema for `associations`
 
@@ -432,7 +432,7 @@ resource "anypoint_privatespace_advanced_config" "example" {
 === Optional Arguments
 
 * `organization_id` - Organization ID where the private space is located. If not provided, the organization ID is inferred from the connected app credentials.
-* `ingress_configuration` - (Block) Ingress configuration for the private space. See <<Nested Schema for ingress_configuration>>.
+* `ingress_configuration` - (Block) Ingress configuration for the private space..
 * `enable_iam_role` - Whether to enable IAM role for the private space. Defaults to `false`.
 
 === Read-Only Attributes
@@ -443,8 +443,8 @@ resource "anypoint_privatespace_advanced_config" "example" {
 
 * `read_response_timeout` - Read response timeout in seconds. Defaults to `"300"`.
 * `protocol` - Protocol for ingress configuration. Defaults to `"https-redirect"`.
-* `logs` - (Block) Logs configuration for ingress. See <<Nested Schema for ingress_configuration.logs>>.
-* `deployment` - (Block) Deployment configuration for ingress. See <<Nested Schema for ingress_configuration.deployment>>.
+* `logs` - (Block) Logs configuration for ingress..
+* `deployment` - (Block) Deployment configuration for ingress..
 
 === Nested Schema for `ingress_configuration.logs`
 
@@ -603,7 +603,7 @@ resource "anypoint_tls_context" "jks_example" {
 
 * `private_space_id` - The ID of the private space this TLS context belongs to.
 * `name` - The name of the TLS context.
-* `ciphers` - (Block) Cipher configuration for the TLS context. See <<Nested Schema for ciphers>>.
+* `ciphers` - (Block) Cipher configuration for the TLS context..
 
 === Optional Arguments
 
@@ -623,8 +623,8 @@ resource "anypoint_tls_context" "jks_example" {
 
 * `id` - The unique identifier for the TLS context.
 * `type` - The type of TLS context.
-* `trust_store` - (Block) Trust store information. See <<Nested Schema for trust_store>>.
-* `key_store` - (Block) Key store information. See <<Nested Schema for key_store>>.
+* `trust_store` - (Block) Trust store information..
+* `key_store` - (Block) Key store information..
 
 === Nested Schema for `ciphers`
 
@@ -762,7 +762,7 @@ resource "anypoint_vpn_connection" "example" {
 
 * `private_space_id` - The ID of the private space.
 * `name` - The name of the VPN connection.
-* `vpns` - (Block List) List of VPN configurations. See <<Nested Schema for vpns>>.
+* `vpns` - (Block List) List of VPN configurations..
 
 === Optional Arguments
 
@@ -777,7 +777,7 @@ resource "anypoint_vpn_connection" "example" {
 * `local_asn` - (Required) Local ASN for the VPN.
 * `remote_asn` - (Required) Remote ASN for the VPN.
 * `remote_ip_address` - (Required) Remote IP address for the VPN.
-* `vpn_tunnels` - (Required, Block List) List of VPN tunnel configurations. See <<Nested Schema for vpns.vpn_tunnels>>.
+* `vpn_tunnels` - (Required, Block List) List of VPN tunnel configurations..
 * `name` - The name of the VPN.
 * `static_routes` - (List of String) List of static routes.
 * `connection_name` - The connection name of the VPN. _(Read-Only)_

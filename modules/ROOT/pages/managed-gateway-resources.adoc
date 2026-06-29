@@ -66,10 +66,10 @@ resource "anypoint_managed_omni_gateway" "example" {
 * `runtime_version` - The Omni Gateway runtime version (for example, `1.9.9`). If omitted, the provider auto-selects the latest version for the chosen `release_channel`.
 * `release_channel` - The release channel for the gateway. Valid values: `lts`, `edge`. Defaults to `lts`.
 * `size` - The size of the gateway instance. Valid values: `small`, `large`. Defaults to `small`.
-* `ingress` - (Block) Ingress configuration for the gateway. See <<Nested Schema for ingress>>.
-* `properties` - (Block) Runtime properties for the gateway. See <<Nested Schema for properties>>.
-* `logging` - (Block) Logging configuration for the gateway. See <<Nested Schema for logging>>.
-* `tracing` - (Block) Distributed tracing configuration for the gateway. See <<Nested Schema for tracing>>.
+* `ingress` - (Block) Ingress configuration for the gateway..
+* `properties` - (Block) Runtime properties for the gateway..
+* `logging` - (Block) Logging configuration for the gateway..
+* `tracing` - (Block) Distributed tracing configuration for the gateway..
 
 === Read-Only Attributes
 

@@ -95,7 +95,7 @@ resource "anypoint_mcp_server" "advanced" {
 === Required Arguments
 
 * `environment_id` - The environment ID where the MCP server will be created.
-* `spec` - (Block) The Exchange asset specification backing this MCP server. See <<Nested Schema for spec>>.
+* `spec` - (Block) The Exchange asset specification backing this MCP server..
 
 === Optional Arguments
 
@@ -107,9 +107,9 @@ resource "anypoint_mcp_server" "advanced" {
 * `consumer_endpoint` - Consumer-facing endpoint URI (the public URL clients use to reach the MCP server). For MCP, this is the proxy URI that clients connect to.
 * `upstream_uri` - Shorthand for a single-upstream routing configuration. Mutually exclusive with `routing`.
 * `gateway_id` - The Omni Gateway UUID. When provided, the deployment block is auto-populated from the Gateway Manager. Mutually exclusive with a full `deployment` block.
-* `endpoint` - (Block) Endpoint and proxy configuration. See <<Nested Schema for endpoint>>.
-* `deployment` - (Block) Deployment target configuration. Auto-populated when `gateway_id` is set. See <<Nested Schema for deployment>>.
-* `routing` - (Block List) Routing rules with upstream backends. Mutually exclusive with `upstream_uri`. See <<Nested Schema for routing>>.
+* `endpoint` - (Block) Endpoint and proxy configuration..
+* `deployment` - (Block) Deployment target configuration. Auto-populated when `gateway_id` is set..
+* `routing` - (Block List) Routing rules with upstream backends. Mutually exclusive with `upstream_uri`..
 
 === Read-Only Attributes
 
@@ -146,9 +146,9 @@ resource "anypoint_mcp_server" "advanced" {
 
 === Nested Schema for `routing`
 
-* `upstreams` - (Required, Block List) Upstream backends for this route. For MCP servers, these are the actual MCP server implementation endpoints. See <<Nested Schema for routing.upstreams>>.
+* `upstreams` - (Required, Block List) Upstream backends for this route. For MCP servers, these are the actual MCP server implementation endpoints..
 * `label` - A label for this route.
-* `rules` - (Block) Match conditions for this route. See <<Nested Schema for routing.rules>>.
+* `rules` - (Block) Match conditions for this route..
 
 === Nested Schema for `routing.rules`
 
@@ -296,7 +296,7 @@ resource "anypoint_agent_instance" "advanced" {
 === Required Arguments
 
 * `environment_id` - The environment ID where the Agent instance will be created.
-* `spec` - (Block) The Exchange asset specification backing this Agent instance. See <<Nested Schema for spec>>.
+* `spec` - (Block) The Exchange asset specification backing this Agent instance..
 
 === Optional Arguments
 
@@ -308,9 +308,9 @@ resource "anypoint_agent_instance" "advanced" {
 * `consumer_endpoint` - Consumer-facing endpoint URI (the public URL clients use to reach the Agent).
 * `upstream_uri` - Shorthand for a single-upstream routing configuration. Mutually exclusive with `routing`.
 * `gateway_id` - The Omni Gateway UUID. When provided, the deployment block is auto-populated from the Gateway Manager. Mutually exclusive with a full `deployment` block.
-* `endpoint` - (Block) Endpoint and proxy configuration. See <<Nested Schema for endpoint>>.
-* `deployment` - (Block) Deployment target configuration. Auto-populated when `gateway_id` is set. See <<Nested Schema for deployment>>.
-* `routing` - (Block List) Routing rules with weighted upstream backends. Mutually exclusive with `upstream_uri`. See <<Nested Schema for routing>>.
+* `endpoint` - (Block) Endpoint and proxy configuration..
+* `deployment` - (Block) Deployment target configuration. Auto-populated when `gateway_id` is set..
+* `routing` - (Block List) Routing rules with weighted upstream backends. Mutually exclusive with `upstream_uri`..
 
 === Read-Only Attributes
 
@@ -346,9 +346,9 @@ resource "anypoint_agent_instance" "advanced" {
 
 === Nested Schema for `routing`
 
-* `upstreams` - (Required, Block List) Weighted upstream backends for this route. See <<Nested Schema for routing.upstreams>>.
+* `upstreams` - (Required, Block List) Weighted upstream backends for this route..
 * `label` - A label for this route.
-* `rules` - (Block) Match conditions for this route. See <<Nested Schema for routing.rules>>.
+* `rules` - (Block) Match conditions for this route..
 
 === Nested Schema for `routing.rules`
 
