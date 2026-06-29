@@ -37,7 +37,7 @@ resource "anypoint_api_policy_a2a_agent_card" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance to attach the agent card to.
-* `configuration` - (Block) Agent card content and serving configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Agent card content and serving configuration..
 
 === Optional Arguments
 
@@ -47,7 +47,7 @@ resource "anypoint_api_policy_a2a_agent_card" "example" {
 * `asset_version` - The policy asset version. Defaults to `2.0.0-20260327083212`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -168,7 +168,7 @@ resource "anypoint_api_policy_a2a_pii_detector" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - Numeric ID of the API instance to attach this policy to.
-* `configuration` - (Block) PII detection configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) PII detection configuration..
 
 === Optional Arguments
 
@@ -178,7 +178,7 @@ resource "anypoint_api_policy_a2a_pii_detector" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.1`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -299,7 +299,7 @@ resource "anypoint_api_policy_a2a_prompt_decorator" "example" {
 
 * `environment_id` - ID of the environment containing the API instance.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Decorator configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Decorator configuration..
 
 === Optional Arguments
 
@@ -309,7 +309,7 @@ resource "anypoint_api_policy_a2a_prompt_decorator" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.1`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -433,7 +433,7 @@ resource "anypoint_api_policy_a2a_schema_validation" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.1`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) List of upstream IDs this policy applies to.
-* `pointcut_data` - Pointcut definition as a JSON string. Restricts the policy to specific resources (methods and/or URIs). When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Pointcut definition as a JSON string. Restricts the policy to specific resources (methods and/or URIs). When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -546,7 +546,7 @@ resource "anypoint_api_policy_a2a_token_rate_limit" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Rate limit configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Rate limit configuration..
 
 === Optional Arguments
 
@@ -556,7 +556,7 @@ resource "anypoint_api_policy_a2a_token_rate_limit" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.0`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -674,7 +674,7 @@ resource "anypoint_api_policy_body_transformation" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Transformation configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Transformation configuration..
 
 === Optional Arguments
 
@@ -684,7 +684,7 @@ resource "anypoint_api_policy_body_transformation" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.0-20260127.133848`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -807,9 +807,9 @@ resource "anypoint_api_policy_circuit_breaker" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Circuit breaker thresholds. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Circuit breaker thresholds..
 * `upstream_ids` - (Required, List of String) Upstream IDs this policy monitors.
-* `pointcut_data` - Pointcut definition as a JSON string. See <<Pointcut Data>>.
+* `pointcut_data` - Pointcut definition as a JSON string..
 
 === Optional Arguments
 
@@ -938,7 +938,7 @@ resource "anypoint_api_policy_access_block" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.0`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -1051,7 +1051,7 @@ resource "anypoint_api_policy_client_id_enforcement" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Client credential extraction configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Client credential extraction configuration..
 
 === Optional Arguments
 
@@ -1061,7 +1061,7 @@ resource "anypoint_api_policy_client_id_enforcement" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.3.3`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -1218,7 +1218,7 @@ resource "anypoint_api_policy_cors" "private" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) CORS configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) CORS configuration..
 
 === Optional Arguments
 
@@ -1228,7 +1228,7 @@ resource "anypoint_api_policy_cors" "private" {
 * `asset_version` - The policy asset version. Defaults to `1.3.2`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -1376,9 +1376,9 @@ resource "anypoint_api_policy_credential_injection_basic_auth" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Credential injection configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Credential injection configuration..
 * `upstream_ids` - (Required, List of String) Upstream IDs to inject credentials into.
-* `pointcut_data` - Pointcut definition as a JSON string. See <<Pointcut Data>>.
+* `pointcut_data` - Pointcut definition as a JSON string..
 
 === Optional Arguments
 
@@ -1508,9 +1508,9 @@ resource "anypoint_api_policy_credential_injection_oauth2" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) OAuth 2.0 token injection configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) OAuth 2.0 token injection configuration..
 * `upstream_ids` - (Required, List of String) Upstream IDs to inject the token into.
-* `pointcut_data` - Pointcut definition as a JSON string. See <<Pointcut Data>>.
+* `pointcut_data` - Pointcut definition as a JSON string..
 
 === Optional Arguments
 
@@ -1642,9 +1642,9 @@ resource "anypoint_api_policy_credential_injection_oauth2_obo" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) On-Behalf-Of token exchange configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) On-Behalf-Of token exchange configuration..
 * `upstream_ids` - (Required, List of String) Upstream IDs to inject the exchanged token into.
-* `pointcut_data` - Pointcut definition as a JSON string. See <<Pointcut Data>>.
+* `pointcut_data` - Pointcut definition as a JSON string..
 
 === Optional Arguments
 
@@ -1780,7 +1780,7 @@ resource "anypoint_api_policy_dataweave_request_filter" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Filter script configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Filter script configuration..
 
 === Optional Arguments
 
@@ -1790,7 +1790,7 @@ resource "anypoint_api_policy_dataweave_request_filter" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.0`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -1907,7 +1907,7 @@ resource "anypoint_api_policy_dataweave_body_transformation" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Transformation configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Transformation configuration..
 
 === Optional Arguments
 
@@ -1917,7 +1917,7 @@ resource "anypoint_api_policy_dataweave_body_transformation" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.0`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -2035,7 +2035,7 @@ resource "anypoint_api_policy_dataweave_headers_transformation" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Header transformation configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Header transformation configuration..
 
 === Optional Arguments
 
@@ -2045,7 +2045,7 @@ resource "anypoint_api_policy_dataweave_headers_transformation" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.0`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -2171,7 +2171,7 @@ resource "anypoint_api_policy_external_oauth2_access_token_enforcement" "example
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Token validation configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Token validation configuration..
 
 === Optional Arguments
 
@@ -2181,7 +2181,7 @@ resource "anypoint_api_policy_external_oauth2_access_token_enforcement" "example
 * `asset_version` - The policy asset version. Defaults to `1.6.0`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -2309,7 +2309,7 @@ resource "anypoint_api_policy_header_injection" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Header injection configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Header injection configuration..
 
 === Optional Arguments
 
@@ -2319,7 +2319,7 @@ resource "anypoint_api_policy_header_injection" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.3.2`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -2440,7 +2440,7 @@ resource "anypoint_api_policy_header_removal" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Header removal configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Header removal configuration..
 
 === Optional Arguments
 
@@ -2450,7 +2450,7 @@ resource "anypoint_api_policy_header_removal" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.1.2`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -2568,7 +2568,7 @@ resource "anypoint_api_policy_header_transformation" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Transformation configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Transformation configuration..
 
 === Optional Arguments
 
@@ -2578,7 +2578,7 @@ resource "anypoint_api_policy_header_transformation" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.0-20260127.134148`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -2697,7 +2697,7 @@ resource "anypoint_api_policy_health_check" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Health check configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Health check configuration..
 
 === Optional Arguments
 
@@ -2707,7 +2707,7 @@ resource "anypoint_api_policy_health_check" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.1`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -2825,7 +2825,7 @@ resource "anypoint_api_policy_http_basic_authentication" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Authentication credentials. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Authentication credentials..
 
 === Optional Arguments
 
@@ -2835,7 +2835,7 @@ resource "anypoint_api_policy_http_basic_authentication" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.3.2`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -2957,7 +2957,7 @@ resource "anypoint_api_policy_http_caching" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Cache configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Cache configuration..
 
 === Optional Arguments
 
@@ -2967,7 +2967,7 @@ resource "anypoint_api_policy_http_caching" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.1.1`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -3090,9 +3090,9 @@ resource "anypoint_api_policy_idle_timeout" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Timeout configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Timeout configuration..
 * `upstream_ids` - (Required, List of String) Upstream IDs this policy monitors.
-* `pointcut_data` - Pointcut definition as a JSON string. See <<Pointcut Data>>.
+* `pointcut_data` - Pointcut definition as a JSON string..
 
 === Optional Arguments
 
@@ -3219,9 +3219,9 @@ resource "anypoint_api_policy_intask_authentication_policy" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Authentication configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Authentication configuration..
 * `upstream_ids` - (Required, List of String) Upstream IDs this policy applies to.
-* `pointcut_data` - Pointcut definition as a JSON string. See <<Pointcut Data>>.
+* `pointcut_data` - Pointcut definition as a JSON string..
 
 === Optional Arguments
 
@@ -3359,9 +3359,9 @@ resource "anypoint_api_policy_intask_authorization_code_policy" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Authorization code flow configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Authorization code flow configuration..
 * `upstream_ids` - (Required, List of String) Upstream IDs this policy applies to.
-* `pointcut_data` - Pointcut definition as a JSON string. See <<Pointcut Data>>.
+* `pointcut_data` - Pointcut definition as a JSON string..
 
 === Optional Arguments
 
@@ -3493,7 +3493,7 @@ resource "anypoint_api_policy_ip_allowlist" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Allowlist configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Allowlist configuration..
 
 === Optional Arguments
 
@@ -3503,7 +3503,7 @@ resource "anypoint_api_policy_ip_allowlist" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.1.2`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -3622,7 +3622,7 @@ resource "anypoint_api_policy_ip_blocklist" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Blocklist configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Blocklist configuration..
 
 === Optional Arguments
 
@@ -3632,7 +3632,7 @@ resource "anypoint_api_policy_ip_blocklist" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.1.2`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -3753,7 +3753,7 @@ resource "anypoint_api_policy_injection_protection" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Injection protection configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Injection protection configuration..
 
 === Optional Arguments
 
@@ -3763,7 +3763,7 @@ resource "anypoint_api_policy_injection_protection" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.0`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -3887,7 +3887,7 @@ resource "anypoint_api_policy_json_threat_protection" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) JSON structural limits. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) JSON structural limits..
 
 === Optional Arguments
 
@@ -3897,7 +3897,7 @@ resource "anypoint_api_policy_json_threat_protection" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.2.1`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -4023,7 +4023,7 @@ resource "anypoint_api_policy_jwt_validation" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) JWT validation configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) JWT validation configuration..
 
 === Optional Arguments
 
@@ -4033,7 +4033,7 @@ resource "anypoint_api_policy_jwt_validation" "example" {
 * `asset_version` - The policy asset version. Defaults to `0.12.0`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -4173,7 +4173,7 @@ resource "anypoint_api_policy_ldap_authentication" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) LDAP connection and search configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) LDAP connection and search configuration..
 
 === Optional Arguments
 
@@ -4183,7 +4183,7 @@ resource "anypoint_api_policy_ldap_authentication" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.4.1`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -4307,9 +4307,9 @@ resource "anypoint_api_policy_bedrock_llm_provider_policy" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) AWS Bedrock connection configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) AWS Bedrock connection configuration..
 * `upstream_ids` - (Required, List of String) Upstream IDs this policy applies to.
-* `pointcut_data` - Pointcut definition as a JSON string. See <<Pointcut Data>>.
+* `pointcut_data` - Pointcut definition as a JSON string..
 
 === Optional Arguments
 
@@ -4436,9 +4436,9 @@ resource "anypoint_api_policy_gemini_llm_provider_policy" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Gemini connection configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Gemini connection configuration..
 * `upstream_ids` - (Required, List of String) Upstream IDs this policy applies to.
-* `pointcut_data` - Pointcut definition as a JSON string. See <<Pointcut Data>>.
+* `pointcut_data` - Pointcut definition as a JSON string..
 
 === Optional Arguments
 
@@ -4561,7 +4561,7 @@ resource "anypoint_api_policy_gemini_transcoding_policy" "example" {
 * `api_instance_id` - ID of the API instance this policy is applied to.
 * `configuration` - (Block) This policy doesn't require any configuration fields — pass an empty block (`configuration = {}`).
 * `upstream_ids` - (Required, List of String) Upstream IDs this policy applies to.
-* `pointcut_data` - Pointcut definition as a JSON string. See <<Pointcut Data>>.
+* `pointcut_data` - Pointcut definition as a JSON string..
 
 === Optional Arguments
 
@@ -4684,7 +4684,7 @@ resource "anypoint_api_policy_llm_gw_core_policy" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Vendor routing configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Vendor routing configuration..
 
 === Optional Arguments
 
@@ -4694,7 +4694,7 @@ resource "anypoint_api_policy_llm_gw_core_policy" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.0-20251230075635`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -4818,7 +4818,7 @@ resource "anypoint_api_policy_llm_proxy_core" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.0-20260127095720`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -4935,7 +4935,7 @@ resource "anypoint_api_policy_llm_proxy_core_policy" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Vendor routing configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Vendor routing configuration..
 
 === Optional Arguments
 
@@ -4945,7 +4945,7 @@ resource "anypoint_api_policy_llm_proxy_core_policy" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.0-20260108100848`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -5067,7 +5067,7 @@ resource "anypoint_api_policy_mcp_access_control" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Access control configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Access control configuration..
 
 === Optional Arguments
 
@@ -5077,7 +5077,7 @@ resource "anypoint_api_policy_mcp_access_control" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.1`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -5197,7 +5197,7 @@ resource "anypoint_api_policy_mcp_global_access_policy" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Access control configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Access control configuration..
 
 === Optional Arguments
 
@@ -5207,7 +5207,7 @@ resource "anypoint_api_policy_mcp_global_access_policy" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.0`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -5322,7 +5322,7 @@ resource "anypoint_api_policy_mcp_pii_detector" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) PII detection configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) PII detection configuration..
 
 === Optional Arguments
 
@@ -5332,7 +5332,7 @@ resource "anypoint_api_policy_mcp_pii_detector" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.0`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -5447,7 +5447,7 @@ resource "anypoint_api_policy_mcp_schema_validation" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Schema validation configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Schema validation configuration..
 
 === Optional Arguments
 
@@ -5457,7 +5457,7 @@ resource "anypoint_api_policy_mcp_schema_validation" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.1.0`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -5580,7 +5580,7 @@ resource "anypoint_api_policy_mcp_support" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.1`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -5697,7 +5697,7 @@ resource "anypoint_api_policy_mcp_tool_mapping" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Tool mapping configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Tool mapping configuration..
 
 === Optional Arguments
 
@@ -5707,7 +5707,7 @@ resource "anypoint_api_policy_mcp_tool_mapping" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.0`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -5829,7 +5829,7 @@ resource "anypoint_api_policy_mcp_transcoding_router" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Transcoding router configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Transcoding router configuration..
 
 === Optional Arguments
 
@@ -5839,7 +5839,7 @@ resource "anypoint_api_policy_mcp_transcoding_router" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.1-20260414150102`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -5966,7 +5966,7 @@ resource "anypoint_api_policy_message_logging" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Logging configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Logging configuration..
 
 === Optional Arguments
 
@@ -5976,7 +5976,7 @@ resource "anypoint_api_policy_message_logging" "example" {
 * `asset_version` - The policy asset version. Defaults to `2.0.2`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -6121,9 +6121,9 @@ resource "anypoint_api_policy_message_logging_outbound" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Logging configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Logging configuration..
 * `upstream_ids` - (Required, List of String) Upstream IDs this policy applies to.
-* `pointcut_data` - Pointcut definition as a JSON string. See <<Pointcut Data>>.
+* `pointcut_data` - Pointcut definition as a JSON string..
 
 === Optional Arguments
 
@@ -6268,7 +6268,7 @@ resource "anypoint_api_policy_model_based_routing" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Routing configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Routing configuration..
 
 === Optional Arguments
 
@@ -6278,7 +6278,7 @@ resource "anypoint_api_policy_model_based_routing" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.0-20260127100214`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -6394,7 +6394,7 @@ resource "anypoint_api_policy_agent_connection_telemetry" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Telemetry configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Telemetry configuration..
 
 === Optional Arguments
 
@@ -6404,7 +6404,7 @@ resource "anypoint_api_policy_agent_connection_telemetry" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.0`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -6526,9 +6526,9 @@ resource "anypoint_api_policy_native_aws_lambda" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Lambda invocation configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Lambda invocation configuration..
 * `upstream_ids` - (Required, List of String) Upstream IDs this policy applies to.
-* `pointcut_data` - Pointcut definition as a JSON string. See <<Pointcut Data>>.
+* `pointcut_data` - Pointcut definition as a JSON string..
 
 === Optional Arguments
 
@@ -6655,7 +6655,7 @@ resource "anypoint_api_policy_native_ext_authz" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) External authorization configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) External authorization configuration..
 
 === Optional Arguments
 
@@ -6665,7 +6665,7 @@ resource "anypoint_api_policy_native_ext_authz" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.2.1`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -6795,7 +6795,7 @@ resource "anypoint_api_policy_native_ext_proc" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) External processor configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) External processor configuration..
 
 === Optional Arguments
 
@@ -6805,7 +6805,7 @@ resource "anypoint_api_policy_native_ext_proc" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.1.1`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -6934,7 +6934,7 @@ resource "anypoint_api_policy_oauth2_token_introspection" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Token introspection configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Token introspection configuration..
 
 === Optional Arguments
 
@@ -6944,7 +6944,7 @@ resource "anypoint_api_policy_oauth2_token_introspection" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.1`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -7068,9 +7068,9 @@ resource "anypoint_api_policy_openai_transcoding_policy" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) OpenAI connection configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) OpenAI connection configuration..
 * `upstream_ids` - (Required, List of String) Upstream IDs this policy applies to.
-* `pointcut_data` - Pointcut definition as a JSON string. See <<Pointcut Data>>.
+* `pointcut_data` - Pointcut definition as a JSON string..
 
 === Optional Arguments
 
@@ -7202,7 +7202,7 @@ resource "anypoint_api_policy_semantic_prompt_guard_policy_openai" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Prompt guard configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Prompt guard configuration..
 
 === Optional Arguments
 
@@ -7212,7 +7212,7 @@ resource "anypoint_api_policy_semantic_prompt_guard_policy_openai" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.0-20260130084752`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -7340,7 +7340,7 @@ resource "anypoint_api_policy_semantic_routing_policy_huggingface" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Semantic routing configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Semantic routing configuration..
 
 === Optional Arguments
 
@@ -7350,7 +7350,7 @@ resource "anypoint_api_policy_semantic_routing_policy_huggingface" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.0-20260130095514`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -7477,7 +7477,7 @@ resource "anypoint_api_policy_rate_limiting" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Rate limit configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Rate limit configuration..
 
 === Optional Arguments
 
@@ -7487,7 +7487,7 @@ resource "anypoint_api_policy_rate_limiting" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.4.1`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -7608,7 +7608,7 @@ resource "anypoint_api_policy_rate_limiting_sla_based" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) SLA-based rate limit configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) SLA-based rate limit configuration..
 
 === Optional Arguments
 
@@ -7618,7 +7618,7 @@ resource "anypoint_api_policy_rate_limiting_sla_based" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.3.1`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -7736,7 +7736,7 @@ resource "anypoint_api_policy_response_timeout" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Timeout configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Timeout configuration..
 
 === Optional Arguments
 
@@ -7746,7 +7746,7 @@ resource "anypoint_api_policy_response_timeout" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.1`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -7863,7 +7863,7 @@ resource "anypoint_api_policy_script_evaluation_transformation" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Script configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Script configuration..
 
 === Optional Arguments
 
@@ -7873,7 +7873,7 @@ resource "anypoint_api_policy_script_evaluation_transformation" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.0-20260127.133315`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -7995,7 +7995,7 @@ resource "anypoint_api_policy_sse_logging" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) SSE logging configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) SSE logging configuration..
 
 === Optional Arguments
 
@@ -8005,7 +8005,7 @@ resource "anypoint_api_policy_sse_logging" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.1`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -8121,7 +8121,7 @@ resource "anypoint_api_policy_spec_validation" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Spec validation configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Spec validation configuration..
 
 === Optional Arguments
 
@@ -8131,7 +8131,7 @@ resource "anypoint_api_policy_spec_validation" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.1`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -8252,7 +8252,7 @@ resource "anypoint_api_policy_spike_control" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Spike control configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Spike control configuration..
 
 === Optional Arguments
 
@@ -8262,7 +8262,7 @@ resource "anypoint_api_policy_spike_control" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.2.2`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -8382,7 +8382,7 @@ resource "anypoint_api_policy_stream_idle_timeout" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Timeout configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Timeout configuration..
 
 === Optional Arguments
 
@@ -8392,7 +8392,7 @@ resource "anypoint_api_policy_stream_idle_timeout" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.0.1`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -8511,7 +8511,7 @@ resource "anypoint_api_policy_tracing" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) Tracing configuration. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) Tracing configuration..
 
 === Optional Arguments
 
@@ -8521,7 +8521,7 @@ resource "anypoint_api_policy_tracing" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.1.1`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -8648,7 +8648,7 @@ resource "anypoint_api_policy_xml_threat_protection" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) XML structural limits. See <<Nested Schema for configuration>>.
+* `configuration` - (Block) XML structural limits..
 
 === Optional Arguments
 
@@ -8658,7 +8658,7 @@ resource "anypoint_api_policy_xml_threat_protection" "example" {
 * `asset_version` - The policy asset version. Defaults to `1.2.1`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
-* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this. See <<Pointcut Data>>.
+* `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
 
 === Read-Only Attributes
 
@@ -8746,5 +8746,4 @@ terraform apply
 [source,shell]
 ----
 terraform import anypoint_api_policy_xml_threat_protection.imported <organization_id>/<environment_id>/<api_instance_id>/<policy_id>
-----
 ----
