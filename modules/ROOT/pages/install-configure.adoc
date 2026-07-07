@@ -39,11 +39,11 @@ terraform init
 
 == Configure Credentials
 
-The provider supports multiple authentication methods depending on the resources you manage.
+The provider supports two types of connected apps depending on the resources you manage.
 
-=== Connected App Credentials
+=== Standard Connected App
 
-Use connected app credentials when resources support client credentials authentication:
+Most resources use a standard connected app (client credentials only):
 
 [source,bash]
 ----
@@ -52,9 +52,9 @@ export TF_VAR_anypoint_client_secret="<client-secret>"
 export TF_VAR_anypoint_base_url="https://anypoint.mulesoft.com"
 ----
 
-=== Connected App Authentication for Access Management Resources
+=== Admin Connected App
 
-Some Access Management resources require authentication on behalf of a user:
+Some resources require an admin connected app configured with user credentials. This is needed for resources that authenticate on behalf of a user:
 
 [source,bash]
 ----
@@ -69,7 +69,7 @@ export TF_VAR_anypoint_base_url="https://anypoint.mulesoft.com"
 
 Configure the provider using the authentication method required for your resources.
 
-=== Connected App Credentials
+=== Standard Connected App
 
 [source,hcl]
 ----
@@ -80,7 +80,7 @@ provider "anypoint" {
 }
 ----
 
-=== Connected App Authentication for Access Management Resources
+=== Admin Connected App
 
 [source,hcl]
 ----
