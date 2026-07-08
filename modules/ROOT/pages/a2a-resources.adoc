@@ -4042,7 +4042,7 @@ resource "anypoint_api_policy_jwt_validation" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `asset_version` - The policy asset version (for example, `1.4.0`). Must match the version deployed in your organization's Exchange.
+* `asset_version` - Policy asset version (for example, `1.4.0`). Must match the version deployed in your organization's Exchange.
 * `configuration` - (Block) JWT validation configuration.
 
 === Optional Arguments
