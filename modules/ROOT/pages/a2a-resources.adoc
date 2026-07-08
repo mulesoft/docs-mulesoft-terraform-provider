@@ -4003,16 +4003,35 @@ resource "anypoint_api_policy_jwt_validation" "example" {
   organization_id = var.organization_id
   environment_id  = var.environment_id
   api_instance_id = anypoint_api_instance.example.id
+  asset_version   = "1.4.0"
 
   configuration = {
-    jwt_origin                = "httpBearerAuthenticationHeader"
-    signing_method            = "rsa"
-    signing_key_length        = 256
-    jwt_key_origin            = "jwks"
-    jwks_url                  = "https://example.com/.well-known/jwks.json"
-    skip_client_id_validation = true
-    validate_aud_claim        = true
-    mandatory_exp_claim       = true
+    jwt_origin                      = "httpBearerAuthenticationHeader"
+    signing_method                  = "rsa"
+    signing_key_length              = 256
+    jwt_key_origin                  = "jwks"
+    jwks_url                        = "https://example.com/.well-known/jwks.json"
+    jwks_service_time_to_live       = 60
+    jwks_service_connection_timeout = 10000
+    skip_client_id_validation       = true
+    validate_aud_claim              = false
+    mandatory_aud_claim             = false
+    mandatory_exp_claim             = false
+    mandatory_nbf_claim             = false
+    validate_custom_claim           = true
+    jwt_expression                  = "#[attributes.headers['jwt']]"
+    client_id_expression            = "#[vars.claimSet.client_id]"
+    supported_audiences             = "aud.example.com"
+    mandatory_custom_claims = [
+      {
+        key   = "key1"
+        value = "value1"
+      },
+      {
+        key   = "key2"
+        value = "value2"
+      }
+    ]
   }
 
   order = 1
@@ -4023,14 +4042,14 @@ resource "anypoint_api_policy_jwt_validation" "example" {
 
 * `environment_id` - ID of the environment where the API instance lives.
 * `api_instance_id` - ID of the API instance this policy is applied to.
-* `configuration` - (Block) JWT validation configuration..
+* `asset_version` - Policy asset version (for example, `1.4.0`). Must match the version deployed in your organization's Exchange.
+* `configuration` - (Block) JWT validation configuration.
 
 === Optional Arguments
 
 * `organization_id` - Organization ID. If omitted, defaults to the organization of the connected app.
 * `label` - A human-readable label for this policy instance.
 * `order` - Execution order relative to other policies. Lower numbers run first.
-* `asset_version` - The policy asset version. Defaults to `0.12.0`.
 * `disabled` - Whether the policy is disabled. Defaults to `false`.
 * `upstream_ids` - (List of String) Upstream IDs this policy applies to. When omitted, applies to all upstreams.
 * `pointcut_data` - Scope the policy to specific HTTP methods and URI patterns as a JSON string. When `null`, the policy applies to all resources. Use `jsonencode()` to set this..
