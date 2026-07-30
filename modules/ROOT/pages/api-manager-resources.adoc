@@ -22,7 +22,7 @@ An API instance binds an Exchange asset specification to an Omni Gateway target,
 
 [WARNING]
 ====
-The top-level `upstream_uri` field is deprecated and will be removed in the next major version. New configurations should use the `routing` block, which supports TLS, labels, multiple upstreams, and weighted routing. See xref:_migrating_from_upstream_uri[Migrating from upstream_uri] below.
+The top-level `upstream_uri` field is deprecated and will be removed in the next major version. Use the `routing` block in new configurations instead, which supports TLS, labels, multiple upstreams, and weighted routing. See <<migrating-from-upstream-uri>>.
 ====
 
 ==== Minimal configuration
@@ -93,7 +93,7 @@ resource "anypoint_api_instance" "weighted_routing" {
   ]
 }
 ----
-
+[migrating-from-upstream-uri]
 === Migrating from `upstream_uri`
 
 If you are using the deprecated `upstream_uri` field, replace it with an equivalent single-upstream `routing` block:
