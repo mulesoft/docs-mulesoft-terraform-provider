@@ -93,7 +93,7 @@ resource "anypoint_api_instance" "weighted_routing" {
   ]
 }
 ----
-[migrating-from-upstream-uri]
+[[migrating-from-upstream-uri]]
 === Migrating from `upstream_uri`
 
 If you are using the deprecated `upstream_uri` field, replace it with an equivalent single-upstream `routing` block:
