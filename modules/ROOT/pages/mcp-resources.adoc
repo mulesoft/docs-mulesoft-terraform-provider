@@ -1,6 +1,6 @@
 = MCP and AI Agent Resources
 
-Use these resources to manage MCP servers and AI agent resources.
+Use these resources to manage MCP servers, MCP bridges, and AI agent resources.
 
 == `anypoint_mcp_server`
 
@@ -407,3 +407,291 @@ terraform apply
 ----
 terraform import anypoint_agent_instance.imported <organization_id>/<environment_id>/<agent_instance_id>
 ----
+
+== `anypoint_mcp_bridge`
+
+Use the `anypoint_mcp_bridge` resource to create and manage an MCP bridge in Anypoint API Manager. An MCP bridge generates an MCP server from one or more source REST APIs by publishing a generated Exchange asset, deploying a Flex/Self-Managed Gateway instance, and attaching MCP transcoding policies that map MCP tool calls to REST calls.
+
+[NOTE]
+====
+*Connected App:* This resource requires a *standard connected app* (client credentials). An admin connected app isn't needed. The connected app must have relevant scopes.
+====
+
+[NOTE]
+====
+*`anypoint_mcp_bridge` vs `anypoint_mcp_server`:* Use `anypoint_mcp_bridge` when you want the provider to generate an MCP server from existing REST API specs in Exchange. Use `anypoint_mcp_server` when you already have an MCP server spec and want to deploy it directly.
+====
+
+[NOTE]
+====
+*Gateway must be running:* The target gateway must be connected and running before you apply. If it isn't, the provider raises a `GatewayNotReadyError` and retries briefly before failing.
+====
+
+[NOTE]
+====
+*ForceNew fields:* `environment_id`, `gateway_id`, `mcp_asset_name`, `port`, and `base_path` can't be changed after creation. Structural changes to `source_apis` (adding or removing source APIs, or changing `label`, `upstream_uri`, `asset_id`, `group_id`, or `version`) also require replacement. Use `terraform apply -replace=<resource_address>` to recreate the resource. Tool-level changes within a source API (adding, removing, or editing tools) are applied in place and bump the generated Exchange asset version.
+====
+
+=== Example Usage
+
+[source,hcl]
+----
+resource "anypoint_mcp_bridge" "example" {
+  organization_id = var.organization_id
+  environment_id  = var.environment_id
+  gateway_id      = var.gateway_id
+  mcp_asset_name  = "petstore-mcp-bridge"
+  port            = 8081
+  base_path       = "petstore"
+
+  source_apis = [
+    {
+      label        = "petstore-api"
+      upstream_uri = "https://sandbox.example.com/petstore/v1"
+      asset_id     = "petstore-rest-api"
+      version      = "1.0.0"
+
+      tools = [
+        {
+          method       = "GET"
+          path         = "/pets"
+          description  = "List all pets"
+          query_params = ["limit", "offset"]
+        },
+        {
+          method   = "POST"
+          path     = "/pets"
+          has_body = true
+        },
+        {
+          method = "GET"
+          path   = "/pets/{petId}"
+        },
+      ]
+    },
+  ]
+}
+----
+
+=== Required Arguments
+
+* `environment_id` - The environment ID where the bridge is created. Changing this value forces a new resource.
+* `gateway_id` - The UUID of the Flex or Self-Managed Gateway to deploy to. Changing this value forces a new resource.
+* `mcp_asset_name` - The MCP asset name. Becomes the generated Exchange asset name and the instance name. Changing this value forces a new resource.
+* `source_apis` - (Attributes List) One entry per source REST API. See xref:nested-schema-for-source-apis[Nested Schema for `source_apis`].
+
+=== Optional Arguments
+
+* `organization_id` - Organization ID. If not provided, the organization ID is inferred from connected app credentials.
+* `port` - (Number) Listener port. Defaults to `8081`. Changing this value forces a new resource.
+* `base_path` - Base path for the MCP server endpoint. Changing this value forces a new resource.
+
+=== Read-Only Attributes
+
+* `id` - The numeric API Manager instance ID (stored as a string).
+* `asset_id` - The generated Exchange asset ID.
+* `asset_version` - The current version of the generated Exchange asset. Starts at `1.0.0` and bumps on each tool-level update.
+* `product_version` - The product version of the bridge.
+* `consumer_endpoint` - The public consumer endpoint. May be null for self-managed Flex Gateway bridges — use `proxy_uri` in that case.
+* `status` - The current status of the bridge.
+* `technology` - Always `flexGateway`.
+* `deployment` - (Object) Auto-populated deployment details. See xref:nested-schema-for-deployment[Nested Schema for `deployment`].
+
+[#nested-schema-for-source-apis]
+=== Nested Schema for `source_apis`
+
+* `label` - (Required) Route label and `X-UPSTREAM-NAME` header value. Must be unique within the bridge.
+* `upstream_uri` - (Required) The backend base URI for this source API.
+* `asset_id` - (Required) The Exchange asset ID of the source REST API.
+* `version` - (Required) The Exchange asset version of the source REST API.
+* `tools` - (Required, Attributes List) The MCP tools to expose from this source API. See xref:nested-schema-for-tools[Nested Schema for `tools`].
+* `group_id` - The group ID of the source Exchange asset. Defaults to `organization_id`.
+
+[#nested-schema-for-tools]
+=== Nested Schema for `source_apis.tools`
+
+* `method` - (Required) The HTTP method. Valid values: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`.
+* `path` - (Required) The API path (for example, `/pets/{petId}`). Must start with `/`. Path parameters become required tool inputs.
+* `name` - The tool name. Defaults to `<method>_<slugified_path>`.
+* `description` - A description of the tool shown to the AI agent.
+* `query_params` - (List of String) Query parameter names to expose as tool inputs.
+* `header_params` - (List of String) Header parameter names to expose as tool inputs.
+* `has_body` - Whether the tool accepts a request body. Defaults to `false`. When `true`, adds a required `body` input to the tool.
+
+[#nested-schema-for-deployment]
+=== Nested Schema for `deployment`
+
+* `environment_id` - The environment ID of the deployment.
+* `type` - The deployment type (always `HY`).
+* `expected_status` - The expected deployment status.
+* `overwrite` - Whether the deployment overwrites an existing one.
+* `target_id` - The target ID of the deployment.
+* `target_name` - The target name.
+* `gateway_version` - The gateway version used for the deployment.
+
+=== Import
+
+An existing MCP bridge can be imported using a composite `<organization_id>/<environment_id>/<mcp_bridge_id>` ID. The `mcp_bridge_id` is the numeric API Manager instance ID visible in the API Manager URL.
+
+On import, the provider reconstructs `source_apis` (labels, upstreams, tools) from the live routing and transcoding policies. Tool `description` values are left null after import — they live only in the generated Exchange asset metadata and don't cause spurious diffs.
+
+==== Using an import block (Terraform ≥ 1.5 — recommended)
+
+[source,hcl]
+----
+import {
+  to = anypoint_mcp_bridge.imported
+  id = "<organization_id>/<environment_id>/<mcp_bridge_id>"
+}
+
+resource "anypoint_mcp_bridge" "imported" {
+  organization_id = "<organization_id>"
+  environment_id  = "<environment_id>"
+  gateway_id      = "<gateway_id>"
+  mcp_asset_name  = "<mcp_asset_name>"
+  source_apis     = []
+}
+----
+
+After adding the import block, run:
+
+[source,shell]
+----
+# Let Terraform generate the full resource configuration automatically:
+terraform plan -generate-config-out=generated.tf
+
+# Or apply the import directly if you have an existing resource block:
+terraform apply
+----
+
+==== Using the CLI (deprecated, Terraform < 1.5)
+
+[source,shell]
+----
+terraform import anypoint_mcp_bridge.imported <organization_id>/<environment_id>/<mcp_bridge_id>
+----
+
+== `anypoint_mcp_bridge` data source
+
+Use the `anypoint_mcp_bridge` data source to read the full details of a single MCP bridge by ID, including reconstructed source APIs and tools.
+
+[NOTE]
+====
+*Tool descriptions:* Tool `description` values are always null when read from this data source — they live only in the generated Exchange asset metadata and aren't exposed via the API Manager APIs.
+====
+
+=== Example Usage
+
+[source,hcl]
+----
+data "anypoint_mcp_bridge" "one" {
+  organization_id = var.organization_id
+  environment_id  = var.environment_id
+  id              = "21058094"
+}
+
+output "bridge_tools" {
+  value = [for s in data.anypoint_mcp_bridge.one.source_apis : {
+    label = s.label
+    tools = [for t in s.tools : t.name]
+  }]
+}
+----
+
+=== Required Arguments
+
+* `id` - The numeric API Manager instance ID of the MCP bridge.
+* `environment_id` - The environment ID.
+
+=== Optional Arguments
+
+* `organization_id` - The organization ID. If not specified, uses the organization from provider credentials.
+
+=== Read-Only Attributes
+
+* `gateway_id` - The UUID of the gateway the bridge is deployed to.
+* `port` - (Number) The listener port.
+* `base_path` - The base path.
+* `asset_id` - The generated Exchange asset ID.
+* `asset_version` - The current version of the generated Exchange asset.
+* `product_version` - The product version.
+* `group_id` - The group ID of the generated asset.
+* `technology` - Always `flexGateway`.
+* `instance_label` - The instance label.
+* `status` - The current status.
+* `consumer_endpoint` - The public consumer endpoint. May be null for self-managed Flex Gateway bridges — use `proxy_uri` in that case.
+* `proxy_uri` - The proxy URI (`http://0.0.0.0:<port>/<base_path>`).
+* `deployment` - (Object) Deployment details. See xref:nested-schema-for-deployment-ds[Nested Schema for `deployment`].
+* `source_apis` - (List of Object) Reconstructed source APIs and tools. See xref:nested-schema-for-source-apis-ds[Nested Schema for `source_apis`].
+
+[#nested-schema-for-deployment-ds]
+=== Nested Schema for `deployment`
+
+* `environment_id` - The environment ID.
+* `type` - The deployment type.
+* `expected_status` - The expected status.
+* `target_id` - The target ID.
+* `target_name` - The target name.
+* `gateway_version` - The gateway version.
+
+[#nested-schema-for-source-apis-ds]
+=== Nested Schema for `source_apis`
+
+* `label` - The route label.
+* `upstream_uri` - The backend base URI.
+* `asset_id` - The Exchange asset ID.
+* `group_id` - The Exchange asset group ID.
+* `version` - The Exchange asset version.
+* `tools` - (List of Object) The MCP tools.
+** `name` - The tool name.
+** `description` - Always null (lives in Exchange asset metadata).
+** `method` - The HTTP method.
+** `path` - The API path.
+** `query_params` - (List of String) Query parameter names.
+** `header_params` - (List of String) Header parameter names.
+** `has_body` - Whether the tool accepts a request body.
+
+== `anypoint_mcp_bridges` data source
+
+Use the `anypoint_mcp_bridges` data source to list all MCP bridges in an environment.
+
+=== Example Usage
+
+[source,hcl]
+----
+data "anypoint_mcp_bridges" "all" {
+  organization_id = var.organization_id
+  environment_id  = var.environment_id
+}
+
+output "bridge_ids" {
+  value = [for b in data.anypoint_mcp_bridges.all.bridges : b.id]
+}
+----
+
+=== Required Arguments
+
+* `environment_id` - The environment ID.
+
+=== Optional Arguments
+
+* `organization_id` - The organization ID. If not specified, uses the organization from provider credentials.
+
+=== Read-Only Attributes
+
+* `id` - Composite identifier `<organization_id>/<environment_id>`.
+* `bridges` - (List of Object) The list of MCP bridges. See xref:nested-schema-for-bridges[Nested Schema for `bridges`].
+
+[#nested-schema-for-bridges]
+=== Nested Schema for `bridges`
+
+* `id` - The numeric API Manager instance ID.
+* `asset_id` - The generated Exchange asset ID.
+* `asset_version` - The current version of the generated Exchange asset.
+* `product_version` - The product version.
+* `group_id` - The group ID.
+* `technology` - Always `flexGateway`.
+* `instance_label` - The instance label.
+* `status` - The current status.
+* `endpoint_uri` - The public endpoint URI. May be null for self-managed Flex Gateway bridges — use `proxy_uri` in that case.
+* `proxy_uri` - The proxy URI. Fetched per bridge; null if the per-bridge fetch fails.

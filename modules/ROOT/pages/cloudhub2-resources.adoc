@@ -1,6 +1,6 @@
 = CloudHub 2.0 Resources
 
-Use CloudHub 2.0 resources to manage private spaces, network configuration, TLS contexts, VPN connections, and related infrastructure components.
+Use CloudHub 2.0 resources to manage private spaces, network configuration, TLS contexts, VPN connections, transit gateway connections, and related infrastructure components.
 
 These resources help you provision and manage CloudHub 2.0 infrastructure declaratively with Terraform.
 
@@ -853,3 +853,203 @@ terraform import anypoint_vpn_connection.imported <private_space_id>/<connection
 # Sub-org:
 terraform import anypoint_vpn_connection.imported <org_id>/<private_space_id>/<connection_id>
 ----
+== `anypoint_transit_gateway_connection`
+
+Use the `anypoint_transit_gateway_connection` resource to manage a Transit Gateway connection (attachment) in a CloudHub 2.0 private space. This resource links a private space to an existing AWS Transit Gateway shared to MuleSoft via AWS RAM, enabling private network connectivity between CloudHub 2.0 and your enterprise on-premises networks or AWS landing zones.
+
+[NOTE]
+====
+*Connected App:* This resource requires a *standard connected app* (client credentials). An admin connected app isn't needed. The connected app must have relevant scopes.
+====
+
+[NOTE]
+====
+*Prerequisites:* The private space must have its network provisioned before you create a transit gateway connection. The AWS Transit Gateway must be shared to MuleSoft's internal AWS account via AWS RAM before you apply. Route CIDRs must not overlap the private space CIDR. Use the `anypoint_private_spaces` data source to discover `private_space_id`.
+====
+
+[NOTE]
+====
+*Status lifecycle:* After creation the connection status transitions from `Pending` to `Available`. The routes are managed inline — updating `routes` replaces the full route set in place.
+====
+
+=== Example Usage
+
+[source,hcl]
+----
+data "anypoint_private_spaces" "all" {
+  organization_id = var.organization_id
+}
+
+resource "anypoint_transit_gateway_connection" "main" {
+  organization_id        = var.organization_id
+  private_space_id       = var.private_space_id
+  name                   = "my-tgw-connection"
+  resource_share_id      = "e8e330a8-4f8c-452b-afd0-7810c41287f1"
+  resource_share_account = "055970264539"
+  routes                 = ["192.168.1.0/24", "172.16.0.0/12"]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+output "transit_gateway_status" {
+  value = anypoint_transit_gateway_connection.main.status
+}
+
+output "aws_transit_gateway_id" {
+  value = anypoint_transit_gateway_connection.main.aws_transit_gateway_id
+}
+----
+
+=== Required Arguments
+
+* `organization_id` - The organization ID.
+* `private_space_id` - The ID of the private space where the transit gateway is attached.
+* `name` - The name of the transit gateway attachment.
+* `resource_share_id` - The AWS RAM resource share ID (UUID, for example, `e8e330a8-4f8c-452b-afd0-7810c41287f1`).
+* `resource_share_account` - The AWS account ID that owns the Transit Gateway.
+* `routes` - (List of String) CIDR routes. At least one route is required. Updating this list replaces the full route set.
+
+=== Read-Only Attributes
+
+* `id` - The unique identifier of the attachment.
+* `status` - The current status of the connection (for example, `Pending`, `Available`).
+* `aws_transit_gateway_id` - The AWS TGW ID discovered by the platform from the resource share. Populated after creation.
+
+=== Import
+
+An existing transit gateway connection can be imported using a composite ID.
+
+==== Using an import block (Terraform ≥ 1.5 — recommended)
+
+[source,hcl]
+----
+import {
+  to = anypoint_transit_gateway_connection.imported
+  id = "<organization_id>/<private_space_id>/<transit_gateway_id>"
+}
+
+resource "anypoint_transit_gateway_connection" "imported" {
+  organization_id        = "<organization_id>"
+  private_space_id       = "<private_space_id>"
+  name                   = "<connection_name>"
+  resource_share_id      = "<resource_share_id>"
+  resource_share_account = "<aws_account_id>"
+  routes                 = []
+}
+----
+
+==== Using the CLI (deprecated, Terraform < 1.5)
+
+[source,shell]
+----
+terraform import anypoint_transit_gateway_connection.imported <organization_id>/<private_space_id>/<transit_gateway_id>
+----
+
+== `anypoint_transit_gateway_connection` data source
+
+Use the `anypoint_transit_gateway_connection` data source to read the details of a single Transit Gateway connection by ID.
+
+=== Example Usage
+
+[source,hcl]
+----
+data "anypoint_transit_gateway_connection" "one" {
+  organization_id  = var.organization_id
+  private_space_id = var.private_space_id
+  id               = "tgw-0af6a0a1b5ae060b1"
+}
+
+output "connection_region" {
+  value = data.anypoint_transit_gateway_connection.one.region
+}
+----
+
+=== Required Arguments
+
+* `id` - The transit gateway connection ID.
+* `organization_id` - The organization ID.
+* `private_space_id` - The ID of the private space.
+
+=== Read-Only Attributes
+
+* `name` - The name of the connection.
+* `aws_transit_gateway_id` - The AWS TGW ID.
+* `resource_share_id` - The AWS RAM resource share ID.
+* `resource_share_account` - The AWS account ID that owns the Transit Gateway.
+* `region` - The AWS region of the connection.
+* `status` - The current status of the connection (for example, `Pending`, `Available`).
+* `attachment` - The current attachment status.
+* `routes` - (List of String) The configured CIDR routes.
+
+== `anypoint_transit_gateway_connections` data source
+
+Use the `anypoint_transit_gateway_connections` data source to list all transit gateway connections in a CloudHub 2.0 private space.
+
+=== Example Usage
+
+[source,hcl]
+----
+data "anypoint_transit_gateway_connections" "all" {
+  organization_id  = var.organization_id
+  private_space_id = var.private_space_id
+}
+
+output "transit_gateway_connection_names" {
+  value = [for tgw in data.anypoint_transit_gateway_connections.all.transit_gateway_connections : tgw.name]
+}
+----
+
+=== Required Arguments
+
+* `organization_id` - The organization ID.
+* `private_space_id` - The ID of the private space.
+
+=== Read-Only Attributes
+
+* `transit_gateway_connections` - (List of Object) The list of transit gateway connections. See xref:nested-schema-for-transit-gateway-connections[Nested Schema for `transit_gateway_connections`].
+
+=== Nested Schema for `transit_gateway_connections`
+
+* `id` - The connection ID.
+* `name` - The name of the connection.
+* `status` - The current status of the connection.
+* `routes` - (List of Object) The configured routes.
+** `cidr` - The CIDR block of the route.
+
+== `anypoint_private_spaces` data source
+
+Use the `anypoint_private_spaces` data source to list all private spaces in an org. Use it to discover `private_space_id` for use in `anypoint_transit_gateway_connection`, `anypoint_vpn_connection`, and other resources.
+
+=== Example Usage
+
+[source,hcl]
+----
+data "anypoint_private_spaces" "all" {
+  organization_id = var.organization_id
+}
+
+output "private_space_ids_by_name" {
+  value = { for ps in data.anypoint_private_spaces.all.private_spaces : ps.name => ps.id }
+}
+----
+
+=== Required Arguments
+
+* `organization_id` - The organization ID.
+
+=== Read-Only Attributes
+
+* `private_spaces` - (List of Object) The list of private spaces. See xref:nested-schema-for-private-spaces[Nested Schema for `private_spaces`].
+
+[#nested-schema-for-private-spaces]
+=== Nested Schema for `private_spaces`
+
+* `id` - The private space ID. Use this value as `private_space_id` in other resources.
+* `name` - The name of the private space.
+* `status` - The current status of the private space.
+* `status_message` - A descriptive status message.
+* `region` - The AWS region of the private space.
+* `organization_id` - The organization ID that owns this private space.
+* `root_organization_id` - The root organization ID. Private spaces can be owned by a sub-org; this field identifies the top-level org.

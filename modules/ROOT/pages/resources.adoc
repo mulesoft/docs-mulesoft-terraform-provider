@@ -12,21 +12,58 @@ Use these resources to manage CloudHub 2.0 infrastructure and networking compone
 * xref:cloudhub2-resources.adoc#anypoint_privatespace_advanced_config[`anypoint_privatespace_advanced_config`]
 * xref:cloudhub2-resources.adoc#anypoint_tls_context[`anypoint_tls_context`]
 * xref:cloudhub2-resources.adoc#anypoint_vpn_connection[`anypoint_vpn_connection`]
+* xref:cloudhub2-resources.adoc#anypoint_transit_gateway_connection[`anypoint_transit_gateway_connection`]
+
+Data sources:
+
+* xref:cloudhub2-resources.adoc#anypoint_transit_gateway_connection-data-source[`anypoint_transit_gateway_connection`]
+* xref:cloudhub2-resources.adoc#anypoint_transit_gateway_connections-data-source[`anypoint_transit_gateway_connections`]
+* xref:cloudhub2-resources.adoc#anypoint_private_spaces-data-source[`anypoint_private_spaces`]
 
 == Managed Omni Gateway Resources
 
-Use these resources to manage managed Omni Gateway instances in CloudHub 2.0.
+Use these resources to manage Managed Omni Gateway instances in CloudHub 2.0.
 
 * xref:managed-gateway-resources.adoc#anypoint_managed_omni_gateway[`anypoint_managed_omni_gateway`]
+
+Data sources:
+
+* xref:managed-gateway-resources.adoc#anypoint_managed_omni_gateway-data-source[`anypoint_managed_omni_gateway`]
+* xref:managed-gateway-resources.adoc#anypoint_managed_omni_gateways-data-source[`anypoint_managed_omni_gateways`]
+
+== Self-Managed Gateway Resources
+
+Use these resources to manage self-managed (connected-mode) Flex Gateway registrations.
+
+* xref:self-managed-gateway-resources.adoc#anypoint_self_managed_gateway[`anypoint_self_managed_gateway`]
+
+Data sources:
+
+* xref:self-managed-gateway-resources.adoc#anypoint_self_managed_gateway-data-source[`anypoint_self_managed_gateway`]
+* xref:self-managed-gateway-resources.adoc#anypoint_self_managed_gateways-data-source[`anypoint_self_managed_gateways`]
 
 == Access Management Resources
 
 Use these resources to manage Access Management configuration.
 
-* xref:access-management-resources.adoc#anypoint_connected_app_scopes[`anypoint_connected_app_scopes`]
+* xref:access-management-resources.adoc#anypoint_connected_app[`anypoint_connected_app`]
+* xref:access-management-resources.adoc#anypoint_connected_app_scopes[`anypoint_connected_app_scopes`] _(deprecated)_
 * xref:access-management-resources.adoc#anypoint_environment[`anypoint_environment`]
 * xref:access-management-resources.adoc#anypoint_organization[`anypoint_organization`]
+* xref:access-management-resources.adoc#anypoint_role[`anypoint_role`]
 * xref:access-management-resources.adoc#anypoint_team[`anypoint_team`]
+
+Data sources:
+
+* xref:access-management-resources.adoc#anypoint_available_permissions-data-source[`anypoint_available_permissions`]
+* xref:access-management-resources.adoc#anypoint_available_scopes-data-source[`anypoint_available_scopes`]
+* xref:access-management-resources.adoc#anypoint_connected_app-data-source[`anypoint_connected_app`]
+* xref:access-management-resources.adoc#anypoint_connected_apps-data-source[`anypoint_connected_apps`]
+* xref:access-management-resources.adoc#anypoint_role-data-source[`anypoint_role`]
+* xref:access-management-resources.adoc#anypoint_roles-data-source[`anypoint_roles`]
+* xref:access-management-resources.adoc#anypoint_team-data-source[`anypoint_team`]
+* xref:access-management-resources.adoc#anypoint_teams-data-source[`anypoint_teams`]
+* xref:access-management-resources.adoc#anypoint_users-data-source[`anypoint_users`]
 
 
 == Secrets Manager Resources
@@ -48,12 +85,29 @@ Use these resources to manage APIs and API configuration in API Manager.
 * xref:api-manager-resources.adoc#anypoint_api_instance[`anypoint_api_instance`]
 * xref:api-manager-resources.adoc#anypoint_api_instance_sla_tier[`anypoint_api_instance_sla_tier`]
 
+== Exchange Resources
+
+Use these resources to manage Anypoint Exchange assets.
+
+* xref:exchange-resources.adoc#anypoint_exchange_asset[`anypoint_exchange_asset`]
+
+Data sources:
+
+* xref:exchange-resources.adoc#anypoint_exchange_asset-data-source[`anypoint_exchange_asset`]
+* xref:exchange-resources.adoc#anypoint_exchange_assets-data-source[`anypoint_exchange_assets`]
+
 == MCP and AI Agent Resources
 
-Use these resources to manage MCP servers and AI agent resources.
+Use these resources to manage MCP servers, MCP bridges, and AI agent resources.
 
 * xref:mcp-resources.adoc#anypoint_mcp_server[`anypoint_mcp_server`]
 * xref:mcp-resources.adoc#anypoint_agent_instance[`anypoint_agent_instance`]
+* xref:mcp-resources.adoc#anypoint_mcp_bridge[`anypoint_mcp_bridge`]
+
+Data sources:
+
+* xref:mcp-resources.adoc#anypoint_mcp_bridge-data-source[`anypoint_mcp_bridge`]
+* xref:mcp-resources.adoc#anypoint_mcp_bridges-data-source[`anypoint_mcp_bridges`]
 
 == API, MCP, and A2A Policy Resources
 

@@ -1,0 +1,329 @@
+= Exchange Resources
+
+Use Exchange resources to publish, manage, and query assets in Anypoint Exchange as part of your Infrastructure-as-Code pipeline.
+
+== `anypoint_exchange_asset`
+
+Use the `anypoint_exchange_asset` resource to publish and manage an Anypoint Exchange asset version (one GAV — group, asset, version).
+
+[NOTE]
+====
+*Connected App:* This resource requires a *standard connected app* (client credentials). An admin connected app isn't needed. The connected app must have relevant scopes.
+====
+
+[NOTE]
+====
+*Immutable fields:* `version`, `type`, `classifier`, and `file_path` can't be changed after creation. The provider raises a plan-time error if you attempt to change them. To publish a new version or change the file, create a new resource instance — for example, using `for_each` keyed by version.
+====
+
+[NOTE]
+====
+*Version reuse:* A previously used GAV can't be republished after deletion. Attempting to do so returns a `409 ASSET_PRE_CONDITIONS_FAILED` error. The provider surfaces this as a clear plan-time error.
+====
+
+[NOTE]
+====
+*`create_before_destroy`:* Only safe for version-bump replacements. Don't use it when replacing `file_path`, `type`, `classifier`, `api_version`, or `main_file` on the same version — those require a destroy before recreate.
+====
+
+=== Example Usage
+
+==== REST API with spec file, docs, and external instances
+
+[source,hcl]
+----
+resource "anypoint_exchange_asset" "rest_api" {
+  organization_id = var.org_id
+  group_id        = var.org_id
+  asset_id        = "my-rest-api"
+  version         = "1.0.0"
+  name            = "My REST API"
+  type            = "rest-api"
+  classifier      = "oas"
+  api_version     = "v1"
+  file_path       = "${path.module}/assets/my-api.json"
+  main_file       = "my-api.json"
+  tags            = ["terraform", "rest"]
+  contact_name    = "Platform Team"
+  contact_email   = "platform@example.com"
+
+  pages = [
+    {
+      page_name = "Overview"
+      content   = "# Overview\n\nThis API is managed by Terraform."
+    }
+  ]
+
+  instances = [
+    {
+      name         = "Production"
+      endpoint_uri = "https://api.example.com/v1"
+      is_public    = true
+    },
+    {
+      name         = "Sandbox"
+      endpoint_uri = "https://sandbox.example.com/v1"
+    }
+  ]
+
+  terms_and_conditions = "# Terms\n\nProvided as-is."
+}
+----
+
+==== Policy asset with two files
+
+[source,hcl]
+----
+resource "anypoint_exchange_asset" "policy" {
+  organization_id = var.org_id
+  group_id        = var.org_id
+  asset_id        = "my-custom-policy"
+  version         = "1.0.0"
+  name            = "My Custom Policy"
+  type            = "extension"
+  classifier      = "mule-plugin"
+  file_path       = "${path.module}/assets/mule-policy.jar"
+
+  additional_file = [
+    {
+      path       = "${path.module}/assets/policy-definition.yaml"
+      classifier = "policy-definition"
+    }
+  ]
+}
+----
+
+[NOTE]
+====
+Exchange normalizes policy and connector assets into the `extension` super-type on publish. Declaring `type = "policy"` succeeds on create but causes a Terraform inconsistency error on the subsequent state read (`type` was `"policy"`, but is now `"extension"`). Use `type = "extension"` and `classifier = "mule-plugin"` for policy and connector assets.
+====
+
+==== MCP asset
+
+[source,hcl]
+----
+resource "anypoint_exchange_asset" "mcp_asset" {
+  organization_id = var.org_id
+  group_id        = var.org_id
+  asset_id        = "my-mcp-server"
+  version         = "1.0.0"
+  name            = "My MCP Server"
+  type            = "mcp"
+}
+----
+
+=== Required Arguments
+
+* `organization_id` - The organization ID to publish the asset to.
+* `group_id` - The group ID (namespace) of the asset. Usually the same as `organization_id`.
+* `asset_id` - The asset slug identifier. Unique within the group. Lowercase alphanumeric characters and hyphens only.
+* `version` - The semantic version of the asset (for example, `1.0.0`). Immutable after creation.
+* `name` - The display name shown in the Exchange portal.
+
+=== Optional Arguments
+
+* `type` - The Exchange asset type. Valid values: `rest-api`, `http-api`, `evented-api`, `graphql-api`, `grpc-api`, `soap-api`, `extension`, `connector`, `app`, `template`, `example`, `policy`, `ruleset`, `agent`, `llm`, `mcp`, `custom`. Immutable after creation. Use `extension` with `classifier = "mule-plugin"` for policy and connector assets — Exchange normalizes these to `extension` on publish regardless of the declared type.
+* `status` - The lifecycle status of the asset. Valid values: `development`, `published` (default), `deprecated`. `development` is only valid at the first publish of a version. To move from `published` back to `development`, bump the version.
+* `description` - A description of the asset. Group-scoped (shared across all versions).
+* `keywords` - Comma-separated keywords for discoverability.
+* `contact_name` - Contact name for the asset. Group-scoped.
+* `contact_email` - Contact email for the asset. Group-scoped.
+* `api_version` - The API version string (for example, `v1`). Required at creation for `rest-api`, `evented-api`, and `grpc-api` asset types.
+* `classifier` - The file format classifier (for example, `oas`, `raml`, `graphql`, `proto`, `wsdl`, `mule-policy`). Required when `file_path` is set. Immutable after creation.
+* `file_path` - Path to the spec file or archive to upload. Create-time only. Immutable after creation.
+* `main_file` - The main file within an archive (for example, the entry-point spec file inside a `.zip`).
+* `additional_file` - (Block List) Extra files to upload alongside `file_path` in the same publish (for example, a policy JAR + policy definition YAML). Create-time only. See xref:nested-schema-for-additional-file[Nested Schema for `additional_file`].
+* `tags` - (List of String) Tags for the asset version.
+* `terms_and_conditions` - Markdown content for the Terms and Conditions portal page.
+* `pages` - (Block List) Portal documentation pages. See xref:nested-schema-for-pages[Nested Schema for `pages`].
+* `instances` - (Block List) External (non-managed) API instances. Authoritative: removing an entry deletes the instance. See xref:nested-schema-for-instances[Nested Schema for `instances`].
+* `categories` - (Block List) Org-taxonomy category assignments. See xref:nested-schema-for-categories[Nested Schema for `categories`].
+* `custom_fields` - (Block List) Org-metadata custom fields. See xref:nested-schema-for-custom-fields[Nested Schema for `custom_fields`].
+
+=== Read-Only Attributes
+
+* `id` - Composite identifier `<group_id>/<asset_id>/<version>`.
+* `minor_version` - The minor version string.
+* `version_group` - The version group identifier.
+* `is_public` - Whether the asset is publicly visible.
+* `is_snapshot` - Whether this is a snapshot version.
+* `file_sha256` - The SHA-256 checksum of the uploaded file.
+* `created_date` - Timestamp when the asset was created.
+* `updated_date` - Timestamp when the asset was last updated.
+* `manager` - The user who manages the asset. Can't be set via Terraform.
+
+[#nested-schema-for-additional-file]
+=== Nested Schema for `additional_file`
+
+* `path` - (Required) The local path to the additional file.
+* `classifier` - (Required) The file format classifier for this file (for example, `policy-definition`).
+
+[#nested-schema-for-pages]
+=== Nested Schema for `pages`
+
+* `page_name` - (Required) The page name. Can't contain `%`, `@`, `*`, `+`, `/`, or `_`.
+* `content` - (Required) The page content in Markdown.
+* `page_path` - _(Read-Only)_ The URL path of the page in the Exchange portal.
+
+[NOTE]
+====
+Pages are ordered by creation time. Reordering requires recreating the resource. A `home` page is automatically provisioned by the platform and adopted by Terraform on import.
+====
+
+[#nested-schema-for-instances]
+=== Nested Schema for `instances`
+
+* `name` - (Required) The instance name.
+* `endpoint_uri` - (Required) The endpoint URI.
+* `is_public` - Whether the instance is publicly visible. Defaults to `false`.
+* `instance_id` - _(Read-Only)_ The platform-assigned instance ID.
+
+[#nested-schema-for-categories]
+=== Nested Schema for `categories`
+
+* `key` - (Required) The category key as defined in the org taxonomy.
+* `values` - (Required, List of String) The category values.
+
+[#nested-schema-for-custom-fields]
+=== Nested Schema for `custom_fields`
+
+* `key` - (Required) The custom field key.
+* `values` - (Required, List of String) The custom field values.
+
+=== Import
+
+An existing Exchange asset version can be imported using a composite `<group_id>/<asset_id>/<version>` ID. `group_id` is usually the same as the organization ID.
+
+On import, the provider seeds immutable fields (`classifier`, `main_file`, `api_version`) and external instances from the platform. The first plan after import shows zero drift. `file_path` settles on the next apply without recreating the asset.
+
+==== Using an import block (Terraform ≥ 1.5 — recommended)
+
+[source,hcl]
+----
+import {
+  to = anypoint_exchange_asset.imported
+  id = "<group_id>/<asset_id>/<version>"
+}
+
+resource "anypoint_exchange_asset" "imported" {
+  organization_id = "<organization_id>"
+  group_id        = "<group_id>"
+  asset_id        = "<asset_id>"
+  version         = "<version>"
+  name            = "<asset_name>"
+}
+----
+
+After adding the import block, run:
+
+[source,shell]
+----
+# Let Terraform generate the full resource configuration automatically:
+terraform plan -generate-config-out=generated.tf
+
+# Or apply the import directly if you have an existing resource block:
+terraform apply
+----
+
+==== Using the CLI (deprecated, Terraform < 1.5)
+
+[source,shell]
+----
+terraform import anypoint_exchange_asset.imported <group_id>/<asset_id>/<version>
+----
+
+== `anypoint_exchange_asset` data source
+
+Use the `anypoint_exchange_asset` data source to read the full details of a specific Exchange asset version by GAV (group, asset, version).
+
+=== Example Usage
+
+[source,hcl]
+----
+data "anypoint_exchange_asset" "rest_api" {
+  group_id = var.org_id
+  asset_id = "my-rest-api"
+  version  = "1.0.0"
+}
+
+output "page_names" {
+  value = [for p in data.anypoint_exchange_asset.rest_api.pages : p.page_name]
+}
+----
+
+=== Required Arguments
+
+* `group_id` - The group ID of the asset.
+* `asset_id` - The asset slug identifier.
+* `version` - The asset version.
+
+=== Read-Only Attributes
+
+* `id` - Composite identifier `<group_id>/<asset_id>/<version>`.
+* `name` - The display name of the asset.
+* `description` - The description of the asset.
+* `type` - The asset type.
+* `status` - The lifecycle status.
+* `contact_name` - Contact name.
+* `contact_email` - Contact email.
+* `manager` - The asset manager.
+* `is_public` - Whether the asset is publicly visible.
+* `is_snapshot` - Whether this is a snapshot version.
+* `minor_version` - The minor version string.
+* `version_group` - The version group identifier.
+* `tags` - (List of String) Tags for the asset.
+* `terms_and_conditions` - The Terms and Conditions content.
+* `pages` - (List of Object) Portal documentation pages.
+* `instances` - (List of Object) External API instances.
+* `categories` - (List of Object) Category assignments.
+* `custom_fields` - (List of Object) Custom field values.
+* `created_date` - Timestamp when the asset was created.
+* `updated_date` - Timestamp when the asset was last updated.
+
+== `anypoint_exchange_assets` data source
+
+Use the `anypoint_exchange_assets` data source to list Exchange assets in an org, optionally filtered by type or search terms.
+
+=== Example Usage
+
+[source,hcl]
+----
+data "anypoint_exchange_assets" "rest_apis" {
+  organization_id = var.org_id
+  type            = "rest-api"
+  search          = "my-api"
+  limit           = 50
+}
+
+output "asset_ids" {
+  value = [for a in data.anypoint_exchange_assets.rest_apis.assets : a.asset_id]
+}
+----
+
+=== Required Arguments
+
+* `organization_id` - The organization ID.
+
+=== Optional Arguments
+
+* `type` - Filter by asset type. Valid values: `rest-api`, `http-api`, `evented-api`, `graphql-api`, `custom`, `connector`, `app`, `template`, `example`, `policy`, `agent`, `llm`, `mcp`.
+* `search` - Free-text search against asset name and description.
+* `limit` - Maximum number of assets to return. If omitted, all assets are returned with automatic pagination.
+
+=== Read-Only Attributes
+
+* `assets` - (List of Object) The list of assets. See xref:nested-schema-for-assets[Nested Schema for `assets`].
+
+[#nested-schema-for-assets]
+=== Nested Schema for `assets`
+
+* `group_id` - The group ID.
+* `asset_id` - The asset slug identifier.
+* `version` - The latest version of the asset.
+* `name` - The display name of the asset.
+* `description` - The description.
+* `type` - The asset type.
+* `status` - The lifecycle status.
+* `is_public` - Whether the asset is publicly visible.
+* `created_date` - Timestamp when the asset was created.
+* `updated_date` - Timestamp when the asset was last updated.
