@@ -909,7 +909,7 @@ output "aws_transit_gateway_id" {
 * `name` - The name of the transit gateway attachment.
 * `resource_share_id` - The AWS RAM resource share ID (UUID, for example, `e8e330a8-4f8c-452b-afd0-7810c41287f1`).
 * `resource_share_account` - The AWS account ID that owns the Transit Gateway.
-* `routes` - (List of String) CIDR routes. At least one route is required. Updating this list replaces the full route set.
+* `routes` - (List of String) CIDR routes. Updating this list replaces the full route set. An empty list (`[]`) is valid for import of a detached connection.
 
 === Read-Only Attributes
 

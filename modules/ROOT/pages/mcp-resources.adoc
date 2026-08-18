@@ -493,6 +493,7 @@ resource "anypoint_mcp_bridge" "example" {
 * `asset_version` - The current version of the generated Exchange asset. Starts at `1.0.0` and bumps on each tool-level update.
 * `product_version` - The product version of the bridge.
 * `consumer_endpoint` - The public consumer endpoint. May be null for self-managed Flex Gateway bridges — use `proxy_uri` in that case.
+* `proxy_uri` - The proxy URI (`http://0.0.0.0:<port>/<base_path>`).
 * `status` - The current status of the bridge.
 * `technology` - Always `flexGateway`.
 * `deployment` - (Object) Auto-populated deployment details. See xref:nested-schema-for-deployment[Nested Schema for `deployment`].

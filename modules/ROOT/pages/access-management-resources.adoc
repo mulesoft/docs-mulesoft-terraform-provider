@@ -4,8 +4,6 @@ Use Access Management resources to manage organizations, environments, connected
 
 Most Access Management resources require the `anypoint.admin` provider configuration (user credentials + connected app). The `anypoint_team` resource and its data sources are the exception — they use standard `client_credentials` authentication.
 
-== Resources
-
 == `anypoint_connected_app`
 
 Use the `anypoint_connected_app` resource to create and manage Anypoint Connected Applications for programmatic access to Anypoint Platform APIs.
@@ -106,7 +104,7 @@ The platform automatically assigns an undeletable `profile` scope to every conne
 === Nested Schema for `scopes`
 
 * `scope` - (Required) The scope display name as shown in the Anypoint UI (for example, `Read Applications`, `Exchange Viewer`). Use the `anypoint_available_scopes` data source to discover valid values. Scope identifiers (for example, `read:applications`) are also accepted.
-* `context_params` - (Map of String) Context parameters. For `client_credentials` apps, `org` is required on every scope; add `envId` for environment-scoped scopes. User-behalf apps ignore `context_params`.
+* `context_params` - (Map of String) Context parameters. For `client_credentials` apps, `org` is required on every scope; add `envId` for environment-scoped scopes. User-behalf apps ignore `context_params`. Missing `org` on a `client_credentials` scope causes a `400` error at apply time and can leave the app in an inconsistent state with credentials outside Terraform state.
 
 === Import
 
@@ -794,8 +792,6 @@ terraform apply
 terraform import anypoint_team.imported <team_id>
 ----
 
-== Data Sources
-
 == `anypoint_available_permissions` data source
 
 Use the `anypoint_available_permissions` data source to list all permissions that can be assigned to role groups and teams.
@@ -1076,6 +1072,11 @@ output "admin_role" {
 == `anypoint_team` data source
 
 Use the `anypoint_team` data source to read the configuration of a single team by ID.
+
+[NOTE]
+====
+*Connected App:* This data source requires a *standard connected app* (client credentials). An admin connected app isn't needed. The connected app must have relevant scopes.
+====
 
 === Example Usage
 

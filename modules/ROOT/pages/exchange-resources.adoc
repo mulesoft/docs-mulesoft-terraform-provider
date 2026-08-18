@@ -13,12 +13,12 @@ Use the `anypoint_exchange_asset` resource to publish and manage an Anypoint Exc
 
 [NOTE]
 ====
-*Immutable fields:* `version`, `type`, `classifier`, and `file_path` can't be changed after creation. The provider raises a plan-time error if you attempt to change them. To publish a new version or change the file, create a new resource instance — for example, using `for_each` keyed by version.
+*Immutable fields:* `version`, `type`, `classifier`, `file_path`, `api_version`, and `main_file` can't be changed after creation. The provider raises a plan-time error if you attempt to change them. To publish a new version or change the file, create a new resource instance — for example, using `for_each` keyed by version.
 ====
 
 [NOTE]
 ====
-*Version reuse:* A previously used GAV can't be republished after deletion. Attempting to do so returns a `409 ASSET_PRE_CONDITIONS_FAILED` error. The provider surfaces this as a clear plan-time error.
+*Version reuse:* A previously used GAV can't be republished after deletion. Attempting to do so returns a `409 ASSET_PRE_CONDITIONS_FAILED` error.
 ====
 
 [NOTE]
@@ -123,7 +123,7 @@ resource "anypoint_exchange_asset" "mcp_asset" {
 === Optional Arguments
 
 * `type` - The Exchange asset type. Valid values: `rest-api`, `http-api`, `evented-api`, `graphql-api`, `grpc-api`, `soap-api`, `extension`, `connector`, `app`, `template`, `example`, `policy`, `ruleset`, `agent`, `llm`, `mcp`, `custom`. Immutable after creation. Use `extension` with `classifier = "mule-plugin"` for policy and connector assets — Exchange normalizes these to `extension` on publish regardless of the declared type.
-* `status` - The lifecycle status of the asset. Valid values: `development`, `published` (default), `deprecated`. `development` is only valid at the first publish of a version. To move from `published` back to `development`, bump the version.
+* `status` - The lifecycle status of the asset. Valid values: `development`, `published` (default), `deprecated`. `development` is only valid at the first publish of a version. To move from `published` back to `development`, bump the version. Mutability of `status` after publish is not fully confirmed — treat it as effectively immutable until verified.
 * `description` - A description of the asset. Group-scoped (shared across all versions).
 * `keywords` - Comma-separated keywords for discoverability.
 * `contact_name` - Contact name for the asset. Group-scoped.
