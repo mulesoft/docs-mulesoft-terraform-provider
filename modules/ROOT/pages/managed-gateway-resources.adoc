@@ -197,7 +197,7 @@ output "gateway_public_url" {
 * `runtime_version` - The Omni Gateway runtime version.
 * `release_channel` - The release channel (`lts` or `edge`).
 * `size` - The gateway instance size (`small` or `large`).
-* `status` - The current status of the gateway (for example, `APPLIED`).
+* `status` - The current status of the gateway (for example, `APPLYING`, `RUNNING`).
 * `desired_status` - The desired status of the gateway (for example, `STARTED`).
 * `status_message` - A descriptive status message.
 * `api_limit` - The maximum number of API instances this gateway can host.
@@ -275,6 +275,6 @@ output "gateway_names" {
 * `id` - The gateway ID.
 * `name` - The name of the gateway.
 * `target_id` - The ID of the deployment target.
-* `status` - The current status of the gateway (for example, `APPLIED`, `RUNNING`).
+* `status` - The current status of the gateway (for example, `APPLYING`, `RUNNING`, `RUNNING`).
 * `date_created` - Timestamp when the gateway was created.
 * `last_updated` - Timestamp when the gateway was last updated.

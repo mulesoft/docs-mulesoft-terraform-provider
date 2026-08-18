@@ -2,7 +2,7 @@
 
 Use Access Management resources to manage organizations, environments, connected applications, roles, and teams in Anypoint Platform.
 
-Most Access Management resources require the `anypoint.admin` provider configuration (user credentials + connected app). The `anypoint_team` resource and its data sources are the exception — they use standard `client_credentials` authentication.
+Access Management resources use a connected-app (`client_credentials`) token, which must have the appropriate org-level permissions. Only the `anypoint_organization` and `anypoint_environment` resources require user credentials (`auth_type = "user"`).
 
 == `anypoint_connected_app`
 
@@ -12,7 +12,7 @@ A connected app can act on behalf of a user (`authorization_code`, `password`, o
 
 [NOTE]
 ====
-*Admin provider required:* This resource requires the `anypoint.admin` provider configured with `auth_type = "user"` (user credentials + connected app client credentials).
+*Connected App:* This resource requires a *standard connected app* (client credentials) with the appropriate org-level permissions. An admin connected app isn't needed.
 ====
 
 [TIP]
@@ -26,20 +26,9 @@ Use the inline `scopes` attribute on this resource to manage connected app scope
 
 [source,hcl]
 ----
-provider "anypoint" {
-  alias         = "admin"
-  auth_type     = "user"
-  client_id     = var.anypoint_admin_client_id
-  client_secret = var.anypoint_admin_client_secret
-  username      = var.anypoint_admin_username
-  password      = var.anypoint_admin_password
-  base_url      = var.anypoint_base_url
-}
-
 resource "anypoint_connected_app" "example" {
-  provider     = anypoint.admin
-  name         = "Automation App"
-  grant_types  = ["client_credentials"]
+  name        = "Automation App"
+  grant_types = ["client_credentials"]
 
   scopes = [
     {
@@ -63,7 +52,6 @@ resource "anypoint_connected_app" "example" {
 [source,hcl]
 ----
 resource "anypoint_connected_app" "user_behalf" {
-  provider      = anypoint.admin
   name          = "User App"
   grant_types   = ["authorization_code"]
   redirect_uris = ["https://app.example.com/callback"]
@@ -125,7 +113,6 @@ import {
 }
 
 resource "anypoint_connected_app" "imported" {
-  provider    = anypoint.admin
   name        = "<app_name>"
   grant_types = ["client_credentials"]
 }
@@ -164,25 +151,14 @@ Use the `anypoint_connected_app_scopes` resource to manage scopes for an existin
 
 [NOTE]
 ====
-*Admin provider required:* This resource requires the `anypoint.admin` provider configured with `auth_type = "user"` (user credentials + connected app client credentials).
+*Connected App:* This resource requires a *standard connected app* (client credentials) with the appropriate org-level permissions. An admin connected app isn't needed.
 ====
 
 === Example Usage
 
 [source,hcl]
 ----
-provider "anypoint" {
-  alias         = "admin"
-  auth_type     = "user"
-  client_id     = var.anypoint_admin_client_id
-  client_secret = var.anypoint_admin_client_secret
-  username      = var.anypoint_admin_username
-  password      = var.anypoint_admin_password
-  base_url      = var.anypoint_base_url
-}
-
 resource "anypoint_connected_app_scopes" "example" {
-  provider         = anypoint.admin
   connected_app_id = "my-connected-app-id"
 
   scopes = [
@@ -232,7 +208,6 @@ import {
 }
 
 resource "anypoint_connected_app_scopes" "imported" {
-  provider         = anypoint.admin
   connected_app_id = "<connected_app_id>"
   scopes           = []
 }
@@ -555,25 +530,14 @@ Use the `anypoint_role` resource to manage Anypoint Platform role groups (custom
 
 [NOTE]
 ====
-*Admin provider required:* This resource requires the `anypoint.admin` provider configured with `auth_type = "user"` (user credentials + connected app client credentials). You must be an Organization Administrator to manage platform-wide roles.
+*Connected App:* This resource requires a *standard connected app* (client credentials) with the appropriate org-level permissions. The connected app must be granted Organization Administrator privileges.
 ====
 
 === Example Usage
 
 [source,hcl]
 ----
-provider "anypoint" {
-  alias         = "admin"
-  auth_type     = "user"
-  client_id     = var.anypoint_admin_client_id
-  client_secret = var.anypoint_admin_client_secret
-  username      = var.anypoint_admin_username
-  password      = var.anypoint_admin_password
-  base_url      = var.anypoint_base_url
-}
-
 resource "anypoint_role" "example" {
-  provider    = anypoint.admin
   name        = "API Developers"
   description = "Role group for the API development team"
 
@@ -644,8 +608,7 @@ import {
 }
 
 resource "anypoint_role" "imported" {
-  provider = anypoint.admin
-  name     = "<role_name>"
+  name = "<role_name>"
 }
 ----
 
@@ -673,7 +636,7 @@ Use the `anypoint_team` resource to manage teams in Anypoint Platform, including
 
 [NOTE]
 ====
-*Connected App:* This resource requires a *standard connected app* (client credentials). An admin connected app isn't needed. The connected app must have relevant scopes.
+*Connected App:* This resource requires a *standard connected app* (client credentials) with the appropriate org-level permissions. An admin connected app isn't needed.
 ====
 
 === Example Usage
@@ -798,19 +761,16 @@ Use the `anypoint_available_permissions` data source to list all permissions tha
 
 [NOTE]
 ====
-*Admin provider required:* This data source requires the `anypoint.admin` provider configured with `auth_type = "user"`.
+*Connected App:* This data source requires a *standard connected app* (client credentials) with the appropriate org-level permissions. An admin connected app isn't needed.
 ====
 
 === Example Usage
 
 [source,hcl]
 ----
-data "anypoint_available_permissions" "all" {
-  provider = anypoint.admin
-}
+data "anypoint_available_permissions" "all" {}
 
 data "anypoint_available_permissions" "read_apps" {
-  provider    = anypoint.admin
   name_filter = "Read Applications"
 }
 
@@ -840,19 +800,16 @@ Use the `anypoint_available_scopes` data source to list all scopes available for
 
 [NOTE]
 ====
-*Admin provider required:* This data source requires the `anypoint.admin` provider configured with `auth_type = "user"`.
+*Connected App:* This data source requires a *standard connected app* (client credentials) with the appropriate org-level permissions. An admin connected app isn't needed.
 ====
 
 === Example Usage
 
 [source,hcl]
 ----
-data "anypoint_available_scopes" "all" {
-  provider = anypoint.admin
-}
+data "anypoint_available_scopes" "all" {}
 
 data "anypoint_available_scopes" "with_internal" {
-  provider         = anypoint.admin
   include_internal = true
 }
 
@@ -885,7 +842,7 @@ Use the `anypoint_connected_app` data source to read the configuration of a sing
 
 [NOTE]
 ====
-*Admin provider required:* This data source requires the `anypoint.admin` provider configured with `auth_type = "user"`.
+*Connected App:* This data source requires a *standard connected app* (client credentials) with the appropriate org-level permissions. An admin connected app isn't needed.
 ====
 
 === Example Usage
@@ -893,8 +850,7 @@ Use the `anypoint_connected_app` data source to read the configuration of a sing
 [source,hcl]
 ----
 data "anypoint_connected_app" "example" {
-  provider = anypoint.admin
-  id       = "abc123-def456-ghi789"
+  id = "abc123-def456-ghi789"
 }
 
 output "scopes" {
@@ -940,16 +896,14 @@ Use the `anypoint_connected_apps` data source to list all connected apps in an o
 
 [NOTE]
 ====
-*Admin provider required:* This data source requires the `anypoint.admin` provider configured with `auth_type = "user"`.
+*Connected App:* This data source requires a *standard connected app* (client credentials) with the appropriate org-level permissions. An admin connected app isn't needed.
 ====
 
 === Example Usage
 
 [source,hcl]
 ----
-data "anypoint_connected_apps" "all" {
-  provider = anypoint.admin
-}
+data "anypoint_connected_apps" "all" {}
 
 output "enabled_apps" {
   value = [for a in data.anypoint_connected_apps.all.apps : a if a.enabled]
@@ -982,7 +936,7 @@ Use the `anypoint_role` data source to read the configuration of a single role g
 
 [NOTE]
 ====
-*Admin provider required:* This data source requires the `anypoint.admin` provider configured with `auth_type = "user"`.
+*Connected App:* This data source requires a *standard connected app* (client credentials) with the appropriate org-level permissions. An admin connected app isn't needed.
 ====
 
 === Example Usage
@@ -990,8 +944,7 @@ Use the `anypoint_role` data source to read the configuration of a single role g
 [source,hcl]
 ----
 data "anypoint_role" "example" {
-  provider = anypoint.admin
-  id       = "12345678-1234-1234-1234-123456789abc"
+  id = "12345678-1234-1234-1234-123456789abc"
 }
 
 output "role_permissions" {
@@ -1034,16 +987,14 @@ Use the `anypoint_roles` data source to list all role groups in an org.
 
 [NOTE]
 ====
-*Admin provider required:* This data source requires the `anypoint.admin` provider configured with `auth_type = "user"`.
+*Connected App:* This data source requires a *standard connected app* (client credentials) with the appropriate org-level permissions. An admin connected app isn't needed.
 ====
 
 === Example Usage
 
 [source,hcl]
 ----
-data "anypoint_roles" "all" {
-  provider = anypoint.admin
-}
+data "anypoint_roles" "all" {}
 
 output "admin_role" {
   value = [for r in data.anypoint_roles.all.roles : r if r.name == "Organization Administrators"]
@@ -1075,7 +1026,7 @@ Use the `anypoint_team` data source to read the configuration of a single team b
 
 [NOTE]
 ====
-*Connected App:* This data source requires a *standard connected app* (client credentials). An admin connected app isn't needed. The connected app must have relevant scopes.
+*Connected App:* This data source requires a *standard connected app* (client credentials) with the appropriate org-level permissions. An admin connected app isn't needed.
 ====
 
 === Example Usage
@@ -1129,7 +1080,7 @@ Use the `anypoint_teams` data source to list all teams in an org, or filter by n
 
 [NOTE]
 ====
-*Connected App:* This data source requires a *standard connected app* (client credentials). An admin connected app isn't needed.
+*Connected App:* This data source requires a *standard connected app* (client credentials) with the appropriate org-level permissions. An admin connected app isn't needed.
 ====
 
 === Example Usage
@@ -1177,19 +1128,16 @@ Use the `anypoint_users` data source to list users in an org. Use it to discover
 
 [NOTE]
 ====
-*Admin provider required:* This data source requires the `anypoint.admin` provider configured with `auth_type = "user"`.
+*Connected App:* This data source requires a *standard connected app* (client credentials) with the appropriate org-level permissions. An admin connected app isn't needed.
 ====
 
 === Example Usage
 
 [source,hcl]
 ----
-data "anypoint_users" "all" {
-  provider = anypoint.admin
-}
+data "anypoint_users" "all" {}
 
 data "anypoint_users" "filtered" {
-  provider    = anypoint.admin
   name_filter = "john.doe"
 }
 
