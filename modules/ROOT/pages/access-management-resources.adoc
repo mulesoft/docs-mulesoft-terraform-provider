@@ -1,35 +1,164 @@
 = Access Management Resources
 
-Use Access Management resources to manage organizations, environments, connected applications, scopes, and teams in Anypoint Platform.
+Use Access Management resources to manage organizations, environments, connected applications, roles, and teams in Anypoint Platform.
 
-Access Management resources require administrative privileges and use the `anypoint.admin` provider configuration for authentication.
+Access Management resources use a connected-app (`client_credentials`) token, which must have the appropriate org-level permissions. Only the `anypoint_organization` and `anypoint_environment` resources require user credentials (`auth_type = "user"`).
 
-== `anypoint_connected_app_scopes`
+== `anypoint_connected_app`
 
-Use the `anypoint_connected_app_scopes` resource to manage scopes for a connected application in Anypoint Platform.
+Use the `anypoint_connected_app` resource to create and manage Anypoint Connected Applications for programmatic access to Anypoint Platform APIs.
+
+A connected app can act on behalf of a user (`authorization_code`, `password`, or `urn:ietf:params:oauth:grant-type:jwt-bearer` grant types) or on its own behalf (`client_credentials` grant type).
 
 [NOTE]
 ====
-*Admin provider required:* This is an Access Management resource. It requires the `anypoint.admin` provider configured with `auth_type = "user"` (user credentials + connected app client credentials). A standard connected app (client credentials only) doesn't have sufficient privileges for Access Management operations.
+*Connected App:* This resource requires a *standard connected app* (client credentials) with the appropriate org-level permissions. An admin connected app isn't needed.
+====
+
+[TIP]
+====
+Use the inline `scopes` attribute on this resource to manage connected app scopes. The `anypoint_connected_app_scopes` resource is deprecated.
+====
+
+=== Example Usage
+
+==== Connected app acting on its own behalf (client credentials)
+
+[source,hcl]
+----
+resource "anypoint_connected_app" "example" {
+  name        = "Automation App"
+  grant_types = ["client_credentials"]
+
+  scopes = [
+    {
+      scope          = "Mule Developer Generative AI User"
+      context_params = { org = var.org_id }
+    },
+    {
+      scope          = "Read Applications"
+      context_params = { org = var.org_id, envId = var.env_id }
+    },
+    {
+      scope          = "Exchange Viewer"
+      context_params = { org = var.org_id }
+    },
+  ]
+}
+----
+
+==== Connected app acting on behalf of a user
+
+[source,hcl]
+----
+resource "anypoint_connected_app" "user_behalf" {
+  name          = "User App"
+  grant_types   = ["authorization_code"]
+  redirect_uris = ["https://app.example.com/callback"]
+  client_uri    = "https://app.example.com"
+  audience      = "internal"
+}
+----
+
+=== Required Arguments
+
+* `name` - The name of the connected app.
+* `grant_types` - (List of String) OAuth grant types. Valid values: `authorization_code`, `password`, `urn:ietf:params:oauth:grant-type:jwt-bearer` (act on behalf of a user), or `client_credentials` (act on its own behalf).
+
+=== Optional Arguments
+
+* `audience` - Whether the app is visible to members of this org only (`internal`) or all Anypoint users (`everyone`). Defaults to `internal`.
+* `client_uri` - Website URL. Required for user-behalf apps to be editable in the Anypoint UI.
+* `enabled` - Whether the connected app is enabled. Defaults to `true`.
+* `organization_id` - The organization ID. If not specified, uses the organization from provider credentials.
+* `public_keys` - (List of String) Public keys for the JWT Bearer grant type.
+* `redirect_uris` - (List of String) OAuth redirect URIs. Required for user-behalf apps to be editable in the Anypoint UI.
+* `scopes` - (Attributes Set) Scopes assigned to the app. When set, this list is authoritative: scopes assigned outside of Terraform are removed on the next apply. Omit to leave scopes unmanaged. Supplying `= []` removes all user-assigned scopes. See xref:nested-schema-for-scopes-connected-app[Nested Schema for `scopes`].
+
+[NOTE]
+====
+The platform automatically assigns an undeletable `profile` scope to every connected app. It doesn't appear in this set and must not be listed. The provider ignores it so that a plan run right after an apply reports no changes.
+====
+
+=== Read-Only Attributes
+
+* `id` - The `client_id` of the connected app.
+* `client_secret` - (Sensitive) The client secret. Only returned on creation and not retrievable after import.
+* `created_at` - Timestamp when the app was created.
+* `owner_user_id` - The user ID of the app owner.
+* `updated_at` - Timestamp when the app was last updated.
+
+[#nested-schema-for-scopes-connected-app]
+=== Nested Schema for `scopes`
+
+* `scope` - (Required) The scope display name as shown in the Anypoint UI (for example, `Read Applications`, `Exchange Viewer`). Use the `anypoint_available_scopes` data source to discover valid values. Scope identifiers (for example, `read:applications`) are also accepted.
+* `context_params` - (Map of String) Context parameters. For `client_credentials` apps, `org` is required on every scope; add `envId` for environment-scoped scopes. User-behalf apps ignore `context_params`. Missing `org` on a `client_credentials` scope causes a `400` error at apply time and can leave the app in an inconsistent state with credentials outside Terraform state.
+
+=== Import
+
+An existing connected app can be imported using its `client_id`, or a composite `{org_id}:{client_id}`.
+
+[NOTE]
+====
+`client_secret` is not available after import (only returned on creation).
+====
+
+==== Using an import block (Terraform ≥ 1.5 — recommended)
+
+[source,hcl]
+----
+import {
+  to = anypoint_connected_app.imported
+  id = "<client_id>"
+}
+
+resource "anypoint_connected_app" "imported" {
+  name        = "<app_name>"
+  grant_types = ["client_credentials"]
+}
+----
+
+After adding the import block, run:
+
+[source,shell]
+----
+# Let Terraform generate the full resource configuration automatically:
+terraform plan -generate-config-out=generated.tf
+
+# Or apply the import directly if you have an existing resource block:
+terraform apply
+----
+
+==== Using the CLI (deprecated, Terraform < 1.5)
+
+[source,shell]
+----
+# Using client_id only:
+terraform import anypoint_connected_app.imported <client_id>
+
+# Using org_id and client_id:
+terraform import anypoint_connected_app.imported <org_id>:<client_id>
+----
+
+== `anypoint_connected_app_scopes`
+
+[CAUTION]
+====
+`anypoint_connected_app_scopes` is deprecated. Use the inline `scopes` attribute on `anypoint_connected_app` instead, which manages scopes as part of the app resource in a single apply.
+====
+
+Use the `anypoint_connected_app_scopes` resource to manage scopes for an existing connected application in Anypoint Platform.
+
+[NOTE]
+====
+*Connected App:* This resource requires a *standard connected app* (client credentials) with the appropriate org-level permissions. An admin connected app isn't needed.
 ====
 
 === Example Usage
 
 [source,hcl]
 ----
-# Admin provider – authenticates on behalf of a user using connected app credentials
-provider "anypoint" {
-  alias         = "admin"
-  auth_type     = "user"
-  client_id     = var.anypoint_admin_client_id
-  client_secret = var.anypoint_admin_client_secret
-  username      = var.anypoint_admin_username
-  password      = var.anypoint_admin_password
-  base_url      = var.anypoint_base_url
-}
-
 resource "anypoint_connected_app_scopes" "example" {
-  provider         = anypoint.admin
   connected_app_id = "my-connected-app-id"
 
   scopes = [
@@ -53,12 +182,13 @@ resource "anypoint_connected_app_scopes" "example" {
 === Required Arguments
 
 * `connected_app_id` - The ID of the connected application to manage scopes for.
-* `scopes` - (Block Set) The set of scopes to assign to the connected application. See xref:nested-schema-for-scopes[Nested Schema for `scopes`].
+* `scopes` - (Block Set) The set of scopes to assign to the connected application. See xref:nested-schema-for-scopes-connected-app-scopes[Nested Schema for `scopes`].
 
 === Read-Only Attributes
 
 * `id` - The unique identifier for the connected app scopes (same as `connected_app_id`).
 
+[#nested-schema-for-scopes-connected-app-scopes]
 === Nested Schema for `scopes`
 
 * `scope` - (Required) The scope name (for example, `admin:cloudhub`, `read:applications`).
@@ -73,13 +203,11 @@ An existing connected app's scopes can be imported using the connected app ID (U
 [source,hcl]
 ----
 import {
-  provider = anypoint.admin
-  to       = anypoint_connected_app_scopes.imported
-  id       = "<connected_app_id>"
+  to = anypoint_connected_app_scopes.imported
+  id = "<connected_app_id>"
 }
 
 resource "anypoint_connected_app_scopes" "imported" {
-  provider         = anypoint.admin
   connected_app_id = "<connected_app_id>"
   scopes           = []
 }
@@ -109,14 +237,13 @@ Use the `anypoint_environment` resource to manage Anypoint Platform environments
 
 [NOTE]
 ====
-*Admin provider required:* This is an Access Management resource. It requires the `anypoint.admin` provider configured with `auth_type = "user"` (user credentials + connected app client credentials). A standard connected app (client credentials only) doesn't have sufficient privileges for Access Management operations.
+*Admin provider required:* This resource requires the `anypoint.admin` provider configured with `auth_type = "user"` (user credentials + connected app client credentials).
 ====
 
 === Example Usage
 
 [source,hcl]
 ----
-# Admin provider – authenticates on behalf of a user using connected app credentials
 provider "anypoint" {
   alias         = "admin"
   auth_type     = "user"
@@ -161,9 +288,8 @@ An existing environment can be imported using its environment ID (UUID).
 [source,hcl]
 ----
 import {
-  provider = anypoint.admin
-  to       = anypoint_environment.imported
-  id       = "<environment_id>"
+  to = anypoint_environment.imported
+  id = "<environment_id>"
 }
 
 resource "anypoint_environment" "imported" {
@@ -198,7 +324,7 @@ Use the `anypoint_organization` resource to create and manage Anypoint Platform 
 
 [NOTE]
 ====
-*Admin provider required:* This is an Access Management resource. It requires the `anypoint.admin` provider configured with `auth_type = "user"` (user credentials + connected app client credentials). A standard connected app (client credentials only) doesn't have sufficient privileges for Access Management operations.
+*Admin provider required:* This resource requires the `anypoint.admin` provider configured with `auth_type = "user"` (user credentials + connected app client credentials).
 ====
 
 === Entitlement State Behaviour
@@ -215,7 +341,6 @@ Only declare entitlement fields you want Terraform to own. Leave everything else
 
 [source,hcl]
 ----
-# Admin provider – authenticates on behalf of a user using connected app credentials
 provider "anypoint" {
   alias         = "admin"
   auth_type     = "user"
@@ -266,7 +391,7 @@ resource "anypoint_organization" "example" {
 * `created_at` - The creation timestamp of the organization.
 * `deleted_at` - The deletion timestamp of the organization.
 * `domain` - The domain of the organization.
-* `environments` - (Block List) The environments within the organization..
+* `environments` - (Block List) The environments within the organization.
 * `gdot_id` - The GDOT ID of the organization.
 * `idprovider_id` - The ID provider ID for the organization.
 * `is_automatic_admin_promotion_exempt` - Whether the organization is exempt from automatic admin promotion.
@@ -278,7 +403,7 @@ resource "anypoint_organization" "example" {
 * `parent_organization_ids` - List of parent organization IDs (ancestor chain).
 * `session_timeout` - The session timeout for the organization.
 * `sub_organization_ids` - List of sub-organization IDs.
-* `subscription` - (Block) The subscription details for the organization..
+* `subscription` - (Block) The subscription details for the organization.
 * `tenant_organization_ids` - List of tenant organization IDs.
 * `updated_at` - The last update timestamp of the organization.
 
@@ -369,9 +494,8 @@ An existing organization can be imported using its organization ID (UUID). Your 
 [source,hcl]
 ----
 import {
-  provider = anypoint.admin
-  to       = anypoint_organization.imported
-  id       = "<organization_id>"
+  to = anypoint_organization.imported
+  id = "<organization_id>"
 }
 
 resource "anypoint_organization" "imported" {
@@ -400,40 +524,164 @@ terraform apply
 terraform import anypoint_organization.imported <organization_id>
 ----
 
-== `anypoint_team`
+== `anypoint_role`
 
-Use the `anypoint_team` resource to manage teams in Anypoint Platform.
+Use the `anypoint_role` resource to manage Anypoint Platform role groups (custom or default), including their inline permission assignments and member list.
 
 [NOTE]
 ====
-*Admin provider required:* This is an Access Management resource. It requires the `anypoint.admin` provider configured with `auth_type = "user"` (user credentials + connected app client credentials). A standard connected app (client credentials only) doesn't have sufficient privileges for Access Management operations.
+*Connected App:* This resource requires a *standard connected app* (client credentials) with the appropriate org-level permissions. The connected app must be granted Organization Administrator privileges.
 ====
 
 === Example Usage
 
 [source,hcl]
 ----
-# Admin provider – authenticates on behalf of a user using connected app credentials
+resource "anypoint_role" "example" {
+  name        = "API Developers"
+  description = "Role group for the API development team"
+
+  permissions = [
+    {
+      name = "Exchange Viewer"
+      context_params = {
+        org = var.organization_id
+      }
+    },
+    {
+      name = "Read Applications"
+      context_params = {
+        org   = var.organization_id
+        envId = var.environment_id
+      }
+    },
+  ]
+
+  members = [
+    "jdoe",
+    "asmith",
+  ]
+}
+----
+
+=== Required Arguments
+
+* `name` - The name of the role group.
+
+=== Optional Arguments
+
+* `description` - A description of the role group. Optional and computed: if you omit it, the server-resolved value is retained and won't be wiped when you change other fields.
+* `organization_id` - The organization ID where the role group will be created. If not specified, uses the organization from provider credentials.
+* `permissions` - (Attributes Set) The set of permissions granted by this role group. When set, this list is authoritative: permissions not listed here are removed on apply. Omit to leave permissions unmanaged. Supplying `= []` declares no managed permissions and removes any that exist. System (internal) assignments are never modified. See xref:nested-schema-for-permissions-role[Nested Schema for `permissions`].
+* `members` - (Set of String) The set of usernames that are members of this role group. When set, this list is authoritative: members not listed here are removed on apply. Omit to leave membership unmanaged. Usernames are case-insensitive. Use the `anypoint_users` data source to discover usernames.
+
+[NOTE]
+====
+Platform side-effect grants (for example, the auto-added org-scoped "Business Group Viewer") are never surfaced in state and never removed by Terraform.
+====
+
+=== Read-Only Attributes
+
+* `id` - The unique identifier for the role group.
+* `created_at` - Timestamp when the role group was created.
+* `editable` - Whether the role group can be edited. Default (system) role groups aren't editable.
+* `external_names` - (List of String) External group names mapped to this role group (SSO/SAML).
+* `updated_at` - Timestamp when the role group was last updated.
+
+[#nested-schema-for-permissions-role]
+=== Nested Schema for `permissions`
+
+* `name` - (Required) The permission display name as shown in the Anypoint UI (for example, `Exchange Viewer`). Case-insensitive. Use the `anypoint_available_permissions` data source to discover valid values.
+* `context_params` - (Map of String) Context parameters. Typically `org` (organization ID) and, for environment-scoped permissions, `envId`.
+
+=== Import
+
+An existing role group can be imported using the role group ID (UUID).
+
+==== Using an import block (Terraform ≥ 1.5 — recommended)
+
+[source,hcl]
+----
+import {
+  to = anypoint_role.imported
+  id = "<role_group_id>"
+}
+
+resource "anypoint_role" "imported" {
+  name = "<role_name>"
+}
+----
+
+After adding the import block, run:
+
+[source,shell]
+----
+# Let Terraform generate the full resource configuration automatically:
+terraform plan -generate-config-out=generated.tf
+
+# Or apply the import directly if you have an existing resource block:
+terraform apply
+----
+
+==== Using the CLI (deprecated, Terraform < 1.5)
+
+[source,shell]
+----
+terraform import anypoint_role.imported <role_group_id>
+----
+
+== `anypoint_team`
+
+Use the `anypoint_team` resource to manage teams in Anypoint Platform, including their role assignments and member list.
+
+[NOTE]
+====
+*Connected App:* Creating a team, managing members, reads, and import work with a standard `client_credentials` connected app. Assigning most permissions requires `auth_type = "user"` — only `Exchange Viewer`, `Exchange Administrator`, and `View Organization` work with client credentials; others return `403 Forbidden`.
+====
+
+=== Example Usage
+
+[source,hcl]
+----
 provider "anypoint" {
-  alias         = "admin"
-  auth_type     = "user"
-  client_id     = var.anypoint_admin_client_id
-  client_secret = var.anypoint_admin_client_secret
-  username      = var.anypoint_admin_username
-  password      = var.anypoint_admin_password
+  client_id     = var.anypoint_client_id
+  client_secret = var.anypoint_client_secret
   base_url      = var.anypoint_base_url
 }
 
+data "anypoint_teams" "all" {}
+
+locals {
+  root_team_id = [for t in data.anypoint_teams.all.teams : t.id if t.is_root_team][0]
+}
+
 resource "anypoint_team" "example" {
-  provider       = anypoint.admin
-  team_name      = "Development Team"
-  parent_team_id = "root-team-id"
+  name           = "Development Team"
   team_type      = "internal"
+  parent_team_id = local.root_team_id
+
+  permissions = [
+    {
+      name = "Exchange Viewer"
+      context_params = {
+        org = var.organization_id
+      }
+    },
+  ]
+
+  members = [
+    {
+      username        = "jdoe"
+      membership_type = "maintainer"
+    },
+    {
+      username = "asmith"
+    },
+  ]
 }
 
 resource "anypoint_team" "sub_team" {
-  provider       = anypoint.admin
-  team_name      = "Frontend Team"
+  name           = "Frontend Team"
   parent_team_id = anypoint_team.example.id
   team_type      = "internal"
 }
@@ -441,19 +689,33 @@ resource "anypoint_team" "sub_team" {
 
 === Required Arguments
 
-* `team_name` - The name of the team.
-* `parent_team_id` - The ID of the parent team.
-* `team_type` - The type of the team.
+* `name` - The name of the team.
 
 === Optional Arguments
 
-* `organization_id` - Organization ID where the team will be created. If not provided, the organization ID is inferred from the connected app credentials.
+* `organization_id` - Organization ID where the team will be created. If not provided, the organization ID is inferred from connected app credentials.
+* `parent_team_id` - The ID of the parent team. If omitted, the org's root team is used. Use the `anypoint_teams` data source to look up team IDs by name.
+* `team_type` - The type of team. Defaults to `internal`. Changing the type requires the target type to be enabled in the org.
+* `members` - (Attributes Set) Members of this team. When set, this list is authoritative: members not listed are removed on apply. Omit to leave membership unmanaged. Members assigned via external groups (SAML/SCIM) are never modified. See xref:nested-schema-for-members-team[Nested Schema for `members`].
+* `permissions` - (Attributes Set) Permissions assigned to this team. When set, this list is authoritative: permissions not listed are removed on apply. Omit to leave permissions unmanaged. System (internal) assignments are never modified. See xref:nested-schema-for-permissions-team[Nested Schema for `permissions`].
 
 === Read-Only Attributes
 
 * `id` - The unique identifier for the team.
 * `created_at` - The timestamp when the team was created.
 * `updated_at` - The timestamp when the team was last updated.
+
+[#nested-schema-for-permissions-team]
+=== Nested Schema for `permissions`
+
+* `name` - (Required) The permission display name (for example, `Exchange Viewer`). Case-insensitive. Use the `anypoint_available_permissions` data source to discover valid values.
+* `context_params` - (Map of String) Context parameters. Typically `org` and, for environment-scoped permissions, `envId`.
+
+[#nested-schema-for-members-team]
+=== Nested Schema for `members`
+
+* `username` - (Required) The username. Case-insensitive. Use the `anypoint_users` data source to discover usernames.
+* `membership_type` - The membership type: `member` (default) or `maintainer`. Maintainers can manage team membership and child teams.
 
 === Import
 
@@ -464,15 +726,13 @@ An existing team can be imported using its team ID (UUID).
 [source,hcl]
 ----
 import {
-  provider = anypoint.admin
-  to       = anypoint_team.imported
-  id       = "<team_id>"
+  to = anypoint_team.imported
+  id = "<team_id>"
 }
 
 resource "anypoint_team" "imported" {
-  provider        = anypoint.admin
   organization_id = "<organization_id>"
-  team_name       = "<team_name>"
+  name            = "<team_name>"
   team_type       = "internal"
 }
 ----
@@ -494,3 +754,412 @@ terraform apply
 ----
 terraform import anypoint_team.imported <team_id>
 ----
+
+== `anypoint_available_permissions` data source
+
+Use the `anypoint_available_permissions` data source to list all permissions that can be assigned to role groups and teams.
+
+[NOTE]
+====
+*Connected App:* This data source requires a *standard connected app* (client credentials) with the appropriate org-level permissions. An admin connected app isn't needed.
+====
+
+=== Example Usage
+
+[source,hcl]
+----
+data "anypoint_available_permissions" "all" {}
+
+data "anypoint_available_permissions" "read_apps" {
+  name_filter = "Read Applications"
+}
+
+output "all_permission_names" {
+  value = [for p in data.anypoint_available_permissions.all.permissions : p.name]
+}
+----
+
+=== Optional Arguments
+
+* `name_filter` - (String) Case-insensitive substring match to filter permissions by name.
+
+=== Read-Only Attributes
+
+* `permissions` - (List of Object) The list of available permissions. See xref:nested-schema-for-permissions-available[Nested Schema for `permissions`].
+
+[#nested-schema-for-permissions-available]
+=== Nested Schema for `permissions`
+
+* `role_id` - The permission's unique ID.
+* `name` - The permission display name. Use this value in `anypoint_role` `permissions[].name` and `anypoint_team` `roles[].name`.
+* `description` - A description of the permission.
+
+== `anypoint_available_scopes` data source
+
+Use the `anypoint_available_scopes` data source to list all scopes available for connected apps.
+
+[NOTE]
+====
+*Connected App:* This data source requires a *standard connected app* (client credentials) with the appropriate org-level permissions. An admin connected app isn't needed.
+====
+
+=== Example Usage
+
+[source,hcl]
+----
+data "anypoint_available_scopes" "all" {}
+
+data "anypoint_available_scopes" "with_internal" {
+  include_internal = true
+}
+
+output "scope_display_names" {
+  value = [for s in data.anypoint_available_scopes.all.scopes : s.display_name]
+}
+----
+
+=== Optional Arguments
+
+* `include_internal` - (Boolean) Whether to include internal-only scopes. Defaults to `false`. Setting this to `true` changes the returned set of scopes, not just field visibility.
+
+=== Read-Only Attributes
+
+* `id` - Static value `"catalog"`. This data source isn't org-scoped.
+* `scopes` - (List of Object) The list of available scopes. See xref:nested-schema-for-scopes-available[Nested Schema for `scopes`].
+
+[#nested-schema-for-scopes-available]
+=== Nested Schema for `scopes`
+
+* `display_name` - The scope display name. Use this value in `anypoint_connected_app` `scopes[].scope`.
+* `scope` - The scope identifier (for example, `admin:cloudhub`). Also accepted in `scopes[].scope`, but display names are preferred.
+* `description` - A description of the scope.
+* `product_label` - The product label for the scope.
+* `internal` - Whether this is an internal scope. Only visible when `include_internal = true`.
+
+== `anypoint_connected_app` data source
+
+Use the `anypoint_connected_app` data source to read the configuration of a single connected app by ID.
+
+[NOTE]
+====
+*Connected App:* This data source requires a *standard connected app* (client credentials) with the appropriate org-level permissions. An admin connected app isn't needed.
+====
+
+=== Example Usage
+
+[source,hcl]
+----
+data "anypoint_connected_app" "example" {
+  id = "abc123-def456-ghi789"
+}
+
+output "scopes" {
+  value = data.anypoint_connected_app.example.scopes
+}
+----
+
+=== Required Arguments
+
+* `id` - The `client_id` of the connected app.
+
+=== Optional Arguments
+
+* `organization_id` - The organization ID. If not specified, uses the organization from provider credentials.
+
+=== Read-Only Attributes
+
+* `name` - The name of the connected app.
+* `grant_types` - (List of String) OAuth grant types.
+* `redirect_uris` - (List of String) OAuth redirect URIs.
+* `audience` - The audience setting (`internal` or `everyone`).
+* `client_uri` - The website URL.
+* `enabled` - Whether the connected app is enabled.
+* `owner_user_id` - The user ID of the app owner.
+* `scopes` - (List of Object) The scopes assigned to the app. See xref:nested-schema-for-scopes-connected-app-ds[Nested Schema for `scopes`].
+* `created_at` - Timestamp when the app was created.
+* `updated_at` - Timestamp when the app was last updated.
+
+[NOTE]
+====
+`client_secret` isn't exposed by this data source (only returned on creation).
+====
+
+[#nested-schema-for-scopes-connected-app-ds]
+=== Nested Schema for `scopes`
+
+* `scope` - The scope display name or identifier.
+* `context_params` - (Map of String) Context parameters.
+
+== `anypoint_connected_apps` data source
+
+Use the `anypoint_connected_apps` data source to list all connected apps in an org.
+
+[NOTE]
+====
+*Connected App:* This data source requires a *standard connected app* (client credentials) with the appropriate org-level permissions. An admin connected app isn't needed.
+====
+
+=== Example Usage
+
+[source,hcl]
+----
+data "anypoint_connected_apps" "all" {}
+
+output "enabled_apps" {
+  value = [for a in data.anypoint_connected_apps.all.apps : a if a.enabled]
+}
+----
+
+=== Optional Arguments
+
+* `organization_id` - The organization ID. If not specified, uses the organization from provider credentials.
+
+=== Read-Only Attributes
+
+* `apps` - (List of Object) The list of connected apps. See xref:nested-schema-for-apps[Nested Schema for `apps`].
+
+=== Nested Schema for `apps`
+
+* `client_id` - The client ID of the connected app.
+* `name` - The name of the connected app.
+* `grant_types` - (List of String) OAuth grant types.
+* `audience` - The audience setting.
+* `client_uri` - The website URL.
+* `enabled` - Whether the connected app is enabled.
+* `owner_user_id` - The user ID of the app owner.
+* `created_at` - Timestamp when the app was created.
+* `updated_at` - Timestamp when the app was last updated.
+
+== `anypoint_role` data source
+
+Use the `anypoint_role` data source to read the configuration of a single role group by ID.
+
+[NOTE]
+====
+*Connected App:* This data source requires a *standard connected app* (client credentials) with the appropriate org-level permissions. An admin connected app isn't needed.
+====
+
+=== Example Usage
+
+[source,hcl]
+----
+data "anypoint_role" "example" {
+  id = "12345678-1234-1234-1234-123456789abc"
+}
+
+output "role_permissions" {
+  value = data.anypoint_role.example.permissions
+}
+
+output "role_members" {
+  value = data.anypoint_role.example.members
+}
+----
+
+=== Required Arguments
+
+* `id` - The role group ID (UUID).
+
+=== Optional Arguments
+
+* `organization_id` - The organization ID. If not specified, uses the organization from provider credentials.
+
+=== Read-Only Attributes
+
+* `name` - The name of the role group.
+* `description` - The description of the role group.
+* `editable` - Whether the role group can be edited.
+* `external_names` - (List of String) External group names mapped to this role group (SSO/SAML).
+* `permissions` - (List of Object) The permissions granted by this role group. Excludes system/internal assignments and platform side-effect grants. See xref:nested-schema-for-permissions-role-ds[Nested Schema for `permissions`].
+* `members` - (List of String) The usernames of members in this role group.
+* `created_at` - Timestamp when the role group was created.
+* `updated_at` - Timestamp when the role group was last updated.
+
+[#nested-schema-for-permissions-role-ds]
+=== Nested Schema for `permissions`
+
+* `name` - The permission display name.
+* `context_params` - (Map of String) Context parameters.
+
+== `anypoint_roles` data source
+
+Use the `anypoint_roles` data source to list all role groups in an org.
+
+[NOTE]
+====
+*Connected App:* This data source requires a *standard connected app* (client credentials) with the appropriate org-level permissions. An admin connected app isn't needed.
+====
+
+=== Example Usage
+
+[source,hcl]
+----
+data "anypoint_roles" "all" {}
+
+output "admin_role" {
+  value = [for r in data.anypoint_roles.all.roles : r if r.name == "Organization Administrators"]
+}
+----
+
+=== Optional Arguments
+
+* `organization_id` - The organization ID. If not specified, uses the organization from provider credentials.
+
+=== Read-Only Attributes
+
+* `roles` - (List of Object) The list of role groups. See xref:nested-schema-for-roles-roles-ds[Nested Schema for `roles`].
+
+[#nested-schema-for-roles-roles-ds]
+=== Nested Schema for `roles`
+
+* `id` - The role group ID.
+* `name` - The name of the role group.
+* `description` - The description of the role group.
+* `editable` - Whether the role group can be edited.
+* `external_names` - (List of String) External group names mapped to this role group.
+* `created_at` - Timestamp when the role group was created.
+* `updated_at` - Timestamp when the role group was last updated.
+
+== `anypoint_team` data source
+
+Use the `anypoint_team` data source to read the configuration of a single team by ID.
+
+[NOTE]
+====
+*Connected App:* Reads work with a standard `client_credentials` connected app. The same permission restriction applies as for the resource: most permission assignments require `auth_type = "user"`.
+====
+
+=== Example Usage
+
+[source,hcl]
+----
+data "anypoint_team" "ops" {
+  id              = "team-uuid-here"
+  organization_id = var.organization_id
+}
+
+output "team_members" {
+  value = data.anypoint_team.ops.members
+}
+----
+
+=== Required Arguments
+
+* `id` - The team ID (UUID).
+
+=== Optional Arguments
+
+* `organization_id` - The organization ID. If not specified, uses the organization from provider credentials.
+
+=== Read-Only Attributes
+
+* `name` - The name of the team.
+* `parent_team_id` - The ID of the parent team. Null for the root team.
+* `team_type` - The type of team.
+* `permissions` - (Attributes List) Permissions assigned to this team. Excludes system/internal assignments. See xref:nested-schema-for-permissions-team-ds[Nested Schema for `permissions`].
+* `members` - (Attributes List) Members of this team. See xref:nested-schema-for-members-team-ds[Nested Schema for `members`].
+* `created_at` - Timestamp when the team was created.
+* `updated_at` - Timestamp when the team was last updated.
+
+[#nested-schema-for-permissions-team-ds]
+=== Nested Schema for `permissions`
+
+* `name` - The permission display name.
+* `context_params` - (Map of String) Context parameters.
+
+[#nested-schema-for-members-team-ds]
+=== Nested Schema for `members`
+
+* `username` - The username.
+* `membership_type` - The membership type (`member` or `maintainer`).
+* `is_assigned_via_external_groups` - Whether this member was assigned via an external group (SAML/SCIM).
+
+== `anypoint_teams` data source
+
+Use the `anypoint_teams` data source to list all teams in an org, or filter by name.
+
+[NOTE]
+====
+*Connected App:* This data source requires a *standard connected app* (client credentials) with the appropriate org-level permissions. An admin connected app isn't needed.
+====
+
+=== Example Usage
+
+[source,hcl]
+----
+data "anypoint_teams" "all" {}
+
+output "root_team_id" {
+  value = [for t in data.anypoint_teams.all.teams : t.id if t.is_root_team][0]
+}
+
+data "anypoint_teams" "engineering" {
+  name_filter = "Engineering"
+}
+
+resource "anypoint_team" "sub_team" {
+  name           = "Sub Team"
+  parent_team_id = data.anypoint_teams.engineering.teams[0].id
+}
+----
+
+=== Optional Arguments
+
+* `organization_id` - The organization ID. If not specified, uses the organization from provider credentials.
+* `name_filter` - (String) Case-insensitive substring match to filter teams by name. If omitted, all teams are returned.
+
+=== Read-Only Attributes
+
+* `teams` - (List of Object) The list of teams. See xref:nested-schema-for-teams[Nested Schema for `teams`].
+
+=== Nested Schema for `teams`
+
+* `id` - The team ID.
+* `name` - The name of the team.
+* `team_type` - The type of team.
+* `ancestor_team_ids` - (List of String) IDs of ancestor teams. Empty for the root team.
+* `is_root_team` - Whether this is the org's root team. Use its `id` as `parent_team_id` for top-level teams.
+* `created_at` - Timestamp when the team was created.
+* `updated_at` - Timestamp when the team was last updated.
+
+== `anypoint_users` data source
+
+Use the `anypoint_users` data source to list users in an org. Use it to discover usernames for the `members` attribute on `anypoint_role` and `anypoint_team`.
+
+[NOTE]
+====
+*Connected App:* This data source requires a *standard connected app* (client credentials) with the appropriate org-level permissions. An admin connected app isn't needed.
+====
+
+=== Example Usage
+
+[source,hcl]
+----
+data "anypoint_users" "all" {}
+
+data "anypoint_users" "filtered" {
+  name_filter = "john.doe"
+}
+
+output "user_id_by_email" {
+  value = [for u in data.anypoint_users.all.users : u.id if u.email == "john.doe@example.com"][0]
+}
+----
+
+=== Optional Arguments
+
+* `organization_id` - The organization ID. If not specified, uses the organization from provider credentials.
+* `name_filter` - (String) Case-insensitive substring match across username, email, first name, and last name.
+
+=== Read-Only Attributes
+
+* `users` - (List of Object) The list of users. See xref:nested-schema-for-users[Nested Schema for `users`].
+
+=== Nested Schema for `users`
+
+* `id` - The user ID.
+* `username` - The username. Use this value in `anypoint_role` `members` and `anypoint_team` `members[].username`.
+* `first_name` - The user's first name.
+* `last_name` - The user's last name.
+* `email` - The user's email address.
+* `enabled` - Whether the user account is enabled.

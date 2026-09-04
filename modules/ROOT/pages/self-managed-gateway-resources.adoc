@@ -1,0 +1,250 @@
+= Self-Managed Gateway Resources
+
+Use Self-Managed Gateway resources to manage registration tokens and retrieve status information for self-managed (connected-mode) Flex Gateway instances running on your own infrastructure.
+
+When you create a `anypoint_self_managed_gateway` resource, the platform mints a registration token. You then use that token to register your Flex Gateway runtime (running on Docker, Linux, or Kubernetes) with the Anypoint control plane. Terraform doesn't provision the runtime itself — it only manages the registration record on the platform side.
+
+== `anypoint_self_managed_gateway`
+
+Use the `anypoint_self_managed_gateway` resource to create a self-managed gateway registration in Anypoint Platform and retrieve the registration token needed to connect your Flex Gateway runtime.
+
+[NOTE]
+====
+*Connected App:* This resource requires a *standard connected app* (client credentials). An admin connected app isn't needed. The connected app must have relevant scopes.
+====
+
+[NOTE]
+====
+*Registration token:* The `registration_token` attribute is a short-lived, one-shot enrollment secret minted at creation time. It's not recoverable after import — importing an existing gateway sets `registration_token` to null in state. This doesn't affect a gateway that's already registered.
+====
+
+[NOTE]
+====
+*Soft delete:* Deleting this resource removes the registration record from the platform. The gateway runtime itself keeps running on your infrastructure until you stop it manually. Deleted gateways remain visible as tombstones with `status = "DELETED"` in the `anypoint_self_managed_gateways` data source when `include_deleted = true`.
+====
+
+=== Example Usage
+
+[source,hcl]
+----
+resource "anypoint_self_managed_gateway" "example" {
+  name           = "my-flex-gateway"
+  environment_id = var.environment_id
+}
+
+output "flex_registration_token" {
+  value     = anypoint_self_managed_gateway.example.registration_token
+  sensitive = true
+}
+----
+
+After running `terraform apply`, use the registration token to register your Flex Gateway runtime. For example, using Docker:
+
+[source,shell]
+----
+docker run --entrypoint flexctl -u $UID \
+  -v "$(pwd)":/registration mulesoft/flex-gateway \
+  registration create \
+  --organization=<your-org-id> \
+  --token="$(terraform output -raw flex_registration_token)" \
+  --output-directory=/registration \
+  --connected=true \
+  my-flex-gateway
+----
+
+=== Required Arguments
+
+* `name` - The name of the gateway. Unique within the org and environment. Changing this value forces a new registration.
+* `environment_id` - The environment ID the gateway registers into. Changing this value forces a new registration.
+
+=== Optional Arguments
+
+* `organization_id` - Organization ID. If not provided, the organization ID is inferred from connected app credentials.
+
+=== Read-Only Attributes
+
+* `id` - Composite identifier `<organization_id>/<environment_id>/<name>`. Stable across the gateway lifecycle, even before the runtime registers.
+* `registration_token` - (Sensitive) The registration token minted for this gateway. Feed this to the Flex runtime to connect it to the Anypoint control plane. Not recoverable after import.
+* `gateway_id` - The platform-assigned gateway ID. Empty until the runtime registers.
+* `status` - The status of the registered gateway (for example, `CONNECTED`, `DISCONNECTED`). Empty until the runtime registers.
+* `last_update` - Timestamp of the last status update (RFC 3339). Empty until the runtime registers.
+
+=== Import
+
+An existing self-managed gateway registration can be imported using a composite ID. Use the 2-part form for root-org gateways and the 3-part form for Business Groups.
+
+[NOTE]
+====
+`registration_token` is a one-shot secret and isn't recoverable on import. Importing an existing gateway sets `registration_token` to null in state. This doesn't affect a gateway that's already registered.
+====
+
+==== Using an import block (Terraform ≥ 1.5 — recommended)
+
+Root org (2-part ID):
+
+[source,hcl]
+----
+import {
+  to = anypoint_self_managed_gateway.imported
+  id = "<environment_id>/<name>"
+}
+
+resource "anypoint_self_managed_gateway" "imported" {
+  name           = "<gateway_name>"
+  environment_id = "<environment_id>"
+}
+----
+
+Sub-org (3-part ID):
+
+[source,hcl]
+----
+import {
+  to = anypoint_self_managed_gateway.imported
+  id = "<organization_id>/<environment_id>/<name>"
+}
+
+resource "anypoint_self_managed_gateway" "imported" {
+  organization_id = "<organization_id>"
+  name            = "<gateway_name>"
+  environment_id  = "<environment_id>"
+}
+----
+
+After adding the import block, run:
+
+[source,shell]
+----
+# Let Terraform generate the full resource configuration automatically:
+terraform plan -generate-config-out=generated.tf
+
+# Or apply the import directly if you have an existing resource block:
+terraform apply
+----
+
+==== Using the CLI (deprecated, Terraform < 1.5)
+
+[source,shell]
+----
+# Root org:
+terraform import anypoint_self_managed_gateway.imported <environment_id>/<name>
+
+# Sub-org:
+terraform import anypoint_self_managed_gateway.imported <organization_id>/<environment_id>/<name>
+----
+
+== `anypoint_self_managed_gateway` data source
+
+Use the `anypoint_self_managed_gateway` data source to read the full details of a single self-managed gateway by ID, including per-replica status.
+
+=== Example Usage
+
+[source,hcl]
+----
+data "anypoint_self_managed_gateway" "one" {
+  organization_id = var.organization_id
+  environment_id  = var.environment_id
+  id              = "8f2a1c34-5b6d-4e7f-90ab-cdef12345678"
+}
+
+output "connected_replica_ids" {
+  value = [for r in data.anypoint_self_managed_gateway.one.replica_details : r.id if r.status == "CONNECTED"]
+}
+----
+
+=== Required Arguments
+
+* `id` - The gateway ID.
+* `environment_id` - The environment ID.
+
+=== Optional Arguments
+
+* `organization_id` - The organization ID. If not specified, uses the organization from provider credentials.
+
+=== Read-Only Attributes
+
+* `name` - The name of the gateway.
+* `status` - The gateway status (`CONNECTED`, `DISCONNECTED`, or `DELETED`).
+* `last_update` - Timestamp of the last status update (RFC 3339).
+* `tags` - (List of String) Tags assigned to the gateway.
+* `versions` - (List of String) Runtime versions reported by the gateway's replicas. Empty until at least one replica reports in.
+* `replicas` - (List of Object) Coarse status-bucket summary across all replicas. See xref:nested-schema-for-replicas-singular[Nested Schema for `replicas`].
+* `replica_details` - (List of Object) Rich per-node replica detail. See xref:nested-schema-for-replica-details[Nested Schema for `replica_details`].
+
+[#nested-schema-for-replicas-singular]
+=== Nested Schema for `replicas`
+
+* `status` - The status bucket (for example, `CONNECTED`, `DISCONNECTED`).
+* `count` - The number of replicas in this status bucket.
+* `certificate_expiration_dates` - (List of String) Certificate expiration dates for replicas in this bucket.
+
+[#nested-schema-for-replica-details]
+=== Nested Schema for `replica_details`
+
+* `id` - The replica ID.
+* `node_id` - The node ID.
+* `name` - The replica name.
+* `target_id` - The deployment target ID.
+* `gateway_version` - The Flex Gateway version running on this replica.
+* `status` - The replica status.
+* `connected_at` - Timestamp when the replica last connected.
+* `disconnected_at` - Timestamp when the replica last disconnected.
+* `configuration_status` - The configuration deployment status on this replica.
+* `configuration_message` - A descriptive message about the configuration status.
+* `certificate_expiration_date` - The certificate expiration date for this replica.
+* `cid` - The cluster ID.
+* `provider` - The infrastructure provider.
+
+== `anypoint_self_managed_gateways` data source
+
+Use the `anypoint_self_managed_gateways` data source to list all self-managed gateways that have registered in an environment.
+
+[NOTE]
+====
+*Soft-deleted gateways:* Self-managed delete is a soft delete — deleted gateways remain as tombstones with `status = "DELETED"`. They're filtered out by default. Set `include_deleted = true` to include them, for example for auditing.
+====
+
+=== Example Usage
+
+[source,hcl]
+----
+data "anypoint_self_managed_gateways" "all" {
+  organization_id = var.organization_id
+  environment_id  = var.environment_id
+}
+
+output "connected_gateways" {
+  value = [for gw in data.anypoint_self_managed_gateways.all.gateways : gw.name if gw.status == "CONNECTED"]
+}
+----
+
+=== Required Arguments
+
+* `environment_id` - The environment ID.
+
+=== Optional Arguments
+
+* `organization_id` - The organization ID. If not specified, uses the organization from provider credentials.
+* `include_deleted` - (Boolean) Whether to include soft-deleted gateways (`status = "DELETED"`). Defaults to `false`.
+
+=== Read-Only Attributes
+
+* `id` - Composite identifier `<organization_id>/<environment_id>`.
+* `gateways` - (List of Object) The list of registered gateways. See xref:nested-schema-for-gateways-list[Nested Schema for `gateways`].
+
+[#nested-schema-for-gateways-list]
+=== Nested Schema for `gateways`
+
+* `id` - The gateway ID.
+* `name` - The name of the gateway.
+* `status` - The gateway status (`CONNECTED`, `DISCONNECTED`, or `DELETED`).
+* `last_update` - Timestamp of the last status update (RFC 3339).
+* `tags` - (List of String) Tags assigned to the gateway.
+* `replicas` - (List of Object) Coarse status-bucket summary. See xref:nested-schema-for-replicas-list[Nested Schema for `replicas`].
+
+[#nested-schema-for-replicas-list]
+=== Nested Schema for `replicas`
+
+* `status` - The status bucket.
+* `count` - The number of replicas in this status bucket.
+* `certificate_expiration_dates` - (List of String) Certificate expiration dates for replicas in this bucket.

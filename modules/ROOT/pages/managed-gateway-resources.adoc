@@ -1,19 +1,19 @@
 = Managed Omni Gateway Resources
 
-Use Managed Omni Gateway resources to manage gateway instances deployed in CloudHub 2.0 private spaces.
+Use Managed Omni Gateway resources to manage gateway instances and retrieve gateway details in Anypoint Platform.
 
 == `anypoint_managed_omni_gateway`
 
-Use the `anypoint_managed_omni_gateway` resource to manage a CloudHub 2.0 Managed Omni Gateway instance in Anypoint Platform.
-
-[NOTE]
-====
-*Supported gateway type:* This provider currently supports *MuleSoft Managed Omni Gateway* (CloudHub 2.0) only. Self-managed Omni Gateway will be supported in a future release.
-====
+Use the `anypoint_managed_omni_gateway` resource to manage a CloudHub 2.0 Managed Omni Gateway instance in Anypoint Platform. The gateway can be deployed to a dedicated private space or a shared space.
 
 [NOTE]
 ====
 *Connected App:* This resource requires a *standard connected app* (client credentials). An admin connected app isn't needed. The connected app must have relevant scopes.
+====
+
+[NOTE]
+====
+*Gateway name is immutable:* The gateway `name` can't be changed after creation. The provider raises a plan-time error if you attempt to rename it. To rename a gateway, replace the resource: `terraform apply -replace=<resource_address>`.
 ====
 
 [NOTE]
@@ -159,3 +159,122 @@ terraform import anypoint_managed_omni_gateway.imported <environment_id>/<gatewa
 # Sub-org:
 terraform import anypoint_managed_omni_gateway.imported <organization_id>/<environment_id>/<gateway_id>
 ----
+
+== `anypoint_managed_omni_gateway` data source
+
+Use the `anypoint_managed_omni_gateway` data source to read the full details of a single managed Omni Gateway instance by ID.
+
+=== Example Usage
+
+[source,hcl]
+----
+data "anypoint_managed_omni_gateway" "gw" {
+  id              = var.gateway_id
+  environment_id  = var.environment_id
+  organization_id = var.organization_id
+}
+
+output "gateway_public_url" {
+  value = data.anypoint_managed_omni_gateway.gw.ingress.public_url
+}
+----
+
+=== Required Arguments
+
+* `id` - The gateway ID.
+* `environment_id` - The environment ID where the gateway is deployed.
+
+=== Optional Arguments
+
+* `organization_id` - The organization ID. If not specified, uses the organization from provider credentials.
+
+=== Read-Only Attributes
+
+* `name` - The name of the gateway.
+* `target_id` - The ID of the deployment target (private or shared space).
+* `target_name` - The name of the deployment target.
+* `target_type` - The type of deployment target (for example, `private-space`).
+* `runtime_version` - The Omni Gateway runtime version.
+* `release_channel` - The release channel (`lts` or `edge`).
+* `size` - The gateway instance size (`small` or `large`).
+* `status` - The current status of the gateway (for example, `APPLYING`, `RUNNING`).
+* `desired_status` - The desired status of the gateway (for example, `STARTED`).
+* `status_message` - A descriptive status message.
+* `api_limit` - The maximum number of API instances this gateway can host.
+* `date_created` - Timestamp when the gateway was created.
+* `last_updated` - Timestamp when the gateway was last updated.
+* `ingress` - (Object) Ingress configuration. See xref:nested-schema-for-ingress-ds[Nested Schema for `ingress`].
+* `properties` - (Object) Runtime properties. See xref:nested-schema-for-properties-ds[Nested Schema for `properties`].
+* `logging` - (Object) Logging configuration. See xref:nested-schema-for-logging-ds[Nested Schema for `logging`].
+* `port_configuration` - (Object) Port configuration. See xref:nested-schema-for-port-configuration-ds[Nested Schema for `port_configuration`].
+
+[#nested-schema-for-ingress-ds]
+=== Nested Schema for `ingress`
+
+* `public_url` - The public URL for the gateway.
+* `internal_urls` - (List of String) Internal URLs for the gateway.
+* `forward_ssl_session` - Whether SSL session forwarding is enabled.
+* `last_mile_security` - Whether last-mile security is enabled.
+
+[#nested-schema-for-properties-ds]
+=== Nested Schema for `properties`
+
+* `upstream_response_timeout` - Timeout in seconds for upstream responses.
+* `connection_idle_timeout` - Timeout in seconds for idle connections.
+
+[#nested-schema-for-logging-ds]
+=== Nested Schema for `logging`
+
+* `level` - The log level.
+* `forward_logs` - Whether log forwarding is enabled.
+
+[#nested-schema-for-port-configuration-ds]
+=== Nested Schema for `port_configuration`
+
+* `ingress` - (Object) Ingress port configuration.
+** `port` - The port number.
+** `protocol` - The protocol (for example, `TCP`).
+* `egress` - (Object) Egress port configuration.
+** `port` - The port number.
+** `protocol` - The protocol (for example, `TCP`).
+
+== `anypoint_managed_omni_gateways` data source
+
+Use the `anypoint_managed_omni_gateways` data source to list all managed Omni Gateway instances in an environment.
+
+=== Example Usage
+
+[source,hcl]
+----
+data "anypoint_managed_omni_gateways" "all" {
+  organization_id = var.organization_id
+  environment_id  = var.environment_id
+}
+
+output "gateway_names" {
+  value = [for gw in data.anypoint_managed_omni_gateways.all.gateways : gw.name]
+}
+----
+
+=== Required Arguments
+
+* `environment_id` - The environment ID.
+
+=== Optional Arguments
+
+* `organization_id` - The organization ID. If not specified, uses the organization from provider credentials.
+
+=== Read-Only Attributes
+
+* `id` - Composite identifier `<organization_id>/<environment_id>`.
+* `gateways` - (List of Object) The list of managed Omni Gateway instances. See xref:nested-schema-for-gateways-plural[Nested Schema for `gateways`].
+
+[#nested-schema-for-gateways-plural]
+=== Nested Schema for `gateways`
+
+* `id` - The gateway ID.
+* `name` - The name of the gateway.
+* `target_id` - The ID of the deployment target.
+* `status` - The current status of the gateway (for example, `APPLYING`, `RUNNING`, `RUNNING`).
+* `date_created` - Timestamp when the gateway was created.
+* `last_updated` - Timestamp when the gateway was last updated.
