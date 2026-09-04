@@ -915,7 +915,8 @@ output "aws_transit_gateway_id" {
 
 * `id` - The unique identifier of the attachment.
 * `status` - The current status of the connection (for example, `Pending`, `Available`).
-* `aws_transit_gateway_id` - The AWS TGW ID discovered by the platform from the resource share. Populated after creation.
+* `aws_transit_gateway_id` - The AWS TGW ID (for example, `tgw-0af6a0a1b5ae060b1`) discovered by the platform from the resource share. Populated after creation.
+* `aws_console_url` - The AWS console URL for the transit gateway attachment. Use this to review or accept the attachment in the AWS Console.
 
 === Import
 
@@ -975,7 +976,8 @@ output "connection_region" {
 === Read-Only Attributes
 
 * `name` - The name of the connection.
-* `aws_transit_gateway_id` - The AWS TGW ID.
+* `aws_transit_gateway_id` - The AWS TGW ID (for example, `tgw-0af6a0a1b5ae060b1`).
+* `aws_console_url` - The AWS console URL for the transit gateway attachment.
 * `resource_share_id` - The AWS RAM resource share ID.
 * `resource_share_account` - The AWS account ID that owns the Transit Gateway.
 * `region` - The AWS region of the connection.

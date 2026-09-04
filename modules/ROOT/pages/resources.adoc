@@ -108,6 +108,7 @@ Data sources:
 
 * xref:mcp-resources.adoc#anypoint_mcp_bridge-data-source[`anypoint_mcp_bridge`]
 * xref:mcp-resources.adoc#anypoint_mcp_bridges-data-source[`anypoint_mcp_bridges`]
+* xref:mcp-resources.adoc#anypoint_mcp_tools-data-source[`anypoint_mcp_tools`]
 
 == API, MCP, and A2A Policy Resources
 

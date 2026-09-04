@@ -636,7 +636,7 @@ Use the `anypoint_team` resource to manage teams in Anypoint Platform, including
 
 [NOTE]
 ====
-*Connected App:* This resource requires a *standard connected app* (client credentials) with the appropriate org-level permissions. An admin connected app isn't needed.
+*Connected App:* Creating a team, managing members, reads, and import work with a standard `client_credentials` connected app. Assigning most permissions requires `auth_type = "user"` — only `Exchange Viewer`, `Exchange Administrator`, and `View Organization` work with client credentials; others return `403 Forbidden`.
 ====
 
 === Example Usage
@@ -660,7 +660,7 @@ resource "anypoint_team" "example" {
   team_type      = "internal"
   parent_team_id = local.root_team_id
 
-  roles = [
+  permissions = [
     {
       name = "Exchange Viewer"
       context_params = {
@@ -697,7 +697,7 @@ resource "anypoint_team" "sub_team" {
 * `parent_team_id` - The ID of the parent team. If omitted, the org's root team is used. Use the `anypoint_teams` data source to look up team IDs by name.
 * `team_type` - The type of team. Defaults to `internal`. Changing the type requires the target type to be enabled in the org.
 * `members` - (Attributes Set) Members of this team. When set, this list is authoritative: members not listed are removed on apply. Omit to leave membership unmanaged. Members assigned via external groups (SAML/SCIM) are never modified. See xref:nested-schema-for-members-team[Nested Schema for `members`].
-* `roles` - (Attributes Set) Roles (permissions) assigned to this team. When set, this list is authoritative: roles not listed are removed on apply. Omit to leave roles unmanaged. System (internal) assignments are never modified. See xref:nested-schema-for-roles-team[Nested Schema for `roles`].
+* `permissions` - (Attributes Set) Permissions assigned to this team. When set, this list is authoritative: permissions not listed are removed on apply. Omit to leave permissions unmanaged. System (internal) assignments are never modified. See xref:nested-schema-for-permissions-team[Nested Schema for `permissions`].
 
 === Read-Only Attributes
 
@@ -705,11 +705,11 @@ resource "anypoint_team" "sub_team" {
 * `created_at` - The timestamp when the team was created.
 * `updated_at` - The timestamp when the team was last updated.
 
-[#nested-schema-for-roles-team]
-=== Nested Schema for `roles`
+[#nested-schema-for-permissions-team]
+=== Nested Schema for `permissions`
 
-* `name` - (Required) The role display name (for example, `Exchange Viewer`). Case-insensitive. Use the `anypoint_available_permissions` data source to discover valid values.
-* `context_params` - (Map of String) Context parameters. Typically `org` and, for environment-scoped roles, `envId`.
+* `name` - (Required) The permission display name (for example, `Exchange Viewer`). Case-insensitive. Use the `anypoint_available_permissions` data source to discover valid values.
+* `context_params` - (Map of String) Context parameters. Typically `org` and, for environment-scoped permissions, `envId`.
 
 [#nested-schema-for-members-team]
 === Nested Schema for `members`
@@ -1026,7 +1026,7 @@ Use the `anypoint_team` data source to read the configuration of a single team b
 
 [NOTE]
 ====
-*Connected App:* This data source requires a *standard connected app* (client credentials) with the appropriate org-level permissions. An admin connected app isn't needed.
+*Connected App:* Reads work with a standard `client_credentials` connected app. The same permission restriction applies as for the resource: most permission assignments require `auth_type = "user"`.
 ====
 
 === Example Usage
@@ -1056,15 +1056,15 @@ output "team_members" {
 * `name` - The name of the team.
 * `parent_team_id` - The ID of the parent team. Null for the root team.
 * `team_type` - The type of team.
-* `roles` - (Attributes List) Roles assigned to this team. Excludes system/internal assignments. See xref:nested-schema-for-roles-team-ds[Nested Schema for `roles`].
+* `permissions` - (Attributes List) Permissions assigned to this team. Excludes system/internal assignments. See xref:nested-schema-for-permissions-team-ds[Nested Schema for `permissions`].
 * `members` - (Attributes List) Members of this team. See xref:nested-schema-for-members-team-ds[Nested Schema for `members`].
 * `created_at` - Timestamp when the team was created.
 * `updated_at` - Timestamp when the team was last updated.
 
-[#nested-schema-for-roles-team-ds]
-=== Nested Schema for `roles`
+[#nested-schema-for-permissions-team-ds]
+=== Nested Schema for `permissions`
 
-* `name` - The role display name.
+* `name` - The permission display name.
 * `context_params` - (Map of String) Context parameters.
 
 [#nested-schema-for-members-team-ds]

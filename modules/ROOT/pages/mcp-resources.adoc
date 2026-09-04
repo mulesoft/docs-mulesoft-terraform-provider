@@ -429,7 +429,7 @@ Use the `anypoint_mcp_bridge` resource to create and manage an MCP bridge in Any
 
 [NOTE]
 ====
-*ForceNew fields:* `environment_id`, `gateway_id`, `mcp_asset_name`, `port`, and `base_path` can't be changed after creation. Structural changes to `source_apis` (adding or removing source APIs, or changing `label`, `upstream_uri`, `asset_id`, `group_id`, or `version`) also require replacement. Use `terraform apply -replace=<resource_address>` to recreate the resource. Tool-level changes within a source API (adding, removing, or editing tools) are applied in place and bump the generated Exchange asset version.
+*ForceNew fields:* `environment_id`, `gateway_id`, `mcp_asset_name`, `port`, and `base_path` can't be changed after creation. Structural changes to `source_apis` (adding or removing source APIs, or changing `label`, `upstream_uri`, `asset_id`, `group_id`, `version`, or `tls_context_id`) also require replacement. Use `terraform apply -replace=<resource_address>` to recreate the resource. Tool-level changes within a source API (adding, removing, or editing tools) are applied in place and bump the generated Exchange asset version.
 ====
 
 === Example Usage
@@ -485,6 +485,10 @@ resource "anypoint_mcp_bridge" "example" {
 * `organization_id` - Organization ID. If not provided, the organization ID is inferred from connected app credentials.
 * `port` - (Number) Listener port. Defaults to `8081`. Changing this value forces a new resource.
 * `base_path` - Base path for the MCP server endpoint. Changing this value forces a new resource.
+* `instance_label` - A label for this bridge instance shown in API Manager. Applied in place.
+* `approval_method` - Client access approval method. Set to `manual` to hold client access requests for review before granting access. Applied in place.
+* `consumer_endpoint` - The public URL clients use to reach the bridge (shown as "Consumer Endpoint" in API Manager). Not derived automatically — a bridge created without this attribute shows an empty consumer endpoint in API Manager. Applied in place.
+* `provider_id` - The external client provider ID for application authentication. Omit to use Anypoint's built-in client provider. Applied in place.
 
 === Read-Only Attributes
 
@@ -507,6 +511,7 @@ resource "anypoint_mcp_bridge" "example" {
 * `version` - (Required) The Exchange asset version of the source REST API.
 * `tools` - (Required, Attributes List) The MCP tools to expose from this source API. See xref:nested-schema-for-tools[Nested Schema for `tools`].
 * `group_id` - The group ID of the source Exchange asset. Defaults to `organization_id`.
+* `tls_context_id` - TLS context to use when the backend is HTTPS and the gateway must trust its certificate. Format: `secretGroupId/tlsContextId` (same format as `anypoint_mcp_server`). Changing this value forces replacement.
 
 [#nested-schema-for-tools]
 === Nested Schema for `source_apis.tools`
@@ -518,6 +523,22 @@ resource "anypoint_mcp_bridge" "example" {
 * `query_params` - (List of String) Query parameter names to expose as tool inputs.
 * `header_params` - (List of String) Header parameter names to expose as tool inputs.
 * `has_body` - Whether the tool accepts a request body. Defaults to `false`. When `true`, adds a required `body` input to the tool.
+* `input_schema` - (String) A JSON Schema object that replaces the derived input schema for this tool. Use `jsonencode({...})` to pass the schema inline. Without this attribute every property defaults to type `string` — set it when you need real types, enums, or constraints on tool inputs. Updating this value republishes the generated Exchange asset and bumps `asset_version`.
+* `http_mapping` - (Block) Overrides how tool inputs map to the upstream HTTP request. Omit to use the derived mapping. Each field is independent — omitting one leaves that part derived. Updating this value re-syncs the transcoding policy only and doesn't bump `asset_version`. See xref:nested-schema-for-http-mapping[Nested Schema for `http_mapping`].
+
+[#nested-schema-for-http-mapping]
+=== Nested Schema for `source_apis.tools.http_mapping`
+
+* `query_params` - (Block List) Query parameter mappings. See xref:nested-schema-for-http-mapping-params[Nested Schema for param mappings].
+* `uri_params` - (Block List) URI parameter mappings.
+* `headers` - (Block List) Header mappings.
+* `body` - (String) Body mapping expression.
+
+[#nested-schema-for-http-mapping-params]
+=== Nested Schema for `http_mapping` param entries
+
+* `key` - (Required) The upstream parameter name.
+* `value` - (Required) The tool input name or expression to map to this parameter.
 
 [#nested-schema-for-deployment]
 === Nested Schema for `deployment`
@@ -696,3 +717,64 @@ output "bridge_ids" {
 * `status` - The current status.
 * `endpoint_uri` - The public endpoint URI. May be null for self-managed Flex Gateway bridges — use `proxy_uri` in that case.
 * `proxy_uri` - The proxy URI. Fetched per bridge; null if the per-bridge fetch fails.
+
+== `anypoint_mcp_tools` data source
+
+Use the `anypoint_mcp_tools` data source to read a source REST API's Exchange spec and generate the tool list automatically. Use the output to populate `source_apis[].tools` in an `anypoint_mcp_bridge` resource without hand-writing each tool entry.
+
+=== Example Usage
+
+[source,hcl]
+----
+data "anypoint_mcp_tools" "petstore" {
+  organization_id = var.organization_id
+  group_id        = var.organization_id
+  asset_id        = "petstore-rest-api"
+  version         = "1.0.0"
+}
+
+resource "anypoint_mcp_bridge" "example" {
+  organization_id = var.organization_id
+  environment_id  = var.environment_id
+  gateway_id      = var.gateway_id
+  mcp_asset_name  = "petstore-mcp-bridge"
+
+  source_apis = [
+    {
+      label        = "petstore-api"
+      upstream_uri = "https://sandbox.example.com/petstore/v1"
+      asset_id     = "petstore-rest-api"
+      version      = "1.0.0"
+      tools        = data.anypoint_mcp_tools.petstore.tools
+    },
+  ]
+}
+----
+
+=== Required Arguments
+
+* `organization_id` - The organization ID.
+* `group_id` - The group ID of the Exchange asset (usually the same as `organization_id`).
+* `asset_id` - The Exchange asset ID of the source REST API.
+* `version` - The Exchange asset version.
+
+=== Optional Arguments
+
+* `exclude_methods` - (List of String) HTTP methods to exclude from the generated tool list (for example, `["DELETE", "PATCH"]`).
+* `exclude_tool_names` - (List of String) Tool names to exclude from the generated tool list.
+
+=== Read-Only Attributes
+
+* `tools` - (List of Object) The generated tool list. Use this directly as `source_apis[].tools` in `anypoint_mcp_bridge`. See xref:nested-schema-for-mcp-tools[Nested Schema for `tools`].
+* `spec_type` - The detected spec type of the Exchange asset (for example, `oas`, `raml`).
+
+[#nested-schema-for-mcp-tools]
+=== Nested Schema for `tools`
+
+* `method` - The HTTP method.
+* `path` - The API path.
+* `name` - The generated tool name.
+* `description` - The tool description derived from the spec.
+* `query_params` - (List of String) Query parameter names.
+* `header_params` - (List of String) Header parameter names.
+* `has_body` - Whether the operation accepts a request body.
