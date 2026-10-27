@@ -21,13 +21,16 @@ The control plane includes resources such as:
 * API Manager
 * Access Management
 * Secrets Manager
-* MCP server and AI agent resources
+* Anypoint Exchange
+* MCP server, MCP bridge, and AI agent resources
 * Policies and governance configuration
 
 The runtime plane includes deployment and infrastructure resources such as:
 
 * CloudHub 2.0 private spaces
-* Managed Omni Gateway resources
+* Transit gateway connections
+* Managed Omni Gateway instances
+* Self-Managed Flex Gateway registrations
 * Network configuration
 * VPN connections
 * TLS contexts
@@ -51,12 +54,14 @@ The provider supports multiple resource types across the MuleSoft Platform.
 Supported resources include:
 
 * API Manager resources
-* MCP server resources
+* MCP server and MCP bridge resources
 * AI agent resources
 * API, MCP, and A2A policies
-* CloudHub 2.0 infrastructure resources
-* Access Management resources
+* CloudHub 2.0 infrastructure resources, including transit gateway connections
+* Managed and self-managed gateway resources
+* Access Management resources, including roles, connected apps, and teams
 * Secrets Manager resources
+* Anypoint Exchange assets
 
 These resources can be managed together as part of a unified Terraform workflow.
 
