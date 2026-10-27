@@ -2,7 +2,7 @@
 
 Use Self-Managed Gateway resources to manage registration tokens and retrieve status information for self-managed (connected-mode) Flex Gateway instances running on your own infrastructure.
 
-When you create a `anypoint_self_managed_gateway` resource, the platform mints a registration token. You then use that token to register your Flex Gateway runtime (running on Docker, Linux, or Kubernetes) with the Anypoint control plane. Terraform doesn't provision the runtime itself — it only manages the registration record on the platform side.
+When you create a `anypoint_self_managed_gateway` resource, the platform mints a registration token. You then use that token to register your Flex Gateway runtime (running on Docker, Linux, or Kubernetes) with the Anypoint control plane. Terraform doesn't provision the runtime itself, it only manages the registration record on the platform side.
 
 == `anypoint_self_managed_gateway`
 
@@ -15,7 +15,7 @@ Use the `anypoint_self_managed_gateway` resource to create a self-managed gatewa
 
 [NOTE]
 ====
-*Registration token:* The `registration_token` attribute is a short-lived, one-shot enrollment secret minted at creation time. It's not recoverable after import — importing an existing gateway sets `registration_token` to null in state. This doesn't affect a gateway that's already registered.
+*Registration token:* The `registration_token` attribute is a short-lived, one-shot enrollment secret minted at creation time. It's not recoverable after import, importing an existing gateway sets `registration_token` to null in state. This doesn't affect a gateway that's already registered.
 ====
 
 [NOTE]
@@ -69,7 +69,7 @@ docker run --entrypoint flexctl -u $UID \
 * `status` - The status of the registered gateway (for example, `CONNECTED`, `DISCONNECTED`). Empty until the runtime registers.
 * `last_update` - Timestamp of the last status update (RFC 3339). Empty until the runtime registers.
 
-=== Import
+=== Import an Existing Self-Managed Gateway Registration
 
 An existing self-managed gateway registration can be imported using a composite ID. Use the 2-part form for root-org gateways and the 3-part form for Business Groups.
 
@@ -78,7 +78,7 @@ An existing self-managed gateway registration can be imported using a composite 
 `registration_token` is a one-shot secret and isn't recoverable on import. Importing an existing gateway sets `registration_token` to null in state. This doesn't affect a gateway that's already registered.
 ====
 
-==== Using an import block (Terraform ≥ 1.5 — recommended)
+==== Using an Import Block (Terraform ≥ 1.5 — Recommended)
 
 Root org (2-part ID):
 
@@ -122,7 +122,7 @@ terraform plan -generate-config-out=generated.tf
 terraform apply
 ----
 
-==== Using the CLI (deprecated, Terraform < 1.5)
+==== Using the CLI (Deprecated, Terraform < 1.5)
 
 [source,shell]
 ----
@@ -133,7 +133,7 @@ terraform import anypoint_self_managed_gateway.imported <environment_id>/<name>
 terraform import anypoint_self_managed_gateway.imported <organization_id>/<environment_id>/<name>
 ----
 
-== `anypoint_self_managed_gateway` data source
+== `anypoint_self_managed_gateway` Data Source
 
 Use the `anypoint_self_managed_gateway` data source to read the full details of a single self-managed gateway by ID, including per-replica status.
 
@@ -195,13 +195,13 @@ output "connected_replica_ids" {
 * `cid` - The cluster ID.
 * `provider` - The infrastructure provider.
 
-== `anypoint_self_managed_gateways` data source
+== `anypoint_self_managed_gateways` Data Source
 
 Use the `anypoint_self_managed_gateways` data source to list all self-managed gateways that have registered in an environment.
 
 [NOTE]
 ====
-*Soft-deleted gateways:* Self-managed delete is a soft delete — deleted gateways remain as tombstones with `status = "DELETED"`. They're filtered out by default. Set `include_deleted = true` to include them, for example for auditing.
+*Soft-deleted gateways:* Self-managed delete is a soft delete. Deleted gateways remain as tombstones with `status = "DELETED"`. They're filtered out by default. Set `include_deleted = true` to include them, for example for auditing.
 ====
 
 === Example Usage
