@@ -28,7 +28,7 @@ Use the `anypoint_exchange_asset` resource to publish and manage an Anypoint Exc
 
 === Example Usage
 
-==== REST API with spec file, docs, and external instances
+==== REST API with Spec File, Docs, and External Instances
 
 [source,hcl]
 ----
@@ -70,7 +70,7 @@ resource "anypoint_exchange_asset" "rest_api" {
 }
 ----
 
-==== Policy asset with two files
+==== Policy Asset with Two Files
 
 [source,hcl]
 ----
@@ -98,7 +98,7 @@ resource "anypoint_exchange_asset" "policy" {
 Exchange normalizes policy and connector assets into the `extension` super-type on publish. Declaring `type = "policy"` succeeds on create but causes a Terraform inconsistency error on the subsequent state read (`type` was `"policy"`, but is now `"extension"`). Use `type = "extension"` and `classifier = "mule-plugin"` for policy and connector assets.
 ====
 
-==== MCP asset
+==== MCP Asset
 
 [source,hcl]
 ----
@@ -122,8 +122,8 @@ resource "anypoint_exchange_asset" "mcp_asset" {
 
 === Optional Arguments
 
-* `type` - The Exchange asset type. Valid values: `rest-api`, `http-api`, `evented-api`, `graphql-api`, `grpc-api`, `soap-api`, `extension`, `connector`, `app`, `template`, `example`, `policy`, `ruleset`, `agent`, `llm`, `mcp`, `custom`. Immutable after creation. Use `extension` with `classifier = "mule-plugin"` for policy and connector assets — Exchange normalizes these to `extension` on publish regardless of the declared type.
-* `status` - The lifecycle status of the asset. Valid values: `development`, `published` (default), `deprecated`. `development` is only valid at the first publish of a version. To move from `published` back to `development`, bump the version. Mutability of `status` after publish is not fully confirmed — treat it as effectively immutable until verified.
+* `type` - The Exchange asset type. Valid values: `rest-api`, `http-api`, `evented-api`, `graphql-api`, `grpc-api`, `soap-api`, `extension`, `connector`, `app`, `template`, `example`, `policy`, `ruleset`, `agent`, `llm`, `mcp`, `custom`. Immutable after creation. Use `extension` with `classifier = "mule-plugin"` for policy and connector assets. Exchange normalizes these to `extension` on publish regardless of the declared type.
+* `status` - The lifecycle status of the asset. Valid values: `development`, `published` (default), `deprecated`. `development` is only valid at the first publish of a version. To move from `published` back to `development`, bump the version. Mutability of `status` after publish isn't fully confirmed. Treat it as effectively immutable until verified.
 * `description` - A description of the asset. Group-scoped (shared across all versions).
 * `keywords` - Comma-separated keywords for discoverability.
 * `contact_name` - Contact name for the asset. Group-scoped.
@@ -190,13 +190,13 @@ Pages are ordered by creation time. Reordering requires recreating the resource.
 * `key` - (Required) The custom field key.
 * `values` - (Required, List of String) The custom field values.
 
-=== Import
+=== Import an Existing Exchange Asset
 
 An existing Exchange asset version can be imported using a composite `<group_id>/<asset_id>/<version>` ID. `group_id` is usually the same as the organization ID.
 
 On import, the provider seeds immutable fields (`classifier`, `main_file`, `api_version`) and external instances from the platform. The first plan after import shows zero drift. `file_path` settles on the next apply without recreating the asset.
 
-==== Using an import block (Terraform ≥ 1.5 — recommended)
+==== Using an Import Block (Terraform ≥ 1.5 — Recommended)
 
 [source,hcl]
 ----
@@ -225,14 +225,14 @@ terraform plan -generate-config-out=generated.tf
 terraform apply
 ----
 
-==== Using the CLI (deprecated, Terraform < 1.5)
+==== Using the CLI (Deprecated, Terraform < 1.5)
 
 [source,shell]
 ----
 terraform import anypoint_exchange_asset.imported <group_id>/<asset_id>/<version>
 ----
 
-== `anypoint_exchange_asset` data source
+== `anypoint_exchange_asset` Data Source
 
 Use the `anypoint_exchange_asset` data source to read the full details of a specific Exchange asset version by GAV (group, asset, version).
 
@@ -280,7 +280,7 @@ output "page_names" {
 * `created_date` - Timestamp when the asset was created.
 * `updated_date` - Timestamp when the asset was last updated.
 
-== `anypoint_exchange_assets` data source
+== `anypoint_exchange_assets` Data Source
 
 Use the `anypoint_exchange_assets` data source to list Exchange assets in an org, optionally filtered by type or search terms.
 
@@ -306,7 +306,7 @@ output "asset_ids" {
 
 === Optional Arguments
 
-* `type` - Filter by asset type. Valid values: `rest-api`, `http-api`, `evented-api`, `graphql-api`, `custom`, `connector`, `app`, `template`, `example`, `policy`, `agent`, `llm`, `mcp`.
+* `type` - Filter by asset type. Valid values: `rest-api`, `http-api`, `evented-api`, `graphql-api`, `custom`, `connector`, `app`, `template`, `example`, `policy`, `agent`, `llm`, and `mcp`.
 * `search` - Free-text search against asset name and description.
 * `limit` - Maximum number of assets to return. If omitted, all assets are returned with automatic pagination.
 

@@ -73,11 +73,11 @@ resource "anypoint_connected_app" "user_behalf" {
 * `organization_id` - The organization ID. If not specified, uses the organization from provider credentials.
 * `public_keys` - (List of String) Public keys for the JWT Bearer grant type.
 * `redirect_uris` - (List of String) OAuth redirect URIs. Required for user-behalf apps to be editable in the Anypoint UI.
-* `scopes` - (Attributes Set) Scopes assigned to the app. When set, this list is authoritative: scopes assigned outside of Terraform are removed on the next apply. Omit to leave scopes unmanaged. Supplying `= []` removes all user-assigned scopes. See xref:nested-schema-for-scopes-connected-app[Nested Schema for `scopes`].
+* `scopes` - (Attributes Set) Scopes assigned to the app. When set, this list is authoritative. Scopes assigned outside of Terraform are removed on the next apply. Omit to leave scopes unmanaged. Supplying `= []` removes all user-assigned scopes. See xref:nested-schema-for-scopes-connected-app[Nested Schema for `scopes`].
 
 [NOTE]
 ====
-The platform automatically assigns an undeletable `profile` scope to every connected app. It doesn't appear in this set and must not be listed. The provider ignores it so that a plan run right after an apply reports no changes.
+The platform automatically assigns an undeletable profile scope to every connected app. It doesn't appear in this set and must not be listed. The provider ignores it so that a plan run right after an apply reports no changes.
 ====
 
 === Read-Only Attributes
@@ -94,13 +94,13 @@ The platform automatically assigns an undeletable `profile` scope to every conne
 * `scope` - (Required) The scope display name as shown in the Anypoint UI (for example, `Read Applications`, `Exchange Viewer`). Use the `anypoint_available_scopes` data source to discover valid values. Scope identifiers (for example, `read:applications`) are also accepted.
 * `context_params` - (Map of String) Context parameters. For `client_credentials` apps, `org` is required on every scope; add `envId` for environment-scoped scopes. User-behalf apps ignore `context_params`. Missing `org` on a `client_credentials` scope causes a `400` error at apply time and can leave the app in an inconsistent state with credentials outside Terraform state.
 
-=== Import
+=== Import a Connected App
 
 An existing connected app can be imported using its `client_id`, or a composite `{org_id}:{client_id}`.
 
 [NOTE]
 ====
-`client_secret` is not available after import (only returned on creation).
+`client_secret` isn't available after import (only returned on creation).
 ====
 
 ==== Using an import block (Terraform ≥ 1.5 — recommended)
@@ -570,10 +570,10 @@ resource "anypoint_role" "example" {
 
 === Optional Arguments
 
-* `description` - A description of the role group. Optional and computed: if you omit it, the server-resolved value is retained and won't be wiped when you change other fields.
-* `organization_id` - The organization ID where the role group will be created. If not specified, uses the organization from provider credentials.
-* `permissions` - (Attributes Set) The set of permissions granted by this role group. When set, this list is authoritative: permissions not listed here are removed on apply. Omit to leave permissions unmanaged. Supplying `= []` declares no managed permissions and removes any that exist. System (internal) assignments are never modified. See xref:nested-schema-for-permissions-role[Nested Schema for `permissions`].
-* `members` - (Set of String) The set of usernames that are members of this role group. When set, this list is authoritative: members not listed here are removed on apply. Omit to leave membership unmanaged. Usernames are case-insensitive. Use the `anypoint_users` data source to discover usernames.
+* `description` - A description of the role group. Optional and computed. If you omit it, the server-resolved value is retained and won't be wiped when you change other fields.
+* `organization_id` - The organization ID where the role group is created. If not specified, uses the organization from provider credentials.
+* `permissions` - (Attributes Set) The set of permissions granted by this role group. When set, this list is authoritative. Permissions not listed here are removed on apply. Omit to leave permissions unmanaged. Supplying `= []` declares no managed permissions and removes any that exist. System (internal) assignments are never modified. See xref:nested-schema-for-permissions-role[Nested Schema for `permissions`].
+* `members` - (Set of String) The set of usernames that are members of this role group. When set, this list is authoritative. Members not listed here are removed on apply. Omit to leave membership unmanaged. Usernames are case-insensitive. Use the `anypoint_users` data source to discover usernames.
 
 [NOTE]
 ====
@@ -594,11 +594,11 @@ Platform side-effect grants (for example, the auto-added org-scoped "Business Gr
 * `name` - (Required) The permission display name as shown in the Anypoint UI (for example, `Exchange Viewer`). Case-insensitive. Use the `anypoint_available_permissions` data source to discover valid values.
 * `context_params` - (Map of String) Context parameters. Typically `org` (organization ID) and, for environment-scoped permissions, `envId`.
 
-=== Import
+=== Import a Role Group
 
 An existing role group can be imported using the role group ID (UUID).
 
-==== Using an import block (Terraform ≥ 1.5 — recommended)
+==== Using an Import Block (Terraform ≥ 1.5 — Recommended)
 
 [source,hcl]
 ----
@@ -696,8 +696,8 @@ resource "anypoint_team" "sub_team" {
 * `organization_id` - Organization ID where the team will be created. If not provided, the organization ID is inferred from connected app credentials.
 * `parent_team_id` - The ID of the parent team. If omitted, the org's root team is used. Use the `anypoint_teams` data source to look up team IDs by name.
 * `team_type` - The type of team. Defaults to `internal`. Changing the type requires the target type to be enabled in the org.
-* `members` - (Attributes Set) Members of this team. When set, this list is authoritative: members not listed are removed on apply. Omit to leave membership unmanaged. Members assigned via external groups (SAML/SCIM) are never modified. See xref:nested-schema-for-members-team[Nested Schema for `members`].
-* `permissions` - (Attributes Set) Permissions assigned to this team. When set, this list is authoritative: permissions not listed are removed on apply. Omit to leave permissions unmanaged. System (internal) assignments are never modified. See xref:nested-schema-for-permissions-team[Nested Schema for `permissions`].
+* `members` - (Attributes Set) Members of this team. When set, this list is authoritative. Members not listed are removed on apply. Omit to leave membership unmanaged. Members assigned via external groups (SAML/SCIM) are never modified. See xref:nested-schema-for-members-team[Nested Schema for `members`].
+* `permissions` - (Attributes Set) Permissions assigned to this team. When set, this list is authoritative. Permissions not listed are removed on apply. Omit to leave permissions unmanaged. System (internal) assignments are never modified. See xref:nested-schema-for-permissions-team[Nested Schema for `permissions`].
 
 === Read-Only Attributes
 
@@ -755,7 +755,7 @@ terraform apply
 terraform import anypoint_team.imported <team_id>
 ----
 
-== `anypoint_available_permissions` data source
+== `anypoint_available_permissions` Data Source
 
 Use the `anypoint_available_permissions` data source to list all permissions that can be assigned to role groups and teams.
 
@@ -794,7 +794,7 @@ output "all_permission_names" {
 * `name` - The permission display name. Use this value in `anypoint_role` `permissions[].name` and `anypoint_team` `roles[].name`.
 * `description` - A description of the permission.
 
-== `anypoint_available_scopes` data source
+== `anypoint_available_scopes` Data Source
 
 Use the `anypoint_available_scopes` data source to list all scopes available for connected apps.
 
@@ -836,7 +836,7 @@ output "scope_display_names" {
 * `product_label` - The product label for the scope.
 * `internal` - Whether this is an internal scope. Only visible when `include_internal = true`.
 
-== `anypoint_connected_app` data source
+== `anypoint_connected_app` Data Source
 
 Use the `anypoint_connected_app` data source to read the configuration of a single connected app by ID.
 
@@ -930,7 +930,7 @@ output "enabled_apps" {
 * `created_at` - Timestamp when the app was created.
 * `updated_at` - Timestamp when the app was last updated.
 
-== `anypoint_role` data source
+== `anypoint_role` Data Source
 
 Use the `anypoint_role` data source to read the configuration of a single role group by ID.
 
@@ -981,7 +981,7 @@ output "role_members" {
 * `name` - The permission display name.
 * `context_params` - (Map of String) Context parameters.
 
-== `anypoint_roles` data source
+== `anypoint_roles` Data Source
 
 Use the `anypoint_roles` data source to list all role groups in an org.
 
@@ -1020,13 +1020,13 @@ output "admin_role" {
 * `created_at` - Timestamp when the role group was created.
 * `updated_at` - Timestamp when the role group was last updated.
 
-== `anypoint_team` data source
+== `anypoint_team` Data Source
 
 Use the `anypoint_team` data source to read the configuration of a single team by ID.
 
 [NOTE]
 ====
-*Connected App:* Reads work with a standard `client_credentials` connected app. The same permission restriction applies as for the resource: most permission assignments require `auth_type = "user"`.
+*Connected App:* Reads work with a standard `client_credentials` connected app. The same permission restriction applies as for the resource. Most permission assignments require `auth_type = "user"`.
 ====
 
 === Example Usage
@@ -1074,7 +1074,7 @@ output "team_members" {
 * `membership_type` - The membership type (`member` or `maintainer`).
 * `is_assigned_via_external_groups` - Whether this member was assigned via an external group (SAML/SCIM).
 
-== `anypoint_teams` data source
+== `anypoint_teams` Data Source
 
 Use the `anypoint_teams` data source to list all teams in an org, or filter by name.
 
@@ -1122,7 +1122,7 @@ resource "anypoint_team" "sub_team" {
 * `created_at` - Timestamp when the team was created.
 * `updated_at` - Timestamp when the team was last updated.
 
-== `anypoint_users` data source
+== `anypoint_users` Data Source
 
 Use the `anypoint_users` data source to list users in an org. Use it to discover usernames for the `members` attribute on `anypoint_role` and `anypoint_team`.
 

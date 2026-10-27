@@ -918,11 +918,11 @@ output "aws_transit_gateway_id" {
 * `aws_transit_gateway_id` - The AWS TGW ID (for example, `tgw-0af6a0a1b5ae060b1`) discovered by the platform from the resource share. Populated after creation.
 * `aws_console_url` - The AWS console URL for the transit gateway attachment. Use this to review or accept the attachment in the AWS Console.
 
-=== Import
+=== Import a Transit Gateway Connection
 
 An existing transit gateway connection can be imported using a composite ID.
 
-==== Using an import block (Terraform ≥ 1.5 — recommended)
+==== Using an Import Block (Terraform ≥ 1.5 — Recommended)
 
 [source,hcl]
 ----
@@ -941,14 +941,14 @@ resource "anypoint_transit_gateway_connection" "imported" {
 }
 ----
 
-==== Using the CLI (deprecated, Terraform < 1.5)
+==== Using the CLI (Deprecated, Terraform < 1.5)
 
 [source,shell]
 ----
 terraform import anypoint_transit_gateway_connection.imported <organization_id>/<private_space_id>/<transit_gateway_id>
 ----
 
-== `anypoint_transit_gateway_connection` data source
+== `anypoint_transit_gateway_connection` Data Source
 
 Use the `anypoint_transit_gateway_connection` data source to read the details of a single Transit Gateway connection by ID.
 
@@ -985,7 +985,7 @@ output "connection_region" {
 * `attachment` - The current attachment status.
 * `routes` - (List of String) The configured CIDR routes.
 
-== `anypoint_transit_gateway_connections` data source
+== `anypoint_transit_gateway_connections` Data Source
 
 Use the `anypoint_transit_gateway_connections` data source to list all transit gateway connections in a CloudHub 2.0 private space.
 
@@ -1020,7 +1020,7 @@ output "transit_gateway_connection_names" {
 * `routes` - (List of Object) The configured routes.
 ** `cidr` - The CIDR block of the route.
 
-== `anypoint_private_spaces` data source
+== `anypoint_private_spaces` Data Source
 
 Use the `anypoint_private_spaces` data source to list all private spaces in an org. Use it to discover `private_space_id` for use in `anypoint_transit_gateway_connection`, `anypoint_vpn_connection`, and other resources.
 

@@ -13,7 +13,7 @@ Use the `anypoint_managed_omni_gateway` resource to manage a CloudHub 2.0 Manage
 
 [NOTE]
 ====
-*Gateway name is immutable:* The gateway `name` can't be changed after creation. The provider raises a plan-time error if you attempt to rename it. To rename a gateway, replace the resource: `terraform apply -replace=<resource_address>`.
+*Gateway name is immutable:* The gateway `name` can't be changed after creation. The provider raises a plan-time error if you attempt to rename it. To rename a gateway, replace the `terraform apply -replace=<resource_address>` resource.
 ====
 
 [NOTE]
@@ -160,7 +160,7 @@ terraform import anypoint_managed_omni_gateway.imported <environment_id>/<gatewa
 terraform import anypoint_managed_omni_gateway.imported <organization_id>/<environment_id>/<gateway_id>
 ----
 
-== `anypoint_managed_omni_gateway` data source
+== `anypoint_managed_omni_gateway` Data Source
 
 Use the `anypoint_managed_omni_gateway` data source to read the full details of a single managed Omni Gateway instance by ID.
 
@@ -238,7 +238,7 @@ output "gateway_public_url" {
 ** `port` - The port number.
 ** `protocol` - The protocol (for example, `TCP`).
 
-== `anypoint_managed_omni_gateways` data source
+== `anypoint_managed_omni_gateways` Data Source
 
 Use the `anypoint_managed_omni_gateways` data source to list all managed Omni Gateway instances in an environment.
 

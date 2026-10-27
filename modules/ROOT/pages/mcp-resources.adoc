@@ -487,7 +487,7 @@ resource "anypoint_mcp_bridge" "example" {
 * `base_path` - Base path for the MCP server endpoint. Changing this value forces a new resource.
 * `instance_label` - A label for this bridge instance shown in API Manager. Applied in place.
 * `approval_method` - Client access approval method. Set to `manual` to hold client access requests for review before granting access. Applied in place.
-* `consumer_endpoint` - The public URL clients use to reach the bridge (shown as "Consumer Endpoint" in API Manager). Not derived automatically — a bridge created without this attribute shows an empty consumer endpoint in API Manager. Applied in place.
+* `consumer_endpoint` - The public URL clients use to reach the bridge (shown as "Consumer Endpoint" in API Manager). Not derived automatically. A bridge created without this attribute shows an empty consumer endpoint in API Manager. Applied in place.
 * `provider_id` - The external client provider ID for application authentication. Omit to use Anypoint's built-in client provider. Applied in place.
 
 === Read-Only Attributes
@@ -496,7 +496,7 @@ resource "anypoint_mcp_bridge" "example" {
 * `asset_id` - The generated Exchange asset ID.
 * `asset_version` - The current version of the generated Exchange asset. Starts at `1.0.0` and bumps on each tool-level update.
 * `product_version` - The product version of the bridge.
-* `consumer_endpoint` - The public consumer endpoint. May be null for self-managed Flex Gateway bridges — use `proxy_uri` in that case.
+* `consumer_endpoint` - The public consumer endpoint. May be null for self-managed Flex Gateway bridges. Use `proxy_uri` in that case.
 * `proxy_uri` - The proxy URI (`http://0.0.0.0:<port>/<base_path>`).
 * `status` - The current status of the bridge.
 * `technology` - Always `flexGateway`.
@@ -516,15 +516,15 @@ resource "anypoint_mcp_bridge" "example" {
 [#nested-schema-for-tools]
 === Nested Schema for `source_apis.tools`
 
-* `method` - (Required) The HTTP method. Valid values: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`.
+* `method` - (Required) The HTTP method. Valid values: `GET`, `POST`, `PUT`, `PATCH`, and `DELETE`.
 * `path` - (Required) The API path (for example, `/pets/{petId}`). Must start with `/`. Path parameters become required tool inputs.
 * `name` - The tool name. Defaults to `<method>_<slugified_path>`.
 * `description` - A description of the tool shown to the AI agent.
 * `query_params` - (List of String) Query parameter names to expose as tool inputs.
 * `header_params` - (List of String) Header parameter names to expose as tool inputs.
 * `has_body` - Whether the tool accepts a request body. Defaults to `false`. When `true`, adds a required `body` input to the tool.
-* `input_schema` - (String) A JSON Schema object that replaces the derived input schema for this tool. Use `jsonencode({...})` to pass the schema inline. Without this attribute every property defaults to type `string` — set it when you need real types, enums, or constraints on tool inputs. Updating this value republishes the generated Exchange asset and bumps `asset_version`.
-* `http_mapping` - (Block) Overrides how tool inputs map to the upstream HTTP request. Omit to use the derived mapping. Each field is independent — omitting one leaves that part derived. Updating this value re-syncs the transcoding policy only and doesn't bump `asset_version`. See xref:nested-schema-for-http-mapping[Nested Schema for `http_mapping`].
+* `input_schema` - (String) A JSON Schema object that replaces the derived input schema for this tool. Use `jsonencode({...})` to pass the schema inline. Without this attribute every property defaults to type `string`. Set it when you need real types, enums, or constraints on tool inputs. Updating this value republishes the generated Exchange asset and bumps `asset_version`.
+* `http_mapping` - (Block) Overrides how tool inputs map to the upstream HTTP request. Omit to use the derived mapping. Each field is independent, omitting one leaves that part derived. Updating this value re-syncs the transcoding policy only and doesn't bump `asset_version`. See xref:nested-schema-for-http-mapping[Nested Schema for `http_mapping`].
 
 [#nested-schema-for-http-mapping]
 === Nested Schema for `source_apis.tools.http_mapping`
@@ -535,7 +535,7 @@ resource "anypoint_mcp_bridge" "example" {
 * `body` - (String) Body mapping expression.
 
 [#nested-schema-for-http-mapping-params]
-=== Nested Schema for `http_mapping` param entries
+=== Nested Schema for `http_mapping` Param Entries
 
 * `key` - (Required) The upstream parameter name.
 * `value` - (Required) The tool input name or expression to map to this parameter.
@@ -551,13 +551,13 @@ resource "anypoint_mcp_bridge" "example" {
 * `target_name` - The target name.
 * `gateway_version` - The gateway version used for the deployment.
 
-=== Import
+=== Import an Existing MCP Bridge
 
 An existing MCP bridge can be imported using a composite `<organization_id>/<environment_id>/<mcp_bridge_id>` ID. The `mcp_bridge_id` is the numeric API Manager instance ID visible in the API Manager URL.
 
-On import, the provider reconstructs `source_apis` (labels, upstreams, tools) from the live routing and transcoding policies. Tool `description` values are left null after import — they live only in the generated Exchange asset metadata and don't cause spurious diffs.
+On import, the provider reconstructs `source_apis` (labels, upstreams, tools) from the live routing and transcoding policies. Tool `description` values are left null after import. They live only in the generated Exchange asset metadata and don't cause spurious diffs.
 
-==== Using an import block (Terraform ≥ 1.5 — recommended)
+==== Using an Import Block (Terraform ≥ 1.5 — Recommended)
 
 [source,hcl]
 ----
